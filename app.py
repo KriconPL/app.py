@@ -53,7 +53,7 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* Globalne wymuszenie wysokości dla przycisków oraz bannerów */
+    /* Globalne wymuszenie wysokości dla przycisków oraz bannerów (32px) */
     .stButton>button {
         background-color: #F97316 !important;
         color: #FFFFFF !important;
@@ -62,7 +62,7 @@ st.markdown("""
         font-weight: 700 !important;
         height: 32px !important;
         line-height: 32px !important;
-        padding: 0 12px !important;
+        padding: 0 10px !important;
         width: 100% !important;
     }
     .stButton>button:hover {
@@ -78,10 +78,9 @@ st.markdown("""
         height: 32px !important;
         line-height: 32px !important;
         border-radius: 4px !important;
-        font-size: 0.85rem !important;
+        font-size: 0.8rem !important;
         display: block !important;
         width: 100% !important;
-        animation: simple-blink 1.2s infinite ease-in-out;
     }
     .success-bet-banner {
         background-color: #16A34A !important;
@@ -91,30 +90,25 @@ st.markdown("""
         height: 32px !important;
         line-height: 32px !important;
         border-radius: 4px !important;
-        font-size: 0.85rem !important;
+        font-size: 0.8rem !important;
         display: block !important;
         width: 100% !important;
         border: 1px solid #22C55E;
     }
-    @keyframes simple-blink {
-        0% { opacity: 0.6; }
-        50% { opacity: 1; }
-        100% { opacity: 0.6; }
-    }
     
-    /* ULTRA CIASNY UKŁAD PIONOWY LISTY MECZÓW */
+    /* --- INTEGRALNY KONTENER KARTY --- */
     .match-container { 
         background: #172554 !important; 
         border: 1px solid #1E3A8A !important; 
         border-radius: 4px; 
-        padding: 4px 12px !important; 
-        margin-bottom: 0px !important; 
+        padding: 6px 12px !important; 
+        margin-bottom: 2px !important; 
         margin-top: 0px !important;
         box-shadow: 0 1px 2px rgba(0,0,0,0.15);
     }
     
     div[data-testid="stVerticalBlock"] {
-        gap: 2px !important; 
+        gap: 0px !important; 
     }
     div[data-testid="stVerticalBlock"] > div {
         padding-bottom: 0px !important;
@@ -122,108 +116,100 @@ st.markdown("""
         margin-bottom: 0px !important;
         margin-top: 0px !important;
     }
-    
-    /* SYMETRYCZNY, WYRÓWNANY W PIONIE RZĄD MECZOWY */
-    .match-inline-main-row {
+
+    /* LINIA GÓRNA: STATUS, DATA, STADION - MAŁA CZCIONKA */
+    .match-top-meta-row {
         display: flex;
-        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.75rem !important;
+        color: #94A3B8 !important;
+        margin-bottom: 6px;
+        border-bottom: 1px dashed #1E3A8A;
+        padding-bottom: 4px;
+    }
+    .match-id-text {
+        font-weight: bold;
+        color: #F97316 !important;
+    }
+    .status-badge { padding: 1px 5px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; color: white !important; }
+    .status-live { background-color: #DC2626 !important; }
+    .status-ended { background-color: #111827 !important; color: #94A3B8 !important; }
+    .status-waiting { background-color: #D97706 !important; }
+    
+    /* LINIA GŁÓWNA: MECZ I WYNIKI - DUŻA CZCIONKA */
+    .match-main-flex-layout {
+        display: flex;
         align-items: center;
         width: 100%;
     }
-    .match-title-section {
-        font-weight: bold;
-        color: #F97316 !important;
-        font-size: 0.95rem !important;
+    
+    .teams-block-left {
         display: flex;
         align-items: center;
-        gap: 6px;
-        width: 25%; /* Zwiększona szerokość na pomieszczenie lokalizacji */
-        white-space: nowrap;
+        width: 50%;
     }
-    .status-badge { padding: 1px 4px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; }
-    .status-live { background-color: #DC2626 !important; color: white !important; }
-    .status-ended { background-color: #111827 !important; color: #94A3B8 !important; }
-    .status-waiting { background-color: #D97706 !important; color: white !important; }
-    
-    .match-date-badge {
-        color: #CBD5E1 !important;
-        font-size: 0.75rem !important;
-        font-weight: bold;
-        background-color: #0F172A;
-        padding: 1px 6px;
-        border-radius: 4px;
-        border: 1px solid #1E3A8A;
-    }
-    
-    /* NOWOŚĆ: Stylizacja przypisanego stadionu/miasta */
-    .match-venue-badge {
-        color: #38BDF8 !important;
-        font-size: 0.75rem !important;
-        font-weight: bold;
-        background-color: #0B1329;
-        padding: 1px 6px;
-        border-radius: 4px;
-        border: 1px solid #1E3A8A;
-    }
-
-    /* SIATKA KOLUMN DLA DRUŻYN I WYNIKU */
-    .teams-display-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 75%; 
-    }
-    .team-home-wing {
+    .team-home-cell {
         width: 42%;
         text-align: right;
-        font-size: 1.15rem !important; 
+        font-size: 1.25rem !important; 
         font-weight: bold !important;
-        color: #F8FAFC !important;
-        padding-right: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-    .score-center-wing {
+    .score-center-cell {
         width: 16%;
         text-align: center;
         display: flex;
         justify-content: center;
         align-items: center;
     }
-    .team-away-wing {
+    .team-away-cell {
         width: 42%;
         text-align: left;
-        font-size: 1.15rem !important; 
+        font-size: 1.25rem !important; 
         font-weight: bold !important;
-        color: #F8FAFC !important;
-        padding-left: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     .official-score-badge {
-        font-size: 1.15rem !important;
+        font-size: 1.25rem !important;
         font-weight: 800 !important;
         color: #0A1128 !important;
         background-color: #F97316 !important;
-        padding: 1px 12px;
+        padding: 2px 12px;
         border-radius: 4px;
         display: inline-block;
-        min-width: 60px;
+        min-width: 65px;
         text-align: center;
-        box-shadow: 0 0 5px rgba(249, 115, 22, 0.5);
+    }
+    
+    /* STREFA INPUTÓW I PRZYCISKÓW PO PRAWEJ */
+    .interactive-block-right {
+        display: flex;
+        align-items: center;
+        width: 50%;
+        gap: 10px;
+        justify-content: flex-end;
     }
     
     .flex-bet-label {
         font-size: 0.85rem !important;
         color: #38BDF8 !important;
         font-weight: bold;
-        height: 32px !important;
-        line-height: 32px !important;
-        margin: 0 !important;
-        display: flex;
-        align-items: center;
+        white-space: nowrap;
     }
     
+    .input-wrapper-fixed { width: 65px !important; }
+    .btn-wrapper-fixed { width: 90px !important; }
+    .banner-wrapper-fixed { width: 150px !important; }
+
     div[data-testid="stNumberInput"] { height: 32px !important; margin: 0 !important; padding: 0 !important; }
     div[data-testid="stNumberInput"] button { background-color: #1E3A8A !important; color: #F8FAFC !important; height: 32px !important; }
-    div[data-testid="stNumberInput"] input { color: #F8FAFC !important; background-color: #0A1128 !important; font-size: 0.85rem !important; height: 32px !important; }
+    div[data-testid="stNumberInput"] input { color: #F8FAFC !important; background-color: #0A1128 !important; font-size: 0.9rem !important; height: 32px !important; }
     
     /* Drabinka i Tabele */
     .bracket-match-card { background: #172554 !important; border: 2px solid #1E3A8A !important; border-radius: 8px; padding: 10px; margin: 8px 0; }
@@ -319,7 +305,6 @@ GROUPS_DICT = {
     "Grupa K": ["Portugalia", "DR Konga", "Uzbekistan", "Kolumbia"], "Grupa L": ["Anglia", "Chorwacja", "Ghana", "Panama"]
 }
 
-# NOWOŚĆ: Oficjalna lista stadionów/miast MŚ 2026 przypisana rotacyjnie
 VENUES_LIST = [
     "Azteca, Meksyk", "MetLife, Nowy Jork", "SoFi, Los Angeles", "AT&T, Dallas",
     "Mercedes-Benz, Atlanta", "BC Place, Vancouver", "Hard Rock, Miami", "Arrowhead, Kansas City",
@@ -357,16 +342,16 @@ def generate_schedule():
     for yr, mo, dy, hr, mn, stage, home, away in raw_fixtures:
         dt = datetime(yr, mo, dy, hr, mn)
         schedule[match_id] = {
-            "timestamp": dt, "date": f"{dt.day} {months_pl[dt.month]}", "time": dt.strftime("%H:00"),
+            "timestamp": dt, "date": f"{dt.day} {months_pl[dt.month]} o godz. {dt.strftime('%H:%M')}",
             "stage": stage, "home": home, "away": away, "score_h": None, "score_a": None, "status": "Oczekuje",
-            "venue": VENUES_LIST[(match_id - 1) % len(VENUES_LIST)] # Dynamiczne przypisanie miasta
+            "venue": VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]
         }
         match_id += 1
 
     sim_day = datetime(2026, 6, 22, 18, 0)
     for g_name, teams in GROUPS_DICT.items():
         for pair in [(teams[0], teams[2]), (teams[1], teams[3])]:
-            schedule[match_id] = {"timestamp": sim_day, "date": f"{sim_day.day} {months_pl[sim_day.month]}", "time": sim_day.strftime("%H:00"), "stage": g_name, "home": pair[0], "away": pair[1], "score_h": None, "score_a": None, "status": "Oczekuje", "venue": VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]}
+            schedule[match_id] = {"timestamp": sim_day, "date": f"{sim_day.day} {months_pl[sim_day.month]} o godz. {sim_day.strftime('%H:%M')}", "stage": g_name, "home": pair[0], "away": pair[1], "score_h": None, "score_a": None, "status": "Oczekuje", "venue": VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]}
             match_id += 1
         sim_day += timedelta(hours=4)
 
@@ -383,7 +368,7 @@ def generate_schedule():
             hour = 18 if i % 2 == 0 else 22
             match_dt = datetime(2026, m_num, d, hour, 0, 0)
             schedule[match_id] = {
-                "timestamp": match_dt, "date": f"{d} {months_pl[m_num]}", "time": match_dt.strftime("%H:00"),
+                "timestamp": match_dt, "date": f"{d} {months_pl[m_num]} o godz. {match_dt.strftime('%H:%M')}",
                 "stage": stage_name, "home": "TBD", "away": "TBD", "score_h": None, "score_a": None, "status": "Oczekuje",
                 "venue": "MetLife, Nowy Jork" if stage_name == "Finał" else VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]
             }
@@ -410,100 +395,6 @@ if 'backup_loaded' not in st.session_state:
     load_backup_local()
     st.session_state.backup_loaded = True
 
-def calculate_points(pred_h, pred_a, real_h, real_a):
-    if real_h is None or real_a is None or pred_h is None or pred_a is None: return 0
-    if pred_h == real_h and pred_a == real_a: return 3
-    if np.sign(pred_h - pred_a) == np.sign(real_h - real_a): return 1
-    return 0
-
-def get_time_to_next_unbet_match(player_name, now_time):
-    upcoming = sorted([m for m in st.session_state.results.values() if m["timestamp"] > now_time], key=lambda x: x["timestamp"])
-    for match in upcoming:
-        m_id = [k for k, v in st.session_state.results.items() if v == match][0]
-        if st.session_state.bets[m_id].get(player_name, (None, None)) == (None, None):
-            diff = match["timestamp"] - now_time
-            if diff.total_seconds() <= 0: continue
-            h, m = int(diff.total_seconds() // 3600), int((diff.total_seconds() % 3600) // 60)
-            return f'<span class="{"time-warning" if diff <= timedelta(hours=1) else "time-normal"}">Za {h}h {m}m</span>'
-    return '<span class="time-ok">✔ Wszystko obstawione</span>'
-
-def render_leaderboard_html(now_time, new_positions_dict_dest=None):
-    scores = {p: 0 for p in players}
-    for m_id, res in st.session_state.results.items():
-        if res['status'] == "Zakończony":
-            for p in players:
-                if p in st.session_state.bets[m_id]:
-                    scores[p] += calculate_points(st.session_state.bets[m_id][p][0], st.session_state.bets[m_id][p][1], res['score_h'], res['score_a'])
-    df = pd.DataFrame(list(scores.items()), columns=["Gracz", "Punkty"]).sort_values(by="Punkty", ascending=False).reset_index(drop=True)
-    
-    legend_html = """
-    <div class="points-legend">
-        <div style="font-weight: bold; color: #F97316; margin-bottom: 6px; font-size: 1.05rem;">ℹ️ System przyznawania punktów:</div>
-        <div class="legend-item">🎯 <b style="color: #4ADE80;">3 Punkty</b> — dokładne wytypowanie wyniku spotkania</div>
-        <div class="legend-item">⚖️ <b style="color: #38BDF8;">1 Punkt</b> — poprawne wskazanie zwycięzcy lub remisu</div>
-    </div>
-    """
-    rows = ""
-    for idx, row in df.iterrows():
-        pos, p_name = idx + 1, row['Gracz']
-        if new_positions_dict_dest is not None: new_positions_dict_dest[p_name] = pos
-        old_pos = st.session_state.last_positions.get(p_name, pos)
-        trend = '<div class="badge-trend trend-box-up">▲</div>' if old_pos > pos else ('<div class="badge-trend trend-box-down">▼</div>' if old_pos < pos else '<div class="badge-trend trend-box-stable">•</div>')
-        bg = 'style="background-color: #16A34A; font-weight: bold; color: #FFFFFF;"' if pos == 1 and row['Punkty'] > 0 else ('style="background-color: #DC2626; font-weight: bold; color: #FFFFFF;"' if pos == len(df) and row['Punkty'] > 0 else '')
-        rows += f"<tr {bg}><td style='text-align:center;'><b>{pos}</b></td><td style='text-align:center;'>{trend}</td><td>{p_name}</td><td><b>{row['Punkty']} pkt</b></td><td>{get_time_to_next_unbet_match(p_name, now_time)}</td></tr>"
-    
-    return legend_html + f"<table class='kricon-table'><tr><th>Msc.</th><th>Trend</th><th>Gracz</th><th>Punkty</th><th>Najbliższy mecz</th></tr>{rows}</table>"
-
-def render_bracket_match_html_clean(match_id):
-    m = st.session_state.results.get(match_id)
-    if not m: return ""
-    if m.get("status") == "Zakończony":
-        sh = str(m.get("score_h", "?"))
-        sa = str(m.get("score_a", "?"))
-    else:
-        sh, sa = "?", "?"
-        
-    win_h = m.get("score_h") is not None and m.get("score_a") is not None and m.get("score_h") > m.get("score_a") and m.get("status") == "Zakończony"
-    win_a = m.get("score_h") is not None and m.get("score_a") is not None and m.get("score_a") > m.get("score_h") and m.get("status") == "Zakończony"
-    
-    home_name = m.get('home', 'TBD')
-    away_name = m.get('away', 'TBD')
-    
-    st.markdown(f"""
-    <div class="bracket-match-card">
-        <div class="bracket-match-title">Mecz #{match_id}</div>
-        <div class="bracket-row {"bracket-team-winner" if win_h else ""}">
-            <span>{get_flag_html(home_name)} {home_name}</span>
-            <span class="bracket-score-cell">{sh}</span>
-        </div>
-        <div class="bracket-row {"bracket-team-winner" if win_a else ""}">
-            <span>{get_flag_html(away_name)} {away_name}</span>
-            <span class="bracket-score-cell">{sa}</span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-def get_mini_group_html_string(g_code):
-    teams = GROUPS_DICT.get(f"Grupa {g_code}", [])
-    lines = "".join([f"<div style='text-align:left; padding:3px 0; font-size:0.9rem;'>{get_flag_html(t)} {t}</div>" for t in teams])
-    return f"""
-    <div class="bracket-group-box">
-        <div style="font-weight:bold; color:#F97316; margin-bottom:4px; font-size:0.85rem;">GRUPA {g_code}</div>
-        {lines}
-    </div>
-    """
-
-if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
-now = datetime.now()
-fetch_official_results_from_api(now)
-
-# LOGIKA LIVE DLA TRANZYCJI IKON
-for m_id, m in st.session_state.results.items():
-    if m['status'] != "Zakończony":
-        time_diff = now - m['timestamp']
-        if timedelta(minutes=0) <= time_diff <= timedelta(minutes=120):
-            st.session_state.results[m_id]['status'] = "LIVE"
-
 if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
     with c1:
@@ -526,7 +417,7 @@ else:
         if "github" in st.secrets: st.sidebar.success("GitHub Cloud Sync: OK")
         if st.sidebar.button("Wymuś przywrócenie danych (Backup)"):
             if load_backup_local(): st.sidebar.success("Pomyślnie odtworzono typy!")
-            else: st.sidebar.error("Błąd odczytu bazy.")
+                st.sidebar.error("Błąd odczytu bazy.")
         st.sidebar.markdown("---")
         
     if st.sidebar.button("Wyloguj się"): st.session_state.logged_in_user = None; st.rerun()
@@ -558,26 +449,27 @@ else:
             has_existing_bet = st.session_state.bets[m_id].get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
             
-            st.markdown(f"<div class='match-container'>", unsafe_allow_html=True)
+            # --- BLOK MECZU (KARTA HTML) ---
+            st.markdown(f"""
+            <div class='match-container'>
+                <div class='match-top-meta-row'>
+                    <span class='match-id-text'>⚽ Mecz #{m_id}</span>
+                    {status_html}
+                    <span class='match-date-badge'>{m['date']}</span>
+                    <span class='match-venue-badge'>📍 {m.get('venue', 'Stadion')}</span>
+                    <span style='color: #64748B;'>({m['stage']})</span>
+                </div>
+            """, unsafe_allow_html=True)
             
-            # --- POPRAWKA: STRUKTURA INLINE + DODANIE MIASTA DO SZEFA GRUPY ---
-            c_info, c_input_h, c_input_a, c_btn, c_banner = st.columns([4.2, 0.6, 0.6, 1.1, 2.5])
+            # --- LINIA GŁÓWNA: PODZIAŁ 50% DRUŻYNY | 50% INTERAKCJA ---
+            c_teams_side, c_input_h, c_input_a, c_btn, c_banner = st.columns([5.0, 0.6, 0.6, 1.2, 2.6])
             
-            with c_info:
-                # Wstrzyknięcie badge .match-venue-badge obok daty spotkania
+            with c_teams_side:
                 st.markdown(f"""
-                <div class='match-inline-main-row'>
-                    <div class='match-title-section'>
-                        <span>⚽ #{m_id}</span>
-                        {status_html}
-                        <span class='match-date-badge'>{m['date']}</span>
-                        <span class='match-venue-badge'>📍 {m.get('venue', 'USA')}</span>
-                    </div>
-                    <div class='teams-display-container'>
-                        <div class='team-home-wing'>{get_flag_html(m['home'])} {m['home']}</div>
-                        <div class='score-center-wing'><span class='official-score-badge'>{oficjalny_wynik_tekst}</span></div>
-                        <div class='team-away-wing'>{get_flag_html(m['away'])} {m['away']}</div>
-                    </div>
+                <div class='match-main-flex-layout'>
+                    <div class='team-home-cell'>{get_flag_html(m['home'])} {m['home']}</div>
+                    <div class='score-center-cell'><span class='official-score-badge'>{oficjalny_wynik_tekst}</span></div>
+                    <div class='team-away-cell'>{get_flag_html(m['away'])} {m['away']}</div>
                 </div>
                 """, unsafe_allow_html=True)
                 
@@ -598,6 +490,7 @@ else:
                         st.success("Zapisano!")
                         st.rerun()
                     st.markdown("</div>", unsafe_allow_html=True)
+                    
             with c_banner:
                 if not locked:
                     if has_existing_bet:
