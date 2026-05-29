@@ -47,7 +47,7 @@ st.markdown("""
         -webkit-text-fill-color: #F97316 !important;
     }
     
-    /* --- NAPRAWIONE: WYMUSZENIE WIDOCZNOŚCI PRZYCISKÓW (KRICON ORANGE) --- */
+    /* --- STYLIZACJA PRZYCISKÓW ZAPISU --- */
     .stButton>button {
         background-color: #F97316 !important;
         color: #FFFFFF !important;
@@ -66,6 +66,19 @@ st.markdown("""
         color: #FFFFFF !important;
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4) !important;
+    }
+    
+    /* --- DYNAMICZNA ANIMACJA PULSOWANIA DLA MECZÓW NIEOBSTAWIONYCH --- */
+    div.pulsing-save-btn button {
+        background-color: #FF6B00 !important;
+        animation: button-pulse-glow 1.5s infinite !important;
+        border: 1px solid #FFF !important;
+    }
+    
+    @keyframes button-pulse-glow {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.7); }
+        50% { transform: scale(1.02); box-shadow: 0 0 0 12px rgba(255, 107, 0, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 0, 0); }
     }
     
     /* Naprawa przycisków wewnątrz pól st.number_input (+ i -) */
@@ -413,7 +426,6 @@ else:
     st.sidebar.write(f"👤 Zalogowany jako: **{st.session_state.logged_in_user}**")
     st.sidebar.markdown("---")
     
-    # Przywracanie danych dostępne wyłącznie dla zalogowanego konta 'admin'
     if st.session_state.logged_in_user == "admin":
         st.sidebar.subheader("💾 System Bezpieczeństwa")
         if os.path.exists(BACKUP_FILE):
@@ -423,7 +435,7 @@ else:
             
         if st.sidebar.button("Wymuś przywrócenie danych (Backup)"):
             if load_backup_local(): st.sidebar.success("Pomyślnie odtworzono typy!")
-            else: st.sidebar.error("Błąd pliku kopii.")
+            else: st.sidebar.error("Błąd odczytu bazy.")
         st.sidebar.markdown("---")
         
     if st.sidebar.button("Wyloguj się"): st.session_state.logged_in_user = None; st.rerun()
@@ -447,6 +459,9 @@ else:
             if m['status'] == "Zakończony": st.markdown(f"<p class='real-score'>Wynik: {m['score_h']} - {m['score_a']}</p>", unsafe_allow_html=True)
             
             locked = (m['timestamp'] - now).total_seconds() <= 0
+            
+            # SPRAWDZENIE CZY ISTNIEJE JUŻ ZAPISANY TYP DLA TEGO MECZU W SESJI
+            has_existing_bet = st.session_state.bets[m_id].get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
             
             c1, c2, c3 = st.columns([1,1,2])
@@ -454,10 +469,19 @@ else:
             with c2: b_a = st.number_input(f"Wynik {m['away']}", 0, 20, cur_a, 1, key=f"a_{m_id}", disabled=locked)
             with c3: 
                 st.write(""); st.write("")
-                if not locked and st.button("Zapisz Typ", key=f"btn_{m_id}"): 
-                    st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a)
-                    save_backup_local_and_github() 
-                    st.success("Zapisano!")
+                if locked:
+                    st.button("Zablokowane", disabled=True, key=f"lock_btn_{m_id}")
+                else:
+                    # WYMUSZENIE PULSOWANIA W HTML TYLKO GDY GRACZ NIE ZAPISAŁ JESZCZE TYPU
+                    button_class = "" if has_existing_bet else "pulsing-save-btn"
+                    st.markdown(f"<div class='{button_class}'>", unsafe_allow_html=True)
+                    if st.button("Zapisz Typ", key=f"btn_{m_id}"): 
+                        st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a)
+                        save_backup_local_and_github() 
+                        st.success("Zapisano!")
+                        st.rerun()
+                    st.markdown("</div>", unsafe_allow_html=True)
+                    
             if locked or m['status'] == "Zakończony":
                 with st.expander("👁️ Zobacz typy innych graczy"):
                     other_bets = []
