@@ -53,7 +53,7 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* Globalne wymuszenie wysokości dla przycisków oraz bannerów */
+    /* Wymuszenie identycznej wysokości komponentów (32px) */
     .stButton>button {
         background-color: #F97316 !important;
         color: #FFFFFF !important;
@@ -62,7 +62,7 @@ st.markdown("""
         font-weight: 700 !important;
         height: 32px !important;
         line-height: 32px !important;
-        padding: 0 12px !important;
+        padding: 0 10px !important;
         width: 100% !important;
     }
     .stButton>button:hover {
@@ -70,7 +70,6 @@ st.markdown("""
         box-shadow: 0 3px 8px rgba(249, 115, 22, 0.4) !important;
     }
     
-    /* Paski stanu dopasowane dokładnie do wysokości przycisku i inputów (32px) */
     .missing-bet-banner {
         background-color: #DC2626 !important;
         color: #FFFFFF !important;
@@ -79,7 +78,7 @@ st.markdown("""
         height: 32px !important;
         line-height: 32px !important;
         border-radius: 4px !important;
-        font-size: 0.85rem !important;
+        font-size: 0.8rem !important;
         display: block !important;
         width: 100% !important;
         animation: simple-blink 1.2s infinite ease-in-out;
@@ -92,7 +91,7 @@ st.markdown("""
         height: 32px !important;
         line-height: 32px !important;
         border-radius: 4px !important;
-        font-size: 0.85rem !important;
+        font-size: 0.8rem !important;
         display: block !important;
         width: 100% !important;
         border: 1px solid #22C55E;
@@ -103,20 +102,19 @@ st.markdown("""
         100% { opacity: 0.6; }
     }
     
-    /* --- LIKWIDACJA CZERWONEJ PRZESTRZENI MIĘDZY MECZAMI (USUNIĘCIE GAP) --- */
+    /* --- INTEGRALNA JEDNOLINIOWA KARTA MECZU --- */
     .match-container { 
         background: #172554 !important; 
         border: 1px solid #1E3A8A !important; 
         border-radius: 4px; 
-        padding: 4px 12px !important; 
-        margin-bottom: 0px !important; 
+        padding: 6px 12px !important; 
+        margin-bottom: 1px !important; 
         margin-top: 0px !important;
         box-shadow: 0 1px 2px rgba(0,0,0,0.15);
     }
     
-    /* Agresywne skasowanie marginesów generowanych pionowo przez Streamlit */
     div[data-testid="stVerticalBlock"] {
-        gap: 2px !important; /* Ściskanie klocków do 2 pikseli */
+        gap: 2px !important; 
     }
     div[data-testid="stVerticalBlock"] > div {
         padding-bottom: 0px !important;
@@ -124,21 +122,15 @@ st.markdown("""
         margin-bottom: 0px !important;
         margin-top: 0px !important;
     }
-    /* ---------------------------------------------------------------------- */
     
-    .match-inline-main-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-    }
     .match-title-section {
         font-weight: bold;
         color: #F97316 !important;
-        font-size: 0.95rem !important;
+        font-size: 0.9rem !important;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 5px;
+        white-space: nowrap;
     }
     .status-badge { padding: 1px 4px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; }
     .status-live { background-color: #DC2626 !important; color: white !important; }
@@ -146,28 +138,29 @@ st.markdown("""
     .status-waiting { background-color: #D97706 !important; color: white !important; }
     
     .teams-display-text {
-        font-size: 1.15rem !important; 
+        font-size: 1.1rem !important; 
         font-weight: bold !important;
         color: #F8FAFC !important;
+        white-space: nowrap;
     }
     .official-score-badge {
-        font-size: 1.15rem !important;
+        font-size: 1.1rem !important;
         font-weight: 800 !important;
         color: #0A1128 !important;
         background-color: #F97316 !important;
         padding: 1px 8px;
         border-radius: 4px;
-        margin-left: 6px;
-        margin-right: 6px;
     }
     .match-meta-inline {
         color: #94A3B8;
         font-size: 0.8rem;
         margin: 0;
+        white-space: nowrap;
+        text-align: right;
     }
     
     .flex-bet-label {
-        font-size: 0.85rem !important;
+        font-size: 0.8rem !important;
         color: #38BDF8 !important;
         font-weight: bold;
         height: 32px !important;
@@ -175,6 +168,7 @@ st.markdown("""
         margin: 0 !important;
         display: flex;
         align-items: center;
+        white-space: nowrap;
     }
     
     div[data-testid="stNumberInput"] { height: 32px !important; margin: 0 !important; padding: 0 !important; }
@@ -494,37 +488,37 @@ else:
             else:
                 oficjalny_wynik_tekst = "? : ?"
             
-            # GŁÓWNY WIERSZ MECZU (LINIA GÓRNA)
-            st.markdown(f"""
-            <div class='match-container'>
+            locked = (m['timestamp'] - now).total_seconds() <= 0
+            has_existing_bet = st.session_state.bets[m_id].get(st.session_state.logged_in_user) is not None
+            cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
+            
+            # --- ARCHITEKTURA JEDNEGO INDYWIDUALNEGO WIERSZA FORMULARZA ---
+            st.markdown(f"<div class='match-container'>", unsafe_allow_html=True)
+            
+            # 5-kolumnowy podział siatki Flex layoutu 
+            c_info, c_input_h, c_input_a, c_btn, c_banner = st.columns([4.3, 0.7, 0.7, 1.3, 5.0])
+            
+            with c_info:
+                st.markdown(f"""
                 <div class='match-inline-main-row'>
                     <div class='match-title-section'>
-                        <span>⚽ Mecz #{m_id}</span>
+                        <span>⚽ #{m_id}</span>
                         {status_html}
-                        <span style='font-size:0.8rem; color:#94A3B8;'>({m['stage']})</span>
                     </div>
                     <div class='teams-display-text'>
                         {get_flag_html(m['home'])} {m['home']} 
                         <span class='official-score-badge'>{oficjalny_wynik_tekst}</span> 
                         {get_flag_html(m['away'])} {m['away']}
                     </div>
-                    <div class='match-meta-inline'>{m['date']}, {m['time']}</div>
+                    <div class='match-meta-inline'>{m['date']}</div>
                 </div>
-            """, unsafe_allow_html=True)
-            
-            locked = (m['timestamp'] - now).total_seconds() <= 0
-            has_existing_bet = st.session_state.bets[m_id].get(st.session_state.logged_in_user) is not None
-            cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
-            
-            # --- ZMODYFIKOWANA SIATKA LAYOUTU DLA IDEALNEGO WYRÓWNANIA PIONOWEGO ---
-            c_label, c_input_h, c_input_a, c_btn, c_banner = st.columns([4.3, 0.7, 0.7, 1.3, 5.0])
-            
-            with c_label:
-                st.markdown("<div class='flex-bet-label'>➔ Twój Typ:</div>", unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
+                
             with c_input_h:
                 b_h = st.number_input(f"H_{m_id}", 0, 20, int(cur_h), 1, key=f"input_h_{m_id}", disabled=locked, label_visibility="collapsed")
             with c_input_a:
                 b_a = st.number_input(f"A_{m_id}", 0, 20, int(cur_a), 1, key=f"input_a_{m_id}", disabled=locked, label_visibility="collapsed")
+                
             with c_btn:
                 if locked:
                     st.button("Zablokowane", disabled=True, key=f"lock_btn_{m_id}")
@@ -537,6 +531,7 @@ else:
                         st.success("Zapisano!")
                         st.rerun()
                     st.markdown("</div>", unsafe_allow_html=True)
+                    
             with c_banner:
                 if not locked:
                     if has_existing_bet:
@@ -544,8 +539,6 @@ else:
                     else:
                         st.markdown("<div class='missing-bet-banner'>⚠️ NIEODDANY TYP</div>", unsafe_allow_html=True)
             
-            st.markdown("</div>", unsafe_allow_html=True) # Zamknięcie wiersza flex
-                        
             if locked or m['status'] == "Zakończony":
                 with st.expander("👁️ Zobacz typy innych graczy"):
                     other_bets = []
@@ -554,6 +547,7 @@ else:
                             p_bet = st.session_state.bets[m_id].get(p)
                             other_bets.append({"Gracz": p, "Typowany wynik": f"{p_bet[0]} - {p_bet[1]}" if p_bet else "Brak typu"})
                     st.dataframe(pd.DataFrame(other_bets), use_container_width=True)
+                    
             st.markdown("</div>", unsafe_allow_html=True)
             
     with tab3:
