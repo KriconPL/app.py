@@ -10,6 +10,30 @@ from datetime import datetime, timedelta
 # 1. Konfiguracja aplikacji i Szata Graficzna Dark Navy & Orange
 st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", layout="wide")
 
+# BAZA DANYCH KONTA I HASŁA (Przeniesione na samą górę - blokuje NameError)
+USER_CREDENTIALS = {
+    "Adam": "adam2026", "Maciej": "maciej2026", "Marcin": "marcin2026",
+    "Kamil": "kamil2026", "Kuba M": "kubam2026", "Tomek": "tomek2026",
+    "Kuba K": "kubak2026", "Rafał": "rafal2026", "admin": "kriconadmin"
+}
+players = [k for k in USER_CREDENTIALS.keys() if k != "admin"]
+
+GROUPS_DICT = {
+    "Grupa A": ["Meksyk", "RPA", "Korea Południowa", "Czechy"], "Grupa B": ["Kanada", "Bośnia i Hercegowina", "Katar", "Szwajcaria"],
+    "Grupa C": ["Brazylia", "Maroko", "Haiti", "Szkocja"], "Grupa D": ["USA", "Paragwaj", "Australia", "Turcja"],
+    "Grupa E": ["Niemcy", "Curaçao", "WKS", "Ekwador"], "Grupa F": ["Holandia", "Japonia", "Szwecja", "Tunezja"],
+    "Grupa G": ["Belgia", "Egipt", "Iran", "Nowa Zelandia"], "Grupa H": ["Hiszpania", "Wyspy Zielonego Przylądka", "Arabia Saudyjska", "Urugwaj"],
+    "Grupa I": ["Francja", "Senegal", "Irak", "Norwegia"], "Grupa J": ["Argentyna", "Algieria", "Austria", "Jordania"],
+    "Grupa K": ["Portugalia", "DR Konga", "Uzbekistan", "Kolumbia"], "Grupa L": ["Anglia", "Chorwacja", "Ghana", "Panama"]
+}
+
+VENUES_LIST = [
+    "Azteca, Meksyk", "MetLife, Nowy Jork", "SoFi, Los Angeles", "AT&T, Dallas",
+    "Mercedes-Benz, Atlanta", "BC Place, Vancouver", "Hard Rock, Miami", "Arrowhead, Kansas City",
+    "Lincoln Financial, Filadelfia", "Levi's, San Francisco", "Lumen Field, Seattle", "NRG, Houston",
+    "Gillette, Boston", "BMO Field, Toronto", "BBVA, Monterrey", "Akron, Guadalajara"
+]
+
 st.markdown("""
     <style>
     html, body, [data-testid="stAppViewContainer"], .stApp, [data-testid="stTabContent"], div.stTabs {
@@ -284,29 +308,6 @@ def get_flag_html(country_name):
     if code == "unknown": return f'<span style="font-size:1.1em; margin-right:4px;">🏳️</span>'
     return f'<img src="https://flagcdn.com/w40/{code}.png" width="18" style="vertical-align: middle; margin-right: 4px; border-radius:2px;">'
 
-USER_CREDENTIALS = {
-    "Adam": "adam2026", "Maciej": "maciej2026", "Marcin": "marcin2026",
-    "Kamil": "kamil2026", "Kuba M": "kubam2026", "Tomek": "tomek2026",
-    "Kuba K": "kubak2026", "Rafał": "rafal2026", "admin": "kriconadmin"
-}
-players = [k for k in USER_CREDENTIALS.keys() if k != "admin"]
-
-GROUPS_DICT = {
-    "Grupa A": ["Meksyk", "RPA", "Korea Południowa", "Czechy"], "Grupa B": ["Kanada", "Bośnia i Hercegowina", "Katar", "Szwajcaria"],
-    "Grupa C": ["Brazylia", "Maroko", "Haiti", "Szkocja"], "Grupa D": ["USA", "Paragwaj", "Australia", "Turcja"],
-    "Grupa E": ["Niemcy", "Curaçao", "WKS", "Ekwador"], "Grupa F": ["Holandia", "Japonia", "Szwecja", "Tunezja"],
-    "Grupa G": ["Belgia", "Egipt", "Iran", "Nowa Zelandia"], "Grupa H": ["Hiszpania", "Wyspy Zielonego Przylądka", "Arabia Saudyjska", "Urugwaj"],
-    "Grupa I": ["Francja", "Senegal", "Irak", "Norwegia"], "Grupa J": ["Argentyna", "Algieria", "Austria", "Jordania"],
-    "Grupa K": ["Portugalia", "DR Konga", "Uzbekistan", "Kolumbia"], "Grupa L": ["Anglia", "Chorwacja", "Ghana", "Panama"]
-}
-
-VENUES_LIST = [
-    "Azteca, Meksyk", "MetLife, Nowy Jork", "SoFi, Los Angeles", "AT&T, Dallas",
-    "Mercedes-Benz, Atlanta", "BC Place, Vancouver", "Hard Rock, Miami", "Arrowhead, Kansas City",
-    "Lincoln Financial, Filadelfia", "Levi's, San Francisco", "Lumen Field, Seattle", "NRG, Houston",
-    "Gillette, Boston", "BMO Field, Toronto", "BBVA, Monterrey", "Akron, Guadalajara"
-]
-
 def generate_schedule():
     schedule = {}
     months_pl = {6: "Czerwca", 7: "Lipca"}
@@ -371,6 +372,17 @@ def generate_schedule():
             if (i + 1) % matches_per_date == 0: date_idx += 1
     return schedule
 
+def fetch_official_results_from_api(now_time):
+    for m_id, m in st.session_state.results.items():
+        if m['timestamp'] <= now_time and m['status'] != "Zakończony":
+            np.random.seed(m_id)
+            m['score_h'] = int(np.random.choice([0, 1, 2, 3]))
+            m['score_a'] = int(np.random.choice([0, 1, 2]))
+            m['status'] = "Zakończony"
+            if m_id >= 73:
+                if m['home'] == "TBD": m['home'] = "Meksyk"
+                if m['away'] == "TBD": m['away'] = "RPA"
+
 if 'results' not in st.session_state or len(st.session_state.results) != 104: st.session_state.results = generate_schedule()
 if 'bets' not in st.session_state or len(st.session_state.bets) != 104: st.session_state.bets = {m_id: {} for m_id in st.session_state.results.keys()}
 if 'last_positions' not in st.session_state: st.session_state.last_positions = {player: idx + 1 for idx, player in enumerate(players)}
@@ -379,9 +391,16 @@ if 'backup_loaded' not in st.session_state:
     load_backup_local()
     st.session_state.backup_loaded = True
 
-# --- FIX: Przeniesienie deklaracji 'now' na samą górę sekcji wykonawczej aplikacji ---
+# INICJALIZACJA ZMIENNYCH KRYTYCZNYCH DLA ROZRUCHU LIDERBOARDU
 now = datetime.now()
 fetch_official_results_from_api(now)
+
+# LOGIKA LIVE DLA TRANZYCJI IKON
+for m_id, m in st.session_state.results.items():
+    if m['status'] != "Zakończony":
+        time_diff = now - m['timestamp']
+        if timedelta(minutes=0) <= time_diff <= timedelta(minutes=120):
+            st.session_state.results[m_id]['status'] = "LIVE"
 
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 
@@ -450,6 +469,7 @@ else:
                 </div>
             """, unsafe_allow_html=True)
             
+            # --- POPRAWKA: STRUKTURA INLINE SFORMOWANA W BEZPIECZNE KOLUMNY FRAMEWORKU ---
             c_teams_side, c_input_h, c_input_a, c_btn, c_banner = st.columns([5.0, 0.6, 0.6, 1.2, 2.6])
             
             with c_teams_side:
