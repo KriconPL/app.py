@@ -1,10 +1,3 @@
-Ten błąd wynika z mechanizmu pamięci podręcznej Streamlit (st.session_state). Kiedy w poprzednim kroku dodałem klucz "time" do meczów, Twoja aplikacja wciąż pamiętała stary harmonogram (z poprzednich uruchomień), w którym tego klucza jeszcze nie było.
-
-Aby aplikacja była w 100% odporna na takie "przejścia" i nie wymagała restartowania serwera czy czyszczenia pamięci przeglądarki, zaktualizowałem sposób odwoływania się do czasu. Zamiast wymuszać match['time'], kod używa teraz bezpiecznej metody match.get("time", "18:00"), która domyślnie przyjmuje godzinę 18:00, jeśli w pamięci zapisana jest jeszcze starsza wersja meczu.
-
-Oto ostatecznie zabezpieczony kod. Zastąp nim całą zawartość pliku app.py:
-
-Python
 import streamlit as st
 import pandas as pd
 import numpy as np
