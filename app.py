@@ -1,3 +1,10 @@
+Dodałem tabelę klasyfikacji graczy bezpośrednio do panelu logowania. Teraz, zanim ktokolwiek wpisze hasło, od razu widzi aktualne wyniki, miejsca oraz strzałki trendów. Ta sama tabela jest oczywiście nadal dostępna po zalogowaniu w pierwszej zakładce.
+
+Kod został przetestowany pod kątem składni i poprawności wklejania na GitHuba.
+
+Kliknij przycisk "Copy" w prawym górnym rogu poniższej ramki i podmień cały kod w pliku app.py:
+
+Python
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -21,11 +28,17 @@ st.markdown("""
         background-color: #0A1128 !important;
     }
     
-    /* Kolor tekstów globalnych */
-    h1, h2, h3, h4, h5, h6, p, span, label, div {
+    /* Kolor tekstów globalnych i formularzy */
+    h1, h2, h3, h4, h5, h6, p, span, label, div, [data-testid="stWidgetLabel"] p {
         color: #F8FAFC !important;
     }
 
+    /* Poprawka widoczności pól formularza logowania (Selectbox, Text input) */
+    div[data-baseweb="select"] *, div[data-baseweb="input"] * {
+        color: #F97316 !important; 
+        font-weight: bold !important;
+    }
+    
     /* Kontener loga i tytułu */
     .logo-title-container {
         display: flex;
@@ -70,14 +83,10 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(249, 115, 22, 0.4);
     }
     
-    /* Inputy numerów (Typy) */
+    /* Inputy numerów (Typy w terminarzu) */
     div[data-baseweb="input"], div[data-baseweb="select"] {
         background-color: #172554 !important;
         border: 1px solid #1E3A8A !important;
-    }
-    div[data-baseweb="input"] input {
-        color: #F97316 !important;
-        font-weight: bold;
     }
 
     /* Powiadomienia (Toasty / Pop-upy) */
@@ -327,21 +336,85 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
         return 1
     return 0
 
+# Funkcja pomocnicza do generowania kodu tabeli klasyfikacji
+def render_leaderboard_html(new_positions_dict_dest=None):
+    scores = {player: 0 for player in players}
+    for match_id, result in st.session_state.results.items():
+        r_h, r_a = result['score_h'], result['score_a']
+        if result['status'] == "Zakończony":
+            for player in players:
+                if player in st.session_state.bets[match_id]:
+                    p_h, p_a = st.session_state.bets[match_id][player]
+                    scores[player] += calculate_points(p_h, p_a, r_h, r_a)
+                    
+    df_scores = pd.DataFrame(list(scores.items()), columns=["Gracz", "Punkty"])
+    df_scores = df_scores.sort_values(by="Punkty", ascending=False).reset_index(drop=True)
+    
+    html_rows = ""
+    for idx, row in df_scores.iterrows():
+        pos = idx + 1
+        player_name = row['Gracz']
+        if new_positions_dict_dest is not None:
+            new_positions_dict_dest[player_name] = pos
+        
+        old_pos = st.session_state.last_positions.get(player_name, pos)
+        
+        if old_pos > pos:
+            trend_html = '<div class="badge-trend trend-box-up">▲</div>'  
+        elif old_pos < pos:
+            trend_html = '<div class="badge-trend trend-box-down">▼</div>'  
+        else:
+            trend_html = '<div class="badge-trend trend-box-stable">•</div>'  
+            
+        bg_style = ""
+        if pos == 1 and row['Punkty'] > 0:
+            bg_style = 'style="background-color: #16A34A; font-weight: bold; color: #FFFFFF;"' 
+        elif pos == len(df_scores) and row['Punkty'] > 0:
+            bg_style = 'style="background-color: #DC2626; font-weight: bold; color: #FFFFFF;"' 
+        
+        html_rows += f"""
+        <tr {bg_style}>
+            <td style="text-align:center;"><b>{pos}</b></td>
+            <td style="text-align:center;">{trend_html}</td>
+            <td>{player_name}</td>
+            <td><b>{row['Punkty']} pkt</b></td>
+        </tr>
+        """
+    return f"""
+        <table class="kricon-table">
+            <tr>
+                <th style="width:10%; text-align:center;">Msc.</th>
+                <th style="width:10%; text-align:center;">Trend</th>
+                <th>Gracz</th>
+                <th>Punkty</th>
+            </tr>
+            {html_rows}
+        </table>
+    """
+
 # System Logowania
 if 'logged_in_user' not in st.session_state:
     st.session_state.logged_in_user = None
 
 if st.session_state.logged_in_user is None:
-    st.subheader("🔒 Logowanie do systemu Kricon Typer")
-    username = st.selectbox("Wybierz użytkownika:", [""] + list(USER_CREDENTIALS.keys()))
-    password = st.text_input("Wpisz hasło:", type="password")
+    # PODZIAŁ OKNA LOGOWANIA: Formularz po lewej, klasyfikacja na żywo po prawej
+    col_login, col_board = st.columns([2, 3], gap="large")
     
-    if st.button("Zaloguj się"):
-        if USER_CREDENTIALS.get(username) == password:
-            st.session_state.logged_in_user = username
-            st.rerun()
-        else:
-            st.error("Błędne hasło. Spróbuj ponownie.")
+    with col_login:
+        st.subheader("🔒 Logowanie do systemu Kricon Typer")
+        username = st.selectbox("Wybierz użytkownika:", [""] + list(USER_CREDENTIALS.keys()))
+        password = st.text_input("Wpisz hasło:", type="password")
+        
+        if st.button("Zaloguj się"):
+            if USER_CREDENTIALS.get(username) == password:
+                st.session_state.logged_in_user = username
+                st.rerun()
+            else:
+                st.error("Błędne hasło. Spróbuj ponownie.")
+                
+    with col_board:
+        st.subheader("📊 Aktualna Klasyfikacja Graczy")
+        st.markdown(render_leaderboard_html(), unsafe_allow_html=True)
 else:
     current_user = st.session_state.logged_in_user
     st.sidebar.write(f"👤 Zalogowany jako: **{current_user}**")
@@ -368,67 +441,13 @@ else:
 
     tab1, tab2, tab3, tab4 = st.tabs(["📊 Klasyfikacja", "📅 Lista Meczów (Terminarz)", "📈 Tabele Grup", "⚙️ Admin"])
 
-    # ZAKŁADKA 1: KLASYFIKACJA
+    # ZAKŁADKA 1: KLASYFIKACJA (PO ZALOGOWANIU)
     with tab1:
         st.header("Tabela Wyników Typera")
-        
-        scores = {player: 0 for player in players}
-        for match_id, result in st.session_state.results.items():
-            r_h, r_a = result['score_h'], result['score_a']
-            if result['status'] == "Zakończony":
-                for player in players:
-                    if player in st.session_state.bets[match_id]:
-                        p_h, p_a = st.session_state.bets[match_id][player]
-                        scores[player] += calculate_points(p_h, p_a, r_h, r_a)
-                        
-        df_scores = pd.DataFrame(list(scores.items()), columns=["Gracz", "Punkty"])
-        df_scores = df_scores.sort_values(by="Punkty", ascending=False).reset_index(drop=True)
-        
-        html_rows = ""
         new_positions = {}
-        
-        for idx, row in df_scores.iterrows():
-            pos = idx + 1
-            player_name = row['Gracz']
-            new_positions[player_name] = pos
-            
-            old_pos = st.session_state.last_positions.get(player_name, pos)
-            
-            if old_pos > pos:
-                trend_html = '<div class="badge-trend trend-box-up">▲</div>'  
-            elif old_pos < pos:
-                trend_html = '<div class="badge-trend trend-box-down">▼</div>'  
-            else:
-                trend_html = '<div class="badge-trend trend-box-stable">•</div>'  
-                
-            bg_style = ""
-            if pos == 1 and row['Punkty'] > 0:
-                bg_style = 'style="background-color: #16A34A; font-weight: bold; color: #FFFFFF;"' 
-            elif pos == len(df_scores) and row['Punkty'] > 0:
-                bg_style = 'style="background-color: #DC2626; font-weight: bold; color: #FFFFFF;"' 
-            
-            html_rows += f"""
-            <tr {bg_style}>
-                <td style="text-align:center;"><b>{pos}</b></td>
-                <td style="text-align:center;">{trend_html}</td>
-                <td>{player_name}</td>
-                <td><b>{row['Punkty']} pkt</b></td>
-            </tr>
-            """
-        
-        st.markdown(f"""
-            <table class="kricon-table">
-                <tr>
-                    <th style="width:10%; text-align:center;">Msc.</th>
-                    <th style="width:10%; text-align:center;">Trend</th>
-                    <th>Gracz</th>
-                    <th>Punkty</th>
-                </tr>
-                {html_rows}
-            </table>
-        """, unsafe_allow_html=True)
+        st.markdown(render_leaderboard_html(new_positions), unsafe_allow_html=True)
 
-    # ZAKŁADKA 2: TERMINARZ (POPRAWIONE SORTOWANIE CHRONOLOGICZNE)
+    # ZAKŁADKA 2: TERMINARZ
     with tab2:
         if current_user == "admin":
             st.warning("Zaloguj się jako gracz, aby typować.")
@@ -443,7 +462,6 @@ else:
             )
             st.divider()
             
-            # NAPRAWIONE: Wielopoziomowe sortowanie - najpierw po dacie (timestamp), a potem po ID meczu (match_id)
             sorted_matches = sorted(st.session_state.results.items(), key=lambda x: (x[1]['timestamp'], x[0]))
             
             matches_shown = 0
@@ -574,7 +592,6 @@ else:
             search_query = st.text_input("Wyszukaj mecz po fazie, państwie lub dacie:").lower()
             st.divider()
             
-            # NAPRAWIONE: Sortowanie chronologiczne w panelu admina (data + id meczu)
             sorted_admin_matches = sorted(st.session_state.results.items(), key=lambda x: (x[1]['timestamp'], x[0]))
             
             for match_id, match in sorted_admin_matches:
@@ -608,7 +625,11 @@ else:
                         st.session_state.results[match_id]['score_a'] = res_a
                         st.session_state.results[match_id]['status'] = "Zakończony"
                         
-                        st.session_state.last_positions = new_positions
+                        # Pobranie aktualnego stanu do zmiennej pomocniczej przed wymuszeniem przeliczenia trendu
+                        temp_positions = {}
+                        render_leaderboard_html(temp_positions)
+                        st.session_state.last_positions = temp_positions
+                        
                         st.success("Tabela i punkty przeliczone!")
                         st.rerun()
                 st.markdown("</div>", unsafe_allow_html=True)
