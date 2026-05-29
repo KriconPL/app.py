@@ -1,12 +1,3 @@
-Ten błąd wynika dokładnie z tego samego powodu co poprzednio: do pliku app.py wkleiłeś mój zwykły tekst z tłumaczeniem ("Zaktualizowałem system inicjalizacji..."). Python próbuje przeczytać to jako kod programistyczny i wyrzuca błąd, gdy natrafia na zwykłe słowa i znaki interpunkcyjne (jak myślnik –).
-
-Aby aplikacja zadziałała, plik app.py musi zawierać wyłącznie kod.
-
-Skasuj całą obecną zawartość pliku app.py (Ctrl+A, a następnie Delete) i skopiuj tylko to, co znajduje się w poniższej czarnej ramce z kodem (najbezpieczniej jest użyć przycisku "Kopiuj" w prawym górnym rogu tej ramki). Zaczyna się ona od import streamlit as st.
-
-Oto czysty kod:
-
-Python
 import streamlit as st
 import pandas as pd
 import numpy as np
