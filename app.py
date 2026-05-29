@@ -1,10 +1,3 @@
-Aby zrealizować blokowanie typów na godzinę przed meczem oraz dynamiczne strzałki pozycji (góra/dół/kropka), musimy rozbudować strukturę danych w aplikacji o historię rankingów. Streamlit przy każdym odświeżeniu uruchamia kod od nowa, więc żeby wiedzieć, czy gracz awansował czy spadł, system musi zapisać pozycję z "poprzedniego kroku" (po wpisaniu ostatniego wyniku przez admina).
-
-Wprowadziłem twardą regułę: jeśli do czasu rozpoczęcia meczu (match['timestamp']) zostało mniej niż 0 minut, pola do wpisywania wyników oraz przycisk "Zapisz typ" zostają całkowicie zablokowane, a gracz widzi czerwony komunikat: „Obstawianie tego meczu zostało zablokowane (mecz w toku lub zakończony).”
-
-Oto kompletny kod. Podmień go w całości na GitHubie w swoim pliku app.py:
-
-Python
 import streamlit as st
 import pandas as pd
 import numpy as np
