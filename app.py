@@ -1,8 +1,10 @@
-Problem polega na tym, że Streamlit zapamiętał w pamięci podręcznej przeglądarki (st.session_state) stary harmonogram z wcześniejszych wersji kodu (który miał mniej meczów) i nie chciał załadować nowej, pełnej listy 104 spotkań.
+Ten błąd wynika dokładnie z tego samego powodu co poprzednio: do pliku app.py wkleiłeś mój zwykły tekst z tłumaczeniem ("Zaktualizowałem system inicjalizacji..."). Python próbuje przeczytać to jako kod programistyczny i wyrzuca błąd, gdy natrafia na zwykłe słowa i znaki interpunkcyjne (jak myślnik –).
 
-Zaktualizowałem system inicjalizacji w kodzie. Teraz aplikacja automatycznie zlicza mecze w pamięci – jeśli jest ich mniej lub więcej niż dokładnie 104, wymusi zresetowanie i załadowanie pełnego, oficjalnego terminarza (72 grupowe + 32 pucharowe).
+Aby aplikacja zadziałała, plik app.py musi zawierać wyłącznie kod.
 
-Oto ostateczny kod. Podmień całą zawartość pliku app.py:
+Skasuj całą obecną zawartość pliku app.py (Ctrl+A, a następnie Delete) i skopiuj tylko to, co znajduje się w poniższej czarnej ramce z kodem (najbezpieczniej jest użyć przycisku "Kopiuj" w prawym górnym rogu tej ramki). Zaczyna się ona od import streamlit as st.
+
+Oto czysty kod:
 
 Python
 import streamlit as st
@@ -11,12 +13,13 @@ import numpy as np
 import os
 from datetime import datetime, timedelta
 
-# 1. Konfiguracja i Szata Graficzna zgodna z nowym brandingiem KriCon Group
+# 1. Konfiguracja i Szata Graficzna zgodna z nowym brandingiem KriCon Group (Ciemny Granat + Pomarańcz)
 st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", layout="wide")
 
 # CSS dla nowoczesnej i przejrzystej stylizacji brandingowej KriCon (Navy & Orange)
 st.markdown("""
     <style>
+    /* Definicja nowej palety kolorów - Navy & Orange */
     :root {
         --kricon-navy: #0F172A;
         --kricon-navy-light: #1E293B;
@@ -26,20 +29,23 @@ st.markdown("""
         --kricon-orange-background: #FEF3E2;
     }
 
+    /* Tło główne i kontenerów - JAŚNIEJSZE */
     .reportview-container, .main .block-container { 
         background: #FFFFFF !important; 
         color: var(--kricon-navy) !important; 
     }
     .main .block-container { padding-top: 1rem; }
     
+    /* Stylizacja paska bocznego (Sidebar) */
     [data-testid="stSidebar"] {
         background-color: var(--kricon-navy-background) !important;
     }
 
+    /* Kontener loga i tytułu */
     .logo-title-container {
         display: flex;
         align-items: center;
-        border-bottom: 3px solid var(--kricon-orange) !important;
+        border-bottom: 3px solid var(--kricon-orange) !important; /* Pomarańczowy akcent KriCon */
         padding-bottom: 15px;
         margin-bottom: 25px;
     }
@@ -51,6 +57,7 @@ st.markdown("""
         width: auto;
     }
     
+    /* Nagłówek H1 - Ciemny Granat KriCon wewnątrz kontenera flex */
     .logo-title-container h1 {
         color: var(--kricon-navy) !important; 
         font-family: 'Segoe UI', Arial, sans-serif;
@@ -60,11 +67,13 @@ st.markdown("""
         padding: 0 !important;
     }
     
+    /* Pozostałe nagłówki */
     h2, h3 { 
         color: var(--kricon-navy) !important;
         font-family: 'Segoe UI', Arial, sans-serif;
     }
     
+    /* Przyciski w kolorystyce KriCon (Granat przechodzący w pomarańcz na hover) */
     .stButton>button {
         background-color: var(--kricon-navy) !important;
         color: white !important;
@@ -82,6 +91,7 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(249, 115, 22, 0.2);
     }
     
+    /* Komunikaty i notyfikacje - Nowy styl na bazie jasnego pomarańczu */
     div[data-testid="stNotification"] {
         background-color: var(--kricon-orange-background) !important;
         color: var(--kricon-navy) !important;
@@ -89,11 +99,13 @@ st.markdown("""
         border-radius: 4px;
     }
     
+    /* Toast pop-up - dostosowany kolor na bazie granatu */
     [data-testid="stToast"] {
         background-color: var(--kricon-navy) !important;
         color: white !important;
     }
     
+    /* Oficjalny wynik - kolor Emergency z witryny KriCon (Pomarańczowy dla wyróżnienia) */
     .real-score { 
         font-size: 1.3rem; 
         color: var(--kricon-orange) !important; 
@@ -105,6 +117,7 @@ st.markdown("""
         margin-top: 5px;
     }
     
+    /* Zakładki (Tabs) dopasowane do stylu */
     .stTabs [data-baseweb="tab"] {
         color: var(--kricon-navy) !important;
         font-weight: 600;
@@ -115,6 +128,7 @@ st.markdown("""
         color: var(--kricon-orange) !important;
     }
 
+    /* Stylizacja tabel HTML - Ciemne granatowe nagłówki, białe tło */
     .kricon-table {
         width: 100%;
         border-collapse: collapse;
@@ -140,7 +154,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Mapowanie Państw na Kody ISO
+# Mapowanie Państw na Kody ISO (dla stabilnych flag PNG z flagcdn.com)
 COUNTRY_FLAGS = {
     "Meksyk": "mx", "RPA": "za", "Korea Południowa": "kr", "Czechy": "cz",
     "Kanada": "ca", "Bośnia i Hercegowina": "ba", "Katar": "qa", "Szwajcaria": "ch",
@@ -157,9 +171,11 @@ COUNTRY_FLAGS = {
     "TBD": "unknown"
 }
 
+# Mapa miesięcy tekstowych na liczby do walidacji czasu
 MONTH_MAP = {"Czerwca": 6, "Lipca": 7}
 
 def get_flag_html(country_name):
+    """Generuje kod HTML dla flagi na podstawie nazwy państwa."""
     clean_name = country_name.replace("🏳️", "").strip()
     code = COUNTRY_FLAGS.get(clean_name, "unknown")
     if code == "unknown":
@@ -167,13 +183,16 @@ def get_flag_html(country_name):
     flag_url = f"https://flagcdn.com/w40/{code}.png"
     return f'<img src="{flag_url}" width="25" style="vertical-align: middle; margin-right: 10px; border: 1px solid #ddd; border-radius:2px;" alt="flaga"> {country_name}'
 
-# 2. Wyświetlanie Loga
+# 2. Wyświetlanie Loga (Ładowanie lokalne dla stabilności)
 LOCAL_LOGO_PATH = "./logo.png"
 
 if os.path.exists(LOCAL_LOGO_PATH):
     logo_html = f'<img src="{LOCAL_LOGO_PATH}" alt="Kricon Group Logo" class="logo-image">'
 else:
-    logo_html = f'<span style="font-size:2em; margin-right:15px; color:#1E3A8A;">KriCon</span>'
+    # Ostrzeżenie dla administratora
+    print(f"OSTRZEŻENIE: Nie znaleziono pliku loga pod ścieżką: {LOCAL_LOGO_PATH}")
+    # Ulepszony placeholder
+    logo_html = f'<span style="font-size:2em; margin-right:15px; color:#1E3A8A;">KriCon</span>' # Placeholder z nazwą
 
 st.markdown(f"""
     <div class="logo-title-container">
@@ -192,6 +211,7 @@ USER_CREDENTIALS = {
 }
 players = [k for k in USER_CREDENTIALS.keys() if k != "admin"]
 
+# Oficjalny podział na grupy Mistrzostw Świata 2026
 GROUPS_DICT = {
     "Grupa A": ["Meksyk", "RPA", "Korea Południowa", "Czechy"],
     "Grupa B": ["Kanada", "Bośnia i Hercegowina", "Katar", "Szwajcaria"],
@@ -207,16 +227,18 @@ GROUPS_DICT = {
     "Grupa L": ["Anglia", "Chorwacja", "Ghana", "Panama"]
 }
 
-# 4. Generator Harmonogramu 104 Meczów
+# 4. Generator Harmonogramu 104 Meczów z Oficjalnymi Ramami Datowymi
 def generate_schedule():
     schedule = {}
     match_id = 1
     
+    # Faza grupowa: 11 - 27 Czerwca
     dates_group = [f"{d} Czerwca" for d in range(11, 28)]
+    
     matchups = [(0,1), (2,3), (0,2), (1,3), (0,3), (1,2)]
     date_idx = 0
     
-    # 72 mecze grupowe
+    # Faza Grupowa (72 mecze przy 12 grupach)
     for m_round in range(6):
         for group_name, teams in GROUPS_DICT.items():
             t1_idx, t2_idx = matchups[m_round]
@@ -230,7 +252,7 @@ def generate_schedule():
             match_id += 1
             if match_id % 4 == 0: date_idx += 1
 
-    # 32 mecze pucharowe
+    # Oficjalne ramy czasowe fazy pucharowej MŚ 2026
     ko_stages = [
         ("1/16 Finału", 16, ["28 Czerwca", "29 Czerwca", "30 Czerwca", "1 Lipca", "2 Lipca", "3 Lipca"]), 
         ("1/8 Finału", 8, ["4 Lipca", "5 Lipca", "6 Lipca", "7 Lipca"]), 
