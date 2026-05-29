@@ -26,7 +26,7 @@ st.markdown("""
         color: #F8FAFC !important;
     }
 
-    /* --- OSTATECZNA NAPRAWA LISTY ROZWIJANEJ ( dropdown ) --- */
+    /* --- BEZWZGLĘDNA POPRAWKA WIDOCZNOŚCI FORMULARZA LOGOWANIA --- */
     /* Etykiety nad polami (Wybierz użytkownika / Wpisz hasło) */
     div[data-testid="stSelectbox"] label p, div[data-testid="stTextInput"] label p {
         color: #F97316 !important;
@@ -34,35 +34,36 @@ st.markdown("""
         font-size: 1.2rem !important;
     }
     
-    /* Główne okienka wyboru przed kliknięciem */
+    /* Główne okienka wyboru przed kliknięciem - CIEMNIEJSZY GRANAT */
     div[data-baseweb="select"], div[data-baseweb="input"] {
-        background-color: #172554 !important;
+        background-color: #060B19 !important;
         border: 2px solid #F97316 !important;
         border-radius: 6px !important;
     }
     
-    /* Tekst wewnątrz zamkniętego okienka */
+    /* Tekst wewnątrz zamkniętego okienka oraz wpisywane hasło - POMARAŃCZOWY */
     div[data-baseweb="select"] div, div[data-baseweb="input"] input {
-        color: #F8FAFC !important; 
+        color: #F97316 !important; 
         font-weight: bold !important;
         font-size: 1.1rem !important;
+        -webkit-text-fill-color: #F97316 !important; /* Poprawka dla Safari/Chrome */
     }
 
-    /* Wymuszenie CIEMNEGO tła dla rozwijanego menu (Zapobiega zlewaniu się bieli) */
+    /* Wymuszenie ciemnego tła dla rozwijanego menu (dropdown) */
     div[role="listbox"], ul[role="listbox"] {
-        background-color: #111827 !important;
+        background-color: #060B19 !important;
         border: 1px solid #F97316 !important;
     }
     
-    /* Imiona na rozwijanej liście - wymuszenie koloru białego/pomarańczowego */
+    /* Opcje (imiona) na rozwijanej liście - POMARAŃCZOWE */
     div[role="option"], li[role="option"], div[role="listbox"] * {
-        color: #F8FAFC !important;
-        background-color: #111827 !important;
+        color: #F97316 !important;
+        background-color: #060B19 !important;
         font-weight: bold !important;
         font-size: 1.1rem !important;
     }
     
-    /* Podświetlenie elementu na liście po najechaniu myszką */
+    /* Podświetlenie elementu na liście po najechaniu myszką - POMARAŃCZOWE TŁO, CZARNY TEKST */
     div[role="option"]:hover, li[role="option"]:hover {
         background-color: #F97316 !important;
         color: #0A1128 !important;
@@ -448,6 +449,7 @@ if 'logged_in_user' not in st.session_state:
 now = datetime.now()
 
 if st.session_state.logged_in_user is None:
+    # PODZIAŁ OKNA LOGOWANIA: Formularz po lewej, klasyfikacja na żywo po prawej
     col_login, col_board = st.columns([2, 3], gap="large")
     
     with col_login:
