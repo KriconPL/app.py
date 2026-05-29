@@ -371,17 +371,6 @@ def generate_schedule():
             if (i + 1) % matches_per_date == 0: date_idx += 1
     return schedule
 
-def fetch_official_results_from_api(now_time):
-    for m_id, m in st.session_state.results.items():
-        if m['timestamp'] <= now_time and m['status'] != "Zakończony":
-            np.random.seed(m_id)
-            m['score_h'] = int(np.random.choice([0, 1, 2, 3]))
-            m['score_a'] = int(np.random.choice([0, 1, 2]))
-            m['status'] = "Zakończony"
-            if m_id >= 73:
-                if m['home'] == "TBD": m['home'] = "Meksyk"
-                if m['away'] == "TBD": m['away'] = "RPA"
-
 if 'results' not in st.session_state or len(st.session_state.results) != 104: st.session_state.results = generate_schedule()
 if 'bets' not in st.session_state or len(st.session_state.bets) != 104: st.session_state.bets = {m_id: {} for m_id in st.session_state.results.keys()}
 if 'last_positions' not in st.session_state: st.session_state.last_positions = {player: idx + 1 for idx, player in enumerate(players)}
@@ -389,6 +378,12 @@ if 'last_positions' not in st.session_state: st.session_state.last_positions = {
 if 'backup_loaded' not in st.session_state:
     load_backup_local()
     st.session_state.backup_loaded = True
+
+# --- FIX: Przeniesienie deklaracji 'now' na samą górę sekcji wykonawczej aplikacji ---
+now = datetime.now()
+fetch_official_results_from_api(now)
+
+if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 
 if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
@@ -455,7 +450,6 @@ else:
                 </div>
             """, unsafe_allow_html=True)
             
-            # --- LINIA GŁÓWNA: PODZIAŁ 50% DRUŻYNY | 50% INTERAKCJA ---
             c_teams_side, c_input_h, c_input_a, c_btn, c_banner = st.columns([5.0, 0.6, 0.6, 1.2, 2.6])
             
             with c_teams_side:
