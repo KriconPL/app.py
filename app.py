@@ -75,7 +75,7 @@ st.markdown("""
     .stButton>button { background-color: #F97316 !important; color: #FFFFFF !important; border-radius: 4px !important; border: none !important; font-weight: 700 !important; height: 32px !important; line-height: 32px !important; padding: 0 12px !important; width: 100% !important; font-size: 0.85rem !important; }
     .stButton>button:hover { background-color: #EA580C !important; box-shadow: 0 3px 8px rgba(249, 115, 22, 0.4) !important; }
     
-    /* DEFINICJA NEONOWEGO MRUGANIA DLA NIEODDANYCH TYPÓW */
+    /* PŁYNNE NEONOWE PULSOWANIA DLA ALERTU */
     @keyframes pulse-red-alert {
         0% { background-color: #DC2626; box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
         50% { background-color: #EF4444; box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
@@ -142,23 +142,22 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- SYSTEM CAŁKOWITEGO OCZYSZCZANIA NAZW (WYCINA KODY REGIONALNE I ZAPISUJE CZYSZCZENIE) ---
+# --- SYSTEM CAŁKOWITEGO WYCINANIA Prefiksów (GWARANTUJE POPRAWNE MAPOWANIE) ---
 def sanitize_team_name(name):
     if not name or name == "TBD": return "TBD"
     s_name = str(name).strip()
-    # Pancerne wyrażenie regularne odcinające kody literowe wielkie i małe
     s_name = re.sub(r'^(MX|ZA|KR|cz|cv|CA|BA|QA|CH|BR|MA|HT|US|PY|AU|TR|DE|WKS|EC|NL|JP|SE|TN|BEL|EGI|IRA|NZ|ESP|SA|URU|FRA|SEN|IRQ|NOR|ARG|ALG|AUT|JOR|POR|DRK|UZB|COL|ANG|CRO|GHA|PAN|Anglia|Szkocja)\s+', '', s_name, flags=re.IGNORECASE)
     s_name = re.sub(r'[^a-zA-ZąęćłńóśźżĄĘĆŁŃÓŚŹŻ\s\-]', '', s_name)
     return s_name.strip()
 
-# --- SYSTEM EMOTIKON FLAG ---
+# --- SŁOWNIK EMOTIKON FLAG ---
 def get_flag_emoji(raw_name):
     clean_name = sanitize_team_name(raw_name)
     if clean_name == "TBD": return "🌐"
     flags = {
         "Meksyk": "🇲🇽", "RPA": "🇿🇦", "Korea Południowa": "🇰🇷", "Czechy": "🇨🇿",
         "Kanada": "🇨🇦", "Bośnia i Hercegowina": "🇧🇦", "Katar": "🇶🇦", "Szwajcaria": "🇨🇭",
-        "Brazylia": "🇧🇷", "Maroko": "🇲🇦", "Haiti": "🇭🇹", "Szkocja": "Szkocja",
+        "Brazylia": "🇧🇷", "Maroko": "🇲🇦", "Haiti": "🇭🇹", "Szkocja": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
         "USA": "🇺🇸", "Paragwaj": "🇵🇾", "Australia": "🇦🇺", "Turcja": "🇹🇷",
         "Niemcy": "🇩🇪", "Curaçao": "🇨🇼", "WKS": "🇨🇮", "Ekwador": "🇪🇨",
         "Holandia": "🇳🇱", "Japonia": "🇯🇵", "Szwecja": "🇸🇪", "Tunezja": "🇹🇳",
@@ -167,7 +166,7 @@ def get_flag_emoji(raw_name):
         "Francja": "🇫🇷", "Senegal": "🇸🇳", "Irak": "🇮🇶", "Norwegia": "🇳🇴",
         "Argentyna": "🇦🇷", "Algieria": "🇩🇿", "Austria": "🇦🇹", "Jordania": "🇯🇴",
         "Portugalia": "🇵🇹", "DR Konga": "🇨🇩", "Uzbekistan": "🇺🇿", "Kolumbia": "🇨🇴",
-        "Anglia": "Anglia", "Chorwacja": "🇭🇷", "Ghana": "🇬🇭", "Panama": "🇵🇦"
+        "Anglia": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Chorwacja": "🇭🇷", "Ghana": "🇬🇭", "Panama": "🇵🇦"
     }
     return flags.get(clean_name, "🌐")
 
@@ -224,9 +223,12 @@ def render_bracket_match_html_clean(match_id):
     sh, sa = (str(m.get("score_h", "?")), str(m.get("score_a", "?"))) if m.get("status") == "Zakończony" else ("?", "?")
     win_h = m.get("score_h") is not None and m.get("score_a") is not None and m.get("score_h") > m.get("score_a") and m.get("status") == "Zakończony"
     win_a = m.get("score_h") is not None and m.get("score_a") is not None and m.get("score_a") > m.get("score_h") and m.get("status") == "Zakończony"
-    h_clean = sanitize_team_name(m.get('home'))
-    a_clean = sanitize_team_name(m.get('away'))
-    st.markdown(f"""<div class="bracket-match-card"><div class="bracket-match-title">Mecz #{match_id}</div><div class='bracket-row {"bracket-team-winner" if win_h else ""}'><span>{get_flag_emoji(h_clean)} {h_clean}</span><span class="bracket-score-cell">{sh}</span></div><div class='bracket-row {"bracket-team-winner" if win_a else ""}'><span>{get_flag_emoji(a_clean)} {a_clean}</span><span class="bracket-score-cell">{sa}</span></div></div>""", unsafe_allow_html=True)
+    
+    # WYMUSZONE TRWAŁE CZYSZCZENIE NAZW W DRABINCE FAZY PUCHAROWEJ
+    m['home'] = sanitize_team_name(m.get('home'))
+    m['away'] = sanitize_team_name(m.get('away'))
+    
+    st.markdown(f"""<div class="bracket-match-card"><div class="bracket-match-title">Mecz #{match_id}</div><div class='bracket-row {"bracket-team-winner" if win_h else ""}'><span>{get_flag_emoji(m['home'])} {m['home']}</span><span class="bracket-score-cell">{sh}</span></div><div class='bracket-row {"bracket-team-winner" if win_a else ""}'><span>{get_flag_emoji(m['away'])} {m['away']}</span><span class="bracket-score-cell">{sa}</span></div></div>""", unsafe_allow_html=True)
 
 def get_mini_group_html_string(g_code):
     teams = GROUPS_DICT.get(f"Grupa {g_code}", [])
@@ -335,7 +337,7 @@ if 'results' not in st.session_state or len(st.session_state.results) != 104: st
 if 'bets' not in st.session_state or len(st.session_state.bets) != 104: st.session_state.bets = {m_id: {} for m_id in st.session_state.results.keys()}
 if 'last_positions' not in st.session_state: st.session_state.last_positions = {player: idx + 1 for idx, player in enumerate(players)}
 
-# Pancerne czyszczenie pamięci podręcznej serwera i trwała mutacja danych na poprawne nazwy
+# PANCERNA MUTACJA — BEZWZGLĘDNIE NADPISUJEMY USZKODZONĄ PAMIĘĆ RAM CHMURY CZYSZCZONYM TEKSTEM
 load_backup_local()
 for m_id in st.session_state.results.keys():
     st.session_state.results[m_id]['home'] = sanitize_team_name(st.session_state.results[m_id]['home'])
@@ -395,19 +397,19 @@ else:
             has_existing_bet = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user, (0,0))
             
-            # Wymuszenie czyszczenia zmiennych w locie przed przypisaniem flagi
-            home_clean = sanitize_team_name(m['home'])
-            away_clean = sanitize_team_name(m['away'])
+            # WYMUSZONA TRANSMUTACJA NAZW W PĘTLI RENDEROWANIA TERMINARZA MECZOWEGO
+            m['home'] = sanitize_team_name(m['home'])
+            m['away'] = sanitize_team_name(m['away'])
             
-            flag_h_emoji = get_flag_emoji(home_clean)
-            flag_a_emoji = get_flag_emoji(away_clean)
+            flag_h_emoji = get_flag_emoji(m['home'])
+            flag_a_emoji = get_flag_emoji(m['away'])
             
             st.markdown(f"<div class='match-container'><div class='match-top-meta-row'><span class='match-id-text'>⚽ Mecz #{m_id}</span>{status_html}<span class='match-date-badge'>📅 {m['date']}</span><span class='match-venue-badge'>📍 {m.get('venue', 'Stadion')}</span><span style='color:#64748B;'>({m['stage']})</span></div>", unsafe_allow_html=True)
             c_home, c_score, c_away, c_in_h, c_in_a, c_btn, c_banner = st.columns([2.2, 1.2, 1.2, 1.3, 1.3, 1.6, 2.5])
             
-            with c_home: st.markdown(f"<span class='team-text-align-right'>{flag_h_emoji} {home_clean}</span>", unsafe_allow_html=True)
+            with c_home: st.markdown(f"<span class='team-text-align-right'>{flag_h_emoji} {m['home']}</span>", unsafe_allow_html=True)
             with c_score: st.markdown(f"<span class='official-score-badge'>{oficjalny_wynik_tekst}</span>", unsafe_allow_html=True)
-            with c_away: st.markdown(f"<span class='team-text-align-left'>{flag_a_emoji} {away_clean}</span>", unsafe_allow_html=True)
+            with c_away: st.markdown(f"<span class='team-text-align-left'>{flag_a_emoji} {m['away']}</span>", unsafe_allow_html=True)
             
             with c_in_h: b_h = st.number_input(f"H_{m_id}", 0, 20, int(cur_h), 1, key=f"input_h_{m_id}", disabled=locked, label_visibility="collapsed")
             with c_in_a: b_a = st.number_input(f"A_{m_id}", 0, 20, int(cur_a), 1, key=f"input_a_{m_id}", disabled=locked, label_visibility="collapsed")
