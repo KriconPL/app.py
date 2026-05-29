@@ -26,32 +26,41 @@ st.markdown("""
         color: #F8FAFC !important;
     }
 
-    /* --- GWARANCJA WIDOCZNOŚCI POLA LOGOWANIA (NAZWA UŻYTKOWNIKA I HASŁO) --- */
-    /* Etykiety nad polami (Napisy: Wybierz użytkownika, Wpisz hasło) */
+    /* --- BEZWZGLĘDNA POPRAWKA WIDOCZNOŚCI FORMULARZA LOGOWANIA (CZARNY TEKST) --- */
+    /* Nagłówki nad polami (Wybierz użytkownika / Wpisz hasło) */
     div[data-testid="stSelectbox"] label p, div[data-testid="stTextInput"] label p {
         color: #F97316 !important;
         font-weight: bold !important;
         font-size: 1.2rem !important;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
     }
     
-    /* Wymuszenie jasnego, czytelnego wnętrza dla pól wprowadzania, aby tekst nigdy się nie zlał */
-    div[data-baseweb="select"] {
-        background-color: #FFFFFF !important;
-        border: 2px solid #F97316 !important;
-        border-radius: 6px !important;
-    }
-    div[data-baseweb="input"] {
+    /* Tło pól wprowadzania danych - czysta biel */
+    div[data-baseweb="select"], div[data-baseweb="input"] {
         background-color: #FFFFFF !important;
         border: 2px solid #F97316 !important;
         border-radius: 6px !important;
     }
     
-    /* Kolor tekstu wpisywanego oraz opcji na liście rozwijanej */
-    div[data-baseweb="select"] *, div[data-baseweb="input"] input, div[role="listbox"] * {
-        color: #0A1128 !important; 
+    /* Wymuszenie czarnego koloru czcionki wewnątrz pól oraz w menu rozwijanym */
+    div[data-baseweb="select"] *, div[data-baseweb="input"] input {
+        color: #000000 !important; 
         font-weight: bold !important;
-        font-size: 1.05rem !important;
+        font-size: 1.1rem !important;
+    }
+
+    /* Globalne wymuszenie czarnego tekstu na białym tle dla wyskakującej listy rozwijanej (Streamlit BaseWeb Dropdown) */
+    div[role="listbox"] {
+        background-color: #FFFFFF !important;
+    }
+    div[role="listbox"] * {
+        color: #000000 !important;
+        font-weight: bold !important;
+        background-color: #FFFFFF !important;
+    }
+    /* Podświetlenie opcji na liście po najechaniu myszką - delikatny szary z czarnym tekstem */
+    div[role="option"]:hover, div[role="option"] *:hover {
+        background-color: #E2E8F0 !important;
+        color: #000000 !important;
     }
     /* ----------------------------------------------------------------------- */
     
