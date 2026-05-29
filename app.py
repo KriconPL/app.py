@@ -153,7 +153,7 @@ st.markdown("""
         background-color: #1E3A8A !important;
     }
     
-    /* Nowe, zaawansowane style wskaźników trendu */
+    /* Style strzałek ligowych */
     .badge-trend {
         display: inline-flex;
         align-items: center;
@@ -368,7 +368,7 @@ else:
 
     tab1, tab2, tab3, tab4 = st.tabs(["📊 Klasyfikacja", "📅 Lista Meczów (Terminarz)", "📈 Tabele Grup", "⚙️ Admin"])
 
-    # ZAKŁADKA 1: KLASYFIKACJA Z NOWYMI STRZAŁKAMI I KOLORAMI MSC
+    # ZAKŁADKA 1: KLASYFIKACJA
     with tab1:
         st.header("Tabela Wyników Typera")
         
@@ -394,19 +394,18 @@ else:
             
             old_pos = st.session_state.last_positions.get(player_name, pos)
             
-            # Generowanie strzałek w kolorowych kwadratach i szarych kropek
             if old_pos > pos:
-                trend_html = '<div class="badge-trend trend-box-up">▲</div>'  # Zielony kwadrat
+                trend_html = '<div class="badge-trend trend-box-up">▲</div>'  
             elif old_pos < pos:
-                trend_html = '<div class="badge-trend trend-box-down">▼</div>'  # Czerwony kwadrat
+                trend_html = '<div class="badge-trend trend-box-down">▼</div>'  
             else:
-                trend_html = '<div class="badge-trend trend-box-stable">•</div>'  # Szara kropka
+                trend_html = '<div class="badge-trend trend-box-stable">•</div>'  
                 
             bg_style = ""
             if pos == 1 and row['Punkty'] > 0:
-                bg_style = 'style="background-color: #16A34A; font-weight: bold; color: #FFFFFF;"' # Lider na zielono
+                bg_style = 'style="background-color: #16A34A; font-weight: bold; color: #FFFFFF;"' 
             elif pos == len(df_scores) and row['Punkty'] > 0:
-                bg_style = 'style="background-color: #DC2626; font-weight: bold; color: #FFFFFF;"' # Ostatni na czerwono
+                bg_style = 'style="background-color: #DC2626; font-weight: bold; color: #FFFFFF;"' 
             
             html_rows += f"""
             <tr {bg_style}>
@@ -429,7 +428,7 @@ else:
             </table>
         """, unsafe_allow_html=True)
 
-    # ZAKŁADKA 2: TERMINARZ
+    # ZAKŁADKA 2: TERMINARZ (POPRAWIONE SORTOWANIE CHRONOLOGICZNE)
     with tab2:
         if current_user == "admin":
             st.warning("Zaloguj się jako gracz, aby typować.")
@@ -444,7 +443,8 @@ else:
             )
             st.divider()
             
-            sorted_matches = sorted(st.session_state.results.items(), key=lambda x: x[1]['timestamp'])
+            # NAPRAWIONE: Wielopoziomowe sortowanie - najpierw po dacie (timestamp), a potem po ID meczu (match_id)
+            sorted_matches = sorted(st.session_state.results.items(), key=lambda x: (x[1]['timestamp'], x[0]))
             
             matches_shown = 0
             for match_id, match in sorted_matches:
@@ -574,7 +574,10 @@ else:
             search_query = st.text_input("Wyszukaj mecz po fazie, państwie lub dacie:").lower()
             st.divider()
             
-            for match_id, match in sorted(st.session_state.results.items(), key=lambda x: x[1]['timestamp']):
+            # NAPRAWIONE: Sortowanie chronologiczne w panelu admina (data + id meczu)
+            sorted_admin_matches = sorted(st.session_state.results.items(), key=lambda x: (x[1]['timestamp'], x[0]))
+            
+            for match_id, match in sorted_admin_matches:
                 match_text = f"mecz #{match_id} {match['stage']} {match['home']} {match['away']} {match['date']}".lower()
                 
                 if search_query and search_query not in match_text:
