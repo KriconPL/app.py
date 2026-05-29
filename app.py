@@ -10,7 +10,6 @@ st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", lay
 
 st.markdown("""
     <style>
-    /* Wymuszenie ciemnego tła dla całej aplikacji Streamlit */
     [data-testid="stAppViewContainer"], .stApp {
         background-color: #0A1128 !important; 
     }
@@ -20,13 +19,9 @@ st.markdown("""
     [data-testid="stHeader"] {
         background-color: #0A1128 !important;
     }
-    
-    /* Kolor tekstów globalnych */
     h1, h2, h3, h4, h5, h6, p, span, label, div {
         color: #F8FAFC !important;
     }
-
-    /* Kontener loga i tytułu */
     .logo-title-container {
         display: flex;
         align-items: center;
@@ -46,15 +41,12 @@ st.markdown("""
         width: auto;
         object-fit: contain;
     }
-    
     .logo-title-container h1 {
         margin: 0 !important;
         border: none !important;
         padding: 0 0 0 15px !important;
         font-size: 2.5rem;
     }
-    
-    /* Przyciski w kolorystyce KriCon Orange */
     .stButton>button {
         background-color: #F97316 !important;
         color: white !important;
@@ -69,8 +61,6 @@ st.markdown("""
         transform: translateY(-1px);
         box-shadow: 0 4px 6px rgba(249, 115, 22, 0.4);
     }
-    
-    /* Inputy numerów (Typy) */
     div[data-baseweb="input"], div[data-baseweb="select"] {
         background-color: #172554 !important;
         border: 1px solid #1E3A8A !important;
@@ -79,15 +69,11 @@ st.markdown("""
         color: #F97316 !important;
         font-weight: bold;
     }
-
-    /* Powiadomienia (Toasty / Pop-upy) */
     [data-testid="stToast"], div[data-testid="stNotification"] {
         background-color: #1E3A8A !important;
         color: white !important;
         border-left: 5px solid #F97316 !important;
     }
-    
-    /* Karty meczów */
     .match-container {
         background: #172554 !important; 
         border: 1px solid #1E3A8A !important;
@@ -114,8 +100,6 @@ st.markdown("""
         display: inline-block;
         margin-top: 10px;
     }
-    
-    /* Zakładki (Tabs) */
     .stTabs [data-baseweb="tab"] {
         color: #94A3B8 !important;
         font-weight: 600;
@@ -125,8 +109,6 @@ st.markdown("""
         border-bottom-color: #F97316 !important;
         color: #F97316 !important;
     }
-
-    /* Tabele HTML */
     .kricon-table {
         width: 100%;
         border-collapse: collapse;
@@ -151,8 +133,6 @@ st.markdown("""
     .kricon-table tr:hover {
         background-color: #1E3A8A !important;
     }
-    
-    /* Style strzałek ligowych */
     .trend-up { color: #4ADE80 !important; font-weight: bold; }
     .trend-down { color: #F87171 !important; font-weight: bold; }
     .trend-stable { color: #94A3B8 !important; font-weight: bold; }
@@ -215,8 +195,3 @@ USER_CREDENTIALS = {
     "Adam": "adam2026", "Maciej": "maciej2026", "Marcin": "marcin2026",
     "Kamil": "kamil2026", "Kuba M": "kubam2026", "Tomek": "tomek2026",
     "Kuba K": "kubak2026", "Rafał": "rafal2026", "admin": "kriconadmin"
-}
-players = [k for k in USER_CREDENTIALS.keys() if k != "admin"]
-
-GROUPS_DICT = {
-    "Grupa A": ["Meksyk", "RPA", "Korea Południowa", "Czechy"],
