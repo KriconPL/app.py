@@ -58,51 +58,34 @@ st.markdown("""
         color: #0A1128 !important;
     }
     
-    /* --- TOTALNA WYMUSZONA WIDOCZNOŚĆ DLA GRUBYCH POMARAŃCZOWYCH SUWAKÓW --- */
-    .scroll-container, .table-scroll-container {
-        max-height: 650px;
-        overflow-y: scroll !important; /* Wymuszenie ciągłego wyświetlania pionowego paska */
-        padding-right: 20px;
-        border: 2px solid #1E3A8A;
-        border-radius: 12px;
-        background-color: #0D1B3E;
-        padding: 20px;
-        margin-bottom: 25px;
-        
-        /* Firefox: Wymuszenie grubego, widocznego paska */
+    /* --- PRZENIESIENIE SUWAKA NA BOK GŁÓWNEGO EKRANU ZAKŁADEK --- */
+    .main-scroll-wrapper {
+        max-height: 750px;
+        overflow-y: scroll !important;
+        padding-right: 25px;
+        margin-top: 10px;
         scrollbar-width: thick !important;
-        scrollbar-color: #F97316 #1E3A8A !important;
+        scrollbar-color: #F97316 #0A1128 !important;
     }
     
-    .table-scroll-container {
-        max-height: 300px;
-    }
-    
-    /* Webkit (Chrome, Safari, Edge, Opera) - pełne formatowanie paska */
-    .scroll-container::-webkit-scrollbar, .table-scroll-container::-webkit-scrollbar {
-        width: 16px !important; /* Grubość paska */
+    /* Webkit (Chrome, Safari, Edge, Opera) - Duży, boczny panel suwaka */
+    .main-scroll-wrapper::-webkit-scrollbar {
+        width: 16px !important;
         display: block !important;
     }
-    
-    /* Tor suwaka (Tło pod paskiem) - ustawione na jasny kontrastowy kolor, by pomarańcz był widoczny */
-    .scroll-container::-webkit-scrollbar-track, .table-scroll-container::-webkit-scrollbar-track {
-        background: #1E3A8A !important;
-        border-radius: 10px !important;
+    .main-scroll-wrapper::-webkit-scrollbar-track {
+        background: #0A1128 !important;
+        border-left: 1px solid #1E3A8A !important;
     }
-    
-    /* Suwak (Uchwyt do przesuwania) - Jaskrawy Pomarańczowy */
-    .scroll-container::-webkit-scrollbar-thumb, .table-scroll-container::-webkit-scrollbar-thumb {
+    .main-scroll-wrapper::-webkit-scrollbar-thumb {
         background-color: #F97316 !important;
-        border-radius: 10px !important;
-        border: 2px solid #1E3A8A !important; /* Odstęp od krawędzi toru */
+        border-radius: 8px !important;
+        border: 2px solid #0A1128 !important;
     }
-    
-    /* Efekt najechania na suwak */
-    .scroll-container::-webkit-scrollbar-thumb:hover, .table-scroll-container::-webkit-scrollbar-thumb:hover {
+    .main-scroll-wrapper::-webkit-scrollbar-thumb:hover {
         background-color: #EA580C !important;
-        cursor: pointer !important;
     }
-    /* ---------------------------------------------------------------------- */
+    /* ------------------------------------------------------------- */
     
     /* Kontener loga i tytułu */
     .logo-title-container {
@@ -188,7 +171,7 @@ st.markdown("""
     .kricon-table {
         width: 100%;
         border-collapse: collapse;
-        margin: 0;
+        margin: 15px 0;
         font-size: 0.95rem;
         background-color: #172554 !important;
         border-radius: 8px;
@@ -442,12 +425,20 @@ if st.session_state.logged_in_user is None:
 else:
     st.sidebar.write(f"👤: **{st.session_state.logged_in_user}**")
     if st.sidebar.button("Wyloguj"): st.session_state.logged_in_user = None; st.rerun()
+    
     tab1, tab2, tab3, tab4 = st.tabs(["📊 Ranking", "📅 Terminarz", "📈 Tabele", "⚙️ Admin"])
-    with tab1: st.header("Klasyfikacja"); st.markdown(render_leaderboard_html(now), unsafe_allow_html=True)
+    
+    with tab1: 
+        st.header("Klasyfikacja")
+        st.markdown(render_leaderboard_html(now), unsafe_allow_html=True)
+        
     with tab2:
         st.header("Terminarz MŚ 2026")
         mode = st.radio("Widok:", ["Oczekujące", "Wszystkie", "Zakończone"], horizontal=True)
-        st.markdown("<div class='scroll-container'>", unsafe_allow_html=True)
+        st.divider()
+        
+        # POPRAWKA: Suwak przypisany jako boczna krawędź całego ekranu tej zakładki
+        st.markdown("<div class='main-scroll-wrapper'>", unsafe_allow_html=True)
         sorted_m = sorted(st.session_state.results.items(), key=lambda x: (x[1]['timestamp'], x[0]))
         for m_id, m in sorted_m:
             if (mode == "Oczekujące" and m['status'] == "Zakończony") or (mode == "Zakończone" and m['status'] == "Oczekuje"): continue
@@ -466,11 +457,13 @@ else:
                     st.dataframe(pd.DataFrame([{"Gracz": p, "Typ": f"{st.session_state.bets[m_id].get(p, (None,None))[0]} - {st.session_state.bets[m_id].get(p, (None,None))[1]}"} for p in players if p != st.session_state.logged_in_user]), use_container_width=True)
             st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
+        
     with tab3:
         st.header("Tabele Grup")
+        # POPRAWKA: Przeniesienie suwaka na całą wysokość zakładki
+        st.markdown("<div class='main-scroll-wrapper'>", unsafe_allow_html=True)
         for g_name in list(GROUPS_DICT.keys()):
             st.markdown(f"### {g_name}")
-            st.markdown("<div class='table-scroll-container'>", unsafe_allow_html=True)
             stats = {t: {"Pkt": 0, "BZ": 0, "BS": 0, "RB": 0} for t in GROUPS_DICT[g_name]}
             for m in st.session_state.results.values():
                 if m["stage"] == g_name and m["status"] == "Zakończony":
@@ -484,10 +477,12 @@ else:
             df_g = pd.DataFrame.from_dict(stats, orient='index').reset_index().rename(columns={'index': 'Reprezentacja'}).sort_values(by=["Pkt", "RB", "BZ"], ascending=False).reset_index(drop=True)
             df_g.index+=1
             g_rows = "".join([f"<tr><td><b>{idx}</b></td><td>{get_flag_html(r['Reprezentacja'])}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>" for idx, r in df_g.iterrows()])
-            st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table></div>", unsafe_allow_html=True)
+            st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+        
     with tab4:
         if st.session_state.logged_in_user == "admin":
-            st.markdown("<div class='scroll-container'>", unsafe_allow_html=True)
+            st.markdown("<div class='main-scroll-wrapper'>", unsafe_allow_html=True)
             for m_id, m in sorted(st.session_state.results.items(), key=lambda x: (x[1]['timestamp'], x[0])):
                 st.markdown(f"<div class='match-container'>Mecz #{m_id} | {m['home']} vs {m['away']}", unsafe_allow_html=True)
                 if "TBD" in m["home"] or "/" in m["stage"]:
