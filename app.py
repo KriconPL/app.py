@@ -106,10 +106,13 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- SŁOWNIK EMOTIKON FLAG ---
+# --- MECHANIZM EMOTIKON FLAG ---
 def get_flag_emoji(raw_name):
-    if not raw_name: return "🌐"
-    clean_name = re.sub(r'[^\w\s]', '', str(raw_name)).strip()
+    if not raw_name or raw_name == "TBD": return "🌐"
+    
+    # Czyszczenie tekstu na wypadek, gdyby w bazie zjsonowanej zostały stare dopiski
+    clean_name = re.sub(r'^(MX|ZA|KR|cz|cv|CA|BA|QA|CH|BR|MA|HT|US|PY|AU|TR|DE|WKS|EC|NL|JP|SE|TN|BE|EG|IR|NZ|ES|SA|UY|FR|SN|IQ|NO|AR|DZ|AT|JO|PT|DR|UZ|CO|BE|EG|IR|NZ|HR|GH|PA|Anglia|Anglii|Szkocja|Szkocji)\s+', '', str(raw_name)).strip()
+    
     flags = {
         "Meksyk": "🇲🇽", "RPA": "🇿🇦", "Korea Południowa": "🇰🇷", "Czechy": "🇨🇿",
         "Kanada": "🇨🇦", "Bośnia i Hercegowina": "🇧🇦", "Katar": "🇶🇦", "Szwajcaria": "🇨🇭",
@@ -122,14 +125,12 @@ def get_flag_emoji(raw_name):
         "Francja": "🇫🇷", "Senegal": "🇸🇳", "Irak": "🇮🇶", "Norwegia": "🇳🇴",
         "Argentyna": "🇦🇷", "Algieria": "🇩🇿", "Austria": "🇦🇹", "Jordania": "🇯🇴",
         "Portugalia": "🇵🇹", "DR Konga": "🇨🇩", "Uzbekistan": "🇺🇿", "Kolumbia": "🇨🇴",
-        "Anglia": "🏴\u200d󠁥󠁮󠁧󠁿", "Chorwacja": "🇭🇷", "Ghana": "🇬🇭", "Panama": "🇵🇦"
+        "Anglia": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Chorwacja": "🇭🇷", "Ghana": "🇬🇭", "Panama": "🇵🇦"
     }
     return flags.get(clean_name, "🌐")
 
-# --- NAPRAWIONA FUNKCJA ZABEZPIECZAJĄCA (PRZEPUSZCZA EMOTIKONY FLAG) ---
 def security_clean_text(val):
     if not isinstance(val, str): return val
-    # Usuwa tylko tagi HTML, kompletnie ignorując i zostawiając symbole narodowe Unicode
     return re.sub(r'<[^>]*?>', '', val).strip()
 
 def calculate_points(pred_h, pred_a, real_h, real_a):
@@ -226,7 +227,7 @@ def generate_schedule():
         (2026, 6, 14, 3, 0, "Grupa C", "Szkocja", "Haiti"), (2026, 6, 14, 6, 0, "Grupa D", "Australia", "Turcja"),
         (2026, 6, 14, 19, 0, "Grupa E", "Niemcy", "Curaçao"), (2026, 6, 14, 22, 0, "Grupa F", "Holandia", "Japonia"),
         (2026, 6, 15, 1, 0, "Grupa E", "WKS", "Ekwador"), (2026, 6, 15, 4, 0, "Grupa F", "Szwecja", "Tunezja"),
-        (2026, 6, 15, 18, 0, "Grupa H", "Hiszpania", "Wyspy Zielonego Przylądka"), (2026, 6, 15, 21, 0, "Grupa G", "Belgia", "Egipt"),
+        (2026, 6, 15, 18, 0, "Grupa H", "Hiszpania", "Wyspy Zielonego Przylążka"), (2026, 6, 15, 21, 0, "Grupa G", "Belgia", "Egipt"),
         (2026, 6, 16, 0, 0, "Grupa H", "Arabia Saudyjska", "Urugwaj"), (2026, 6, 16, 3, 0, "Grupa G", "Iran", "Nowa Zelandia"),
         (2026, 6, 16, 21, 0, "Grupa I", "Francja", "Senegal"), (2026, 6, 16, 21, 0, "Grupa I", "Irak", "Norwegia"),
         (2026, 6, 17, 3, 0, "Grupa J", "Argentyna", "Algieria"), (2026, 6, 17, 6, 0, "Grupa J", "Austria", "Jordania"),
@@ -340,7 +341,6 @@ else:
             has_existing_bet = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user, (0,0))
             
-            # Wywołanie flag
             flag_h_emoji = get_flag_emoji(m['home'])
             flag_a_emoji = get_flag_emoji(m['away'])
             
