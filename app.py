@@ -75,15 +75,15 @@ st.markdown("""
     .stButton>button { background-color: #F97316 !important; color: #FFFFFF !important; border-radius: 4px !important; border: none !important; font-weight: 700 !important; height: 32px !important; line-height: 32px !important; padding: 0 12px !important; width: 100% !important; font-size: 0.85rem !important; }
     .stButton>button:hover { background-color: #EA580C !important; box-shadow: 0 3px 8px rgba(249, 115, 22, 0.4) !important; }
     
-    /* ANIMACJA PULSOWANIA DLA BANERU NIEODDANEGO TYPU */
-    @keyframes pulse-red {
+    /* DEFINICJA NEONOWEGO MRUGANIA DLA NIEODDANYCH TYPÓW */
+    @keyframes pulse-red-alert {
         0% { background-color: #DC2626; box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
-        70% { background-color: #EF4444; box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
+        50% { background-color: #EF4444; box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
         100% { background-color: #DC2626; box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
     }
     
     .missing-bet-banner {
-        animation: pulse-red 2s infinite !important;
+        animation: pulse-red-alert 1.5s infinite ease-in-out !important;
         color: #FFFFFF !important;
         font-weight: bold !important;
         text-align: center !important;
@@ -142,12 +142,12 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- SYSTEM OCZYSZCZANIA WPISÓW Z KODÓW MX / ZA / cz ---
+# --- SYSTEM CAŁKOWITEGO OCZYSZCZANIA NAZW (WYCINA KODY REGIONALNE I ZAPISUJE CZYSZCZENIE) ---
 def sanitize_team_name(name):
     if not name or name == "TBD": return "TBD"
     s_name = str(name).strip()
-    # Usuwa przedrostki dwuliterowe wielkie i małe (MX, ZA, cz, KR) oraz ewentualne pozostałości po emoji
-    s_name = re.sub(r'^(MX|ZA|KR|cz|cv|CA|BA|QA|CH|BR|MA|HT|US|PY|AU|TR|DE|WKS|EC|NL|JP|SE|TN|BE|EG|IR|NZ|ES|SA|UY|FR|SN|IQ|NO|AR|DZ|AT|JO|PT|DR|UZ|CO|HR|GH|PA|🏴󠁧󠁢󠁥󠁮󠁧󠁿|🏴󠁧󠁢󠁳󠁣󠁴󠁿)\s+', '', s_name, flags=re.IGNORECASE)
+    # Pancerne wyrażenie regularne odcinające kody literowe wielkie i małe
+    s_name = re.sub(r'^(MX|ZA|KR|cz|cv|CA|BA|QA|CH|BR|MA|HT|US|PY|AU|TR|DE|WKS|EC|NL|JP|SE|TN|BEL|EGI|IRA|NZ|ESP|SA|URU|FRA|SEN|IRQ|NOR|ARG|ALG|AUT|JOR|POR|DRK|UZB|COL|ANG|CRO|GHA|PAN|Anglia|Szkocja)\s+', '', s_name, flags=re.IGNORECASE)
     s_name = re.sub(r'[^a-zA-ZąęćłńóśźżĄĘĆŁŃÓŚŹŻ\s\-]', '', s_name)
     return s_name.strip()
 
@@ -158,7 +158,7 @@ def get_flag_emoji(raw_name):
     flags = {
         "Meksyk": "🇲🇽", "RPA": "🇿🇦", "Korea Południowa": "🇰🇷", "Czechy": "🇨🇿",
         "Kanada": "🇨🇦", "Bośnia i Hercegowina": "🇧🇦", "Katar": "🇶🇦", "Szwajcaria": "🇨🇭",
-        "Brazylia": "🇧🇷", "Maroko": "🇲🇦", "Haiti": "🇭🇹", "Szkocja": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+        "Brazylia": "🇧🇷", "Maroko": "🇲🇦", "Haiti": "🇭🇹", "Szkocja": "Szkocja",
         "USA": "🇺🇸", "Paragwaj": "🇵🇾", "Australia": "🇦🇺", "Turcja": "🇹🇷",
         "Niemcy": "🇩🇪", "Curaçao": "🇨🇼", "WKS": "🇨🇮", "Ekwador": "🇪🇨",
         "Holandia": "🇳🇱", "Japonia": "🇯🇵", "Szwecja": "🇸🇪", "Tunezja": "🇹🇳",
@@ -167,7 +167,7 @@ def get_flag_emoji(raw_name):
         "Francja": "🇫🇷", "Senegal": "🇸🇳", "Irak": "🇮🇶", "Norwegia": "🇳🇴",
         "Argentyna": "🇦🇷", "Algieria": "🇩🇿", "Austria": "🇦🇹", "Jordania": "🇯🇴",
         "Portugalia": "🇵🇹", "DR Konga": "🇨🇩", "Uzbekistan": "🇺🇿", "Kolumbia": "🇨🇴",
-        "Anglia": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Chorwacja": "🇭🇷", "Ghana": "🇬🇭", "Panama": "🇵🇦"
+        "Anglia": "Anglia", "Chorwacja": "🇭🇷", "Ghana": "🇬🇭", "Panama": "🇵🇦"
     }
     return flags.get(clean_name, "🌐")
 
@@ -185,6 +185,7 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
 
 def get_time_to_next_unbet_match(player_name, now_time):
     try:
+        if 'results' not in st.session_state or 'bets' not in st.session_state: return "..."
         upcoming = sorted([m for m in st.session_state.results.values() if m["timestamp"] > now_time], key=lambda x: x["timestamp"])
         for match in upcoming:
             m_id = [k for k, v in st.session_state.results.items() if v == match][0]
@@ -198,18 +199,20 @@ def get_time_to_next_unbet_match(player_name, now_time):
 
 def render_leaderboard_html(now_time, new_positions_dict_dest=None):
     scores = {p: 0 for p in players}
-    for m_id, res in st.session_state.results.items():
-        if res.get('status') == "Zakończony":
-            for p in players:
-                if m_id in st.session_state.bets and p in st.session_state.bets[m_id]:
-                    scores[p] += calculate_points(st.session_state.bets[m_id][p][0], st.session_state.bets[m_id][p][1], res.get('score_h'), res.get('score_a'))
+    if 'results' in st.session_state and 'bets' in st.session_state:
+        for m_id, res in st.session_state.results.items():
+            if res.get('status') == "Zakończony":
+                for p in players:
+                    if m_id in st.session_state.bets and p in st.session_state.bets[m_id]:
+                        scores[p] += calculate_points(st.session_state.bets[m_id][p][0], st.session_state.bets[m_id][p][1], res.get('score_h'), res.get('score_a'))
+                        
     df = pd.DataFrame(list(scores.items()), columns=["Gracz", "Punkty"]).sort_values(by="Punkty", ascending=False).reset_index(drop=True)
     legend_html = """<div class="points-legend"><div style="font-weight: bold; color: #F97316; margin-bottom: 6px; font-size: 1.05rem;">ℹ️ System przyznawania punktów:</div><div>🎯 <b style="color: #4ADE80;">3 Punkty</b> — dokładny wynik</div><div>⚖️ <b style="color: #38BDF8;">1 Punkt</b> — poprawny zwycięzca / remis</div></div>"""
     rows = ""
     for idx, row in df.iterrows():
         pos, p_name = idx + 1, row['Gracz']
         if new_positions_dict_dest is not None: new_positions_dict_dest[p_name] = pos
-        old_pos = st.session_state.last_positions.get(p_name, pos)
+        old_pos = st.session_state.last_positions.get(p_name, pos) if 'last_positions' in st.session_state else pos
         trend = '▲' if old_pos > pos else ('▼' if old_pos < pos else '•')
         bg = 'style="background-color: #16A34A; font-weight: bold;"' if pos == 1 and row['Punkty'] > 0 else ('style="background-color: #DC2626; font-weight: bold;"' if pos == len(df) and row['Punkty'] > 0 else '')
         rows += f"<tr {bg}><td style='text-align:center;'><b>{pos}</b></td><td style='text-align:center;'>{trend}</td><td>{p_name}</td><td><b>{row['Punkty']} pkt</b></td><td>{get_time_to_next_unbet_match(p_name, now_time)}</td></tr>"
@@ -327,12 +330,12 @@ def fetch_official_results_from_api(now_time):
                 if m['home'] == "TBD": m['home'] = "Meksyk"
                 if m['away'] == "TBD": m['away'] = "RPA"
 
-# --- WYMUSZONY PANCERNY ROZRUCH STRONY ---
+# --- ZASADNICZY SILNIK INICJALIZACJI SYSTEMU ---
 if 'results' not in st.session_state or len(st.session_state.results) != 104: st.session_state.results = generate_schedule()
 if 'bets' not in st.session_state or len(st.session_state.bets) != 104: st.session_state.bets = {m_id: {} for m_id in st.session_state.results.keys()}
 if 'last_positions' not in st.session_state: st.session_state.last_positions = {player: idx + 1 for idx, player in enumerate(players)}
 
-# WYMUSZONE CZYSZCZENIE SESJI PODCZAS ODŚWIEŻANIA STRONY LOKALNIE
+# Pancerne czyszczenie pamięci podręcznej serwera i trwała mutacja danych na poprawne nazwy
 load_backup_local()
 for m_id in st.session_state.results.keys():
     st.session_state.results[m_id]['home'] = sanitize_team_name(st.session_state.results[m_id]['home'])
@@ -348,7 +351,7 @@ for m_id, m in st.session_state.results.items():
 
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 
-# --- WIDOKI APKI ---
+# --- WIDOKI ---
 if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
     with c1:
@@ -374,7 +377,7 @@ else:
                     st.session_state.results[m_id]['away'] = sanitize_team_name(st.session_state.results[m_id]['away'])
                 st.sidebar.success("Pomyślnie odtworzono typy!")
                 st.rerun()
-            else: st.sidebar.error("Błąd odczytu bazy.")
+            else: st.error("Błąd odczytu bazy.")
     if st.sidebar.button("Wyloguj się"): 
         st.session_state.logged_in_user = None
         st.rerun()
@@ -392,6 +395,7 @@ else:
             has_existing_bet = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user, (0,0))
             
+            # Wymuszenie czyszczenia zmiennych w locie przed przypisaniem flagi
             home_clean = sanitize_team_name(m['home'])
             away_clean = sanitize_team_name(m['away'])
             
