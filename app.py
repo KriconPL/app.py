@@ -58,32 +58,34 @@ st.markdown("""
         color: #0A1128 !important;
     }
     
-    /* --- PRZENIESIENIE SUWAKA NA BOK GŁÓWNEGO EKRANU ZAKŁADEK --- */
+    /* --- CAŁKOWICIE NOWY, NEONOWY, BARDZO WIDOCZNY SUWAK BOCZNY --- */
     .main-scroll-wrapper {
-        max-height: 750px;
+        max-height: 720px;
         overflow-y: scroll !important;
-        padding-right: 25px;
+        padding-right: 20px;
         margin-top: 10px;
         scrollbar-width: thick !important;
-        scrollbar-color: #F97316 #0A1128 !important;
+        scrollbar-color: #FF6B00 #060B19 !important; /* Dla Firefox */
     }
     
-    /* Webkit (Chrome, Safari, Edge, Opera) - Duży, boczny panel suwaka */
+    /* Webkit (Chrome, Safari, Edge, Opera) */
     .main-scroll-wrapper::-webkit-scrollbar {
-        width: 16px !important;
+        width: 18px !important; /* Jeszcze grubszy pasek */
         display: block !important;
     }
     .main-scroll-wrapper::-webkit-scrollbar-track {
-        background: #0A1128 !important;
-        border-left: 1px solid #1E3A8A !important;
+        background: #060B19 !important; /* Bardzo ciemne tło toru, by jaskrawy suwak się wyróżniał */
+        border-left: 2px solid #1E3A8A !important;
+        border-radius: 10px !important;
     }
     .main-scroll-wrapper::-webkit-scrollbar-thumb {
-        background-color: #F97316 !important;
-        border-radius: 8px !important;
-        border: 2px solid #0A1128 !important;
+        background-color: #FF6B00 !important; /* Jaskrawy, neonowy pomarańczowy */
+        border-radius: 10px !important;
+        border: 3px solid #060B19 !important; /* Kontrastowe odcięcie od toru */
+        box-shadow: 0 0 8px rgba(255, 107, 0, 0.6) !important; /* Efekt delikatnego świecenia */
     }
     .main-scroll-wrapper::-webkit-scrollbar-thumb:hover {
-        background-color: #EA580C !important;
+        background-color: #FF8833 !important; /* Rozjaśnienie po najechaniu */
     }
     /* ------------------------------------------------------------- */
     
@@ -147,6 +149,13 @@ st.markdown("""
         border-bottom: 1px solid #1E3A8A;
         padding-bottom: 10px;
     }
+    .teams-display {
+        font-size: 1.6rem !important;
+        font-weight: bold !important;
+        color: #F8FAFC !important;
+        margin-top: 10px;
+        margin-bottom: 5px;
+    }
     .real-score { 
         font-size: 1.3rem; 
         color: #0A1128 !important; 
@@ -205,7 +214,7 @@ st.markdown("""
     .trend-box-down { background-color: #DC2626; color: white; }
     .trend-box-stable { background-color: #374151; color: #94A3B8; }
     .time-ok { color: #4ADE80 !important; font-weight: bold; }
-    .time-warning { color: #F97316 !important; font-weight: bold; }
+    .time-warning { color: #FF6B00 !important; font-weight: bold; }
     .time-normal { color: #CBD5E1 !important; }
     </style>
 """, unsafe_allow_html=True)
@@ -257,7 +266,7 @@ def get_flag_html(country_name):
     if code == "unknown":
         return f'<span style="font-size:1.2em; margin-right:8px;">🏳️</span> {country_name}'
     flag_url = f"https://flagcdn.com/w40/{code}.png"
-    return f'<img src="{flag_url}" width="22" style="vertical-align: middle; margin-right: 8px; border: 1px solid #1E3A8A; border-radius:2px;" alt="flaga"> {country_name}'
+    return f'<img src="{flag_url}" width="22" style="vertical-align: middle; margin-right: 8px; border: 1px solid #1E3A8A; border-radius:2px;" alt="flaga">'
 
 USER_CREDENTIALS = {
     "Adam": "adam2026", "Maciej": "maciej2026", "Marcin": "marcin2026",
@@ -274,7 +283,7 @@ GROUPS_DICT = {
     "Grupa E": ["Niemcy", "Curaçao", "WKS", "Ekwador"],
     "Grupa F": ["Holandia", "Japonia", "Szwecja", "Tunezja"],
     "Grupa G": ["Belgia", "Egipt", "Iran", "Nowa Zelandia"],
-    "Grupa H": ["Hiszpania", "Wyspy Zielonego Przylądka", "Arabia Saudyjska", "Urugwaj"],
+    "Grupa H": ["Hiszpania", "Wyspy Zielonego Przyl फडणला", "Arabia Saudyjska", "Urugwaj"],
     "Grupa I": ["Francja", "Senegal", "Irak", "Norwegia"],
     "Grupa J": ["Argentyna", "Algieria", "Austria", "Jordania"],
     "Grupa K": ["Portugalia", "DR Konga", "Uzbekistan", "Kolumbia"],
@@ -437,12 +446,16 @@ else:
         mode = st.radio("Widok:", ["Oczekujące", "Wszystkie", "Zakończone"], horizontal=True)
         st.divider()
         
-        # POPRAWKA: Suwak przypisany jako boczna krawędź całego ekranu tej zakładki
         st.markdown("<div class='main-scroll-wrapper'>", unsafe_allow_html=True)
         sorted_m = sorted(st.session_state.results.items(), key=lambda x: (x[1]['timestamp'], x[0]))
         for m_id, m in sorted_m:
             if (mode == "Oczekujące" and m['status'] == "Zakończony") or (mode == "Zakończone" and m['status'] == "Oczekuje"): continue
-            st.markdown(f"<div class='match-container'><div class='match-header'>⚽ Mecz #{m_id}</div>### {get_flag_html(m['home'])} vs {get_flag_html(m['away'])}<p style='color: #94A3B8;'>Faza: {m['stage']} | {m['date']}, {m['time']}</p>", unsafe_allow_html=True)
+            
+            # NAPRAWIONE: Wyczyszczenie kodu HTML z tagów markdownowych typu ###
+            st.write(f"⚽ Mecz #{m_id}")
+            st.markdown(f"<div class='teams-display'>{get_flag_html(m['home'])} {m['home']} vs {get_flag_html(m['away'])} {m['away']}</div>", unsafe_allow_html=True)
+            st.write(f"Faza: {m['stage']} | {m['date']}, {m['time']}")
+            
             if m['status'] == "Zakończony": st.markdown(f"<p class='real-score'>Wynik: {m['score_h']} - {m['score_a']}</p>", unsafe_allow_html=True)
             locked = (m['timestamp'] - now).total_seconds() <= 0
             cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
@@ -455,12 +468,11 @@ else:
             if locked or m['status'] == "Zakończony":
                 with st.expander("Typy innych"):
                     st.dataframe(pd.DataFrame([{"Gracz": p, "Typ": f"{st.session_state.bets[m_id].get(p, (None,None))[0]} - {st.session_state.bets[m_id].get(p, (None,None))[1]}"} for p in players if p != st.session_state.logged_in_user]), use_container_width=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown("<hr style='border: 1px solid #1E3A8A; margin-top: 20px; margin-bottom: 20px;'>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
         
     with tab3:
         st.header("Tabele Grup")
-        # POPRAWKA: Przeniesienie suwaka na całą wysokość zakładki
         st.markdown("<div class='main-scroll-wrapper'>", unsafe_allow_html=True)
         for g_name in list(GROUPS_DICT.keys()):
             st.markdown(f"### {g_name}")
@@ -476,7 +488,7 @@ else:
                         else: stats[h]["Pkt"]+=1; stats[a]["Pkt"]+=1
             df_g = pd.DataFrame.from_dict(stats, orient='index').reset_index().rename(columns={'index': 'Reprezentacja'}).sort_values(by=["Pkt", "RB", "BZ"], ascending=False).reset_index(drop=True)
             df_g.index+=1
-            g_rows = "".join([f"<tr><td><b>{idx}</b></td><td>{get_flag_html(r['Reprezentacja'])}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>" for idx, r in df_g.iterrows()])
+            g_rows = "".join([f"<tr><td><b>{idx}</b></td><td>{get_flag_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>" for idx, r in df_g.iterrows()])
             st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
         
