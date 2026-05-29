@@ -62,7 +62,7 @@ st.markdown("""
         font-weight: 700 !important;
         height: 32px !important;
         line-height: 32px !important;
-        padding: 0 10px !important;
+        padding: 0 12px !important;
         width: 100% !important;
     }
     .stButton>button:hover {
@@ -78,7 +78,7 @@ st.markdown("""
         height: 32px !important;
         line-height: 32px !important;
         border-radius: 4px !important;
-        font-size: 0.8rem !important;
+        font-size: 0.85rem !important;
         display: block !important;
         width: 100% !important;
     }
@@ -96,12 +96,12 @@ st.markdown("""
         border: 1px solid #22C55E;
     }
     
-    /* --- INTEGRALNY KONTENER KARTY --- */
+    /* ULTRA CIASNY UKŁAD PIONOWY LISTY MECZÓW */
     .match-container { 
         background: #172554 !important; 
         border: 1px solid #1E3A8A !important; 
         border-radius: 4px; 
-        padding: 6px 12px !important; 
+        padding: 4px 12px !important; 
         margin-bottom: 2px !important; 
         margin-top: 0px !important;
         box-shadow: 0 1px 2px rgba(0,0,0,0.15);
@@ -137,6 +137,26 @@ st.markdown("""
     .status-ended { background-color: #111827 !important; color: #94A3B8 !important; }
     .status-waiting { background-color: #D97706 !important; }
     
+    .match-date-badge {
+        color: #CBD5E1 !important;
+        font-size: 0.75rem !important;
+        font-weight: bold;
+        background-color: #0F172A;
+        padding: 1px 6px;
+        border-radius: 4px;
+        border: 1px solid #1E3A8A;
+    }
+    
+    .match-venue-badge {
+        color: #38BDF8 !important;
+        font-size: 0.75rem !important;
+        font-weight: bold;
+        background-color: #0B1329;
+        padding: 1px 6px;
+        border-radius: 4px;
+        border: 1px solid #1E3A8A;
+    }
+
     /* LINIA GŁÓWNA: MECZ I WYNIKI - DUŻA CZCIONKA */
     .match-main-flex-layout {
         display: flex;
@@ -144,11 +164,6 @@ st.markdown("""
         width: 100%;
     }
     
-    .teams-block-left {
-        display: flex;
-        align-items: center;
-        width: 50%;
-    }
     .team-home-cell {
         width: 42%;
         text-align: right;
@@ -187,26 +202,6 @@ st.markdown("""
         text-align: center;
     }
     
-    /* STREFA INPUTÓW I PRZYCISKÓW PO PRAWEJ */
-    .interactive-block-right {
-        display: flex;
-        align-items: center;
-        width: 50%;
-        gap: 10px;
-        justify-content: flex-end;
-    }
-    
-    .flex-bet-label {
-        font-size: 0.85rem !important;
-        color: #38BDF8 !important;
-        font-weight: bold;
-        white-space: nowrap;
-    }
-    
-    .input-wrapper-fixed { width: 65px !important; }
-    .btn-wrapper-fixed { width: 90px !important; }
-    .banner-wrapper-fixed { width: 150px !important; }
-
     div[data-testid="stNumberInput"] { height: 32px !important; margin: 0 !important; padding: 0 !important; }
     div[data-testid="stNumberInput"] button { background-color: #1E3A8A !important; color: #F8FAFC !important; height: 32px !important; }
     div[data-testid="stNumberInput"] input { color: #F8FAFC !important; background-color: #0A1128 !important; font-size: 0.9rem !important; height: 32px !important; }
@@ -417,7 +412,7 @@ else:
         if "github" in st.secrets: st.sidebar.success("GitHub Cloud Sync: OK")
         if st.sidebar.button("Wymuś przywrócenie danych (Backup)"):
             if load_backup_local(): st.sidebar.success("Pomyślnie odtworzono typy!")
-                st.sidebar.error("Błąd odczytu bazy.")
+            else: st.sidebar.error("Błąd odczytu bazy.")
         st.sidebar.markdown("---")
         
     if st.sidebar.button("Wyloguj się"): st.session_state.logged_in_user = None; st.rerun()
@@ -449,7 +444,6 @@ else:
             has_existing_bet = st.session_state.bets[m_id].get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
             
-            # --- BLOK MECZU (KARTA HTML) ---
             st.markdown(f"""
             <div class='match-container'>
                 <div class='match-top-meta-row'>
