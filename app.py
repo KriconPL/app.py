@@ -53,13 +53,63 @@ st.markdown("""
         font-weight: bold !important;
     }
     
+    /* Globalne wymuszenie wysokości dla przycisków oraz bannerów */
+    .stButton>button {
+        background-color: #F97316 !important;
+        color: #FFFFFF !important;
+        border-radius: 4px !important;
+        border: none !important;
+        font-weight: 700 !important;
+        height: 32px !important;
+        line-height: 32px !important;
+        padding: 0 12px !important;
+        width: 100% !important;
+    }
+    .stButton>button:hover {
+        background-color: #EA580C !important;
+        box-shadow: 0 3px 8px rgba(249, 115, 22, 0.4) !important;
+    }
+    
+    /* Paski stanu dopasowane dokładnie do wysokości przycisku i inputów (32px) */
+    .missing-bet-banner {
+        background-color: #DC2626 !important;
+        color: #FFFFFF !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        height: 32px !important;
+        line-height: 32px !important;
+        border-radius: 4px !important;
+        font-size: 0.85rem !important;
+        display: block !important;
+        width: 100% !important;
+        animation: simple-blink 1.2s infinite ease-in-out;
+    }
+    .success-bet-banner {
+        background-color: #16A34A !important;
+        color: #FFFFFF !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        height: 32px !important;
+        line-height: 32px !important;
+        border-radius: 4px !important;
+        font-size: 0.85rem !important;
+        display: block !important;
+        width: 100% !important;
+        border: 1px solid #22C55E;
+    }
+    @keyframes simple-blink {
+        0% { opacity: 0.6; }
+        50% { opacity: 1; }
+        100% { opacity: 0.6; }
+    }
+    
     /* --- ULTRA CIASNY UKŁAD PIONOWY LISTY MECZÓW --- */
     .match-container { 
         background: #172554 !important; 
         border: 1px solid #1E3A8A !important; 
         border-radius: 4px; 
-        padding: 4px 10px !important; 
-        margin-bottom: 1px !important; /* Maksymalne zmniejszenie odległości między meczami */
+        padding: 4px 12px !important; 
+        margin-bottom: 1px !important; /* Ściskanie kontenerów jeden pod drugim */
         box-shadow: 0 1px 2px rgba(0,0,0,0.15);
     }
     .match-inline-main-row {
@@ -102,90 +152,18 @@ st.markdown("""
         margin: 0;
     }
     
-    /* --- IDEALNY UKŁAD INLINE FLEX DLA TYPOWANIA (ROWNA LINIA I ROZMIAR) --- */
-    .flex-bet-inline-row {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        width: 100%;
-        margin-top: 4px;
-    }
-    
+    /* --- HARMONIJNE USTAWIENIE SIATKI DLA DOLNEJ LINII --- */
     .flex-bet-label {
         font-size: 0.85rem !important;
         color: #38BDF8 !important;
         font-weight: bold;
-        white-space: nowrap;
-        height: 32px;
+        height: 32px !important;
+        line-height: 32px !important;
+        margin: 0 !important;
         display: flex;
         align-items: center;
     }
     
-    .flex-input-box {
-        width: 70px !important;
-        height: 32px !important;
-    }
-    
-    .flex-btn-box {
-        width: 100px !important;
-        height: 32px !important;
-    }
-    
-    .flex-banner-box {
-        flex-grow: 1;
-        height: 32px;
-    }
-
-    /* Wymuszenie identycznej wysokości dla przycisków i banerów */
-    .stButton>button {
-        background-color: #F97316 !important;
-        color: #FFFFFF !important;
-        border-radius: 4px !important;
-        border: none !important;
-        font-weight: 700 !important;
-        height: 32px !important;
-        line-height: 32px !important;
-        padding: 0 12px !important;
-        width: 100% !important;
-    }
-    .stButton>button:hover {
-        background-color: #EA580C !important;
-        box-shadow: 0 3px 8px rgba(249, 115, 22, 0.4) !important;
-    }
-    
-    .missing-bet-banner {
-        background-color: #DC2626 !important;
-        color: #FFFFFF !important;
-        font-weight: bold !important;
-        text-align: center !important;
-        height: 32px !important;
-        line-height: 32px !important;
-        border-radius: 4px !important;
-        font-size: 0.85rem !important;
-        display: block !important;
-        width: 100% !important;
-        animation: simple-blink 1.2s infinite ease-in-out;
-    }
-    .success-bet-banner {
-        background-color: #16A34A !important;
-        color: #FFFFFF !important;
-        font-weight: bold !important;
-        text-align: center !important;
-        height: 32px !important;
-        line-height: 32px !important;
-        border-radius: 4px !important;
-        font-size: 0.85rem !important;
-        display: block !important;
-        width: 100% !important;
-        border: 1px solid #22C55E;
-    }
-    @keyframes simple-blink {
-        0% { opacity: 0.6; }
-        50% { opacity: 1; }
-        100% { opacity: 0.6; }
-    }
-    
-    /* Ukrywanie etykiet inputów w strukturze flex */
     div[data-testid="stNumberInput"] { height: 32px !important; margin: 0 !important; padding: 0 !important; }
     div[data-testid="stNumberInput"] button { background-color: #1E3A8A !important; color: #F8FAFC !important; height: 32px !important; }
     div[data-testid="stNumberInput"] input { color: #F8FAFC !important; background-color: #0A1128 !important; font-size: 0.85rem !important; height: 32px !important; }
@@ -289,7 +267,7 @@ def generate_schedule():
     months_pl = {6: "Czerwca", 7: "Lipca"}
     raw_fixtures = [
         (2026, 6, 11, 21, 0, "Grupa A", "Meksyk", "RPA"), (2026, 6, 12, 4, 0, "Grupa A", "Korea Południowa", "Czechy"),
-        (2026, 6, 12, 21, 0, "Grupa B", "Kanada", "Bośnia i Hercegowina"), (2026, 6, 13, 3, 0, "Grupa D", "USA", "Paragwaj"),
+        (2026, 6, 12, 21, 0, "Grupa B", "Kanada", "Bosnie i Hercegowine"), (2026, 6, 13, 3, 0, "Grupa D", "USA", "Paragwaj"),
         (2026, 6, 13, 21, 0, "Grupa B", "Katar", "Szwajcaria"), (2026, 6, 14, 0, 0, "Grupa C", "Brazylia", "Maroko"),
         (2026, 6, 14, 3, 0, "Grupa C", "Haiti", "Szkocja"), (2026, 6, 14, 6, 0, "Grupa D", "Australia", "Turcja"),
         (2026, 6, 14, 19, 0, "Grupa E", "Niemcy", "Curaçao"), (2026, 6, 14, 22, 0, "Grupa F", "Holandia", "Japonia"),
@@ -503,7 +481,7 @@ else:
             else:
                 oficjalny_wynik_tekst = "? : ?"
             
-            # GŁÓWNY WIERSZ MECZU
+            # GŁÓWNY WIERSZ MECZU (LINIA GÓRNA)
             st.markdown(f"""
             <div class='match-container'>
                 <div class='match-inline-main-row'>
@@ -525,10 +503,10 @@ else:
             has_existing_bet = st.session_state.bets[m_id].get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
             
-            # --- CAŁKOWITY RE-DESIGN INLINE: BANERY, POLA I PRZYCISKI W JEDNEJ LINII FLEX ---
+            # --- ŻELAZNE SZTYWNE WYRÓWNANIE PROJEKTU: POLA, ETYKIETA I PRZYCISK W JEDNYM LAYOUCIE ---
             st.markdown("<div class='flex-bet-inline-row'>", unsafe_allow_html=True)
             
-            c_label, c_input_h, c_input_a, c_btn, c_banner = st.columns([1.5, 1.0, 1.0, 1.5, 4.0])
+            c_label, c_input_h, c_input_a, c_btn, c_banner = st.columns([2.5, 0.7, 0.7, 1.2, 4.9])
             
             with c_label:
                 st.markdown("<div class='flex-bet-label'>➔ Twój Typ:</div>", unsafe_allow_html=True)
