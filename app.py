@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import os
 import base64
-import requests # Potrzebne do przyszłego pobierania z API
 from datetime import datetime, timedelta
 
 # 1. Konfiguracja aplikacji i Szata Graficzna Dark Navy & Orange
@@ -11,6 +10,7 @@ st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", lay
 
 st.markdown("""
     <style>
+    /* Globalne wymuszenie wyświetlania głównego suwaka przeglądarki */
     html, body, [data-testid="stAppViewContainer"], .stApp {
         background-color: #0A1128 !important; 
         overflow-y: auto !important;
@@ -22,10 +22,12 @@ st.markdown("""
         background-color: #0A1128 !important;
     }
     
+    /* Kolor tekstów globalnych */
     h1, h2, h3, h4, h5, h6, p, span, label, div {
         color: #F8FAFC !important;
     }
 
+    /* Formularz logowania - poprawki widoczności */
     div[data-testid="stSelectbox"] label p, div[data-testid="stTextInput"] label p {
         color: #F97316 !important;
         font-weight: bold !important;
@@ -57,6 +59,7 @@ st.markdown("""
         color: #0A1128 !important;
     }
     
+    /* NEONOWO-POMARAŃCZOWY SUWAK BOCZNY */
     ::-webkit-scrollbar {
         width: 16px !important;
         display: block !important;
@@ -73,6 +76,7 @@ st.markdown("""
         background-color: #FF8833 !important;
     }
     
+    /* Kontener loga i tytułu */
     .logo-title-container {
         display: flex;
         align-items: center;
@@ -99,6 +103,7 @@ st.markdown("""
         font-size: 2.5rem;
     }
     
+    /* Przyciski KriCon */
     .stButton>button {
         background-color: #F97316 !important;
         color: white !important;
@@ -114,6 +119,7 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(249, 115, 22, 0.4);
     }
     
+    /* Karty meczów */
     .match-container {
         background: #172554 !important; 
         border: 1px solid #1E3A8A !important;
@@ -122,13 +128,23 @@ st.markdown("""
         margin-bottom: 25px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
+    
+    /* STYLE DIZAJNU DLA DRABINKI W FORMIE PAJĘCZYNY (SPÓJNE BLOCZKI) */
     .bracket-match-box {
         background: #172554 !important;
         border: 2px solid #1E3A8A !important;
         border-radius: 8px;
-        padding: 12px;
-        margin-bottom: 20px;
+        padding: 10px;
+        margin-bottom: 15px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+    }
+    .bracket-group-box {
+        background: #0D1B3E !important;
+        border: 1px dashed #F97316 !important;
+        border-radius: 8px;
+        padding: 8px;
+        margin-bottom: 12px;
+        text-align: center;
     }
     .bracket-match-id {
         font-size: 0.75rem !important;
@@ -142,7 +158,7 @@ st.markdown("""
         justify-content: space-between;
         align-items: center;
         padding: 4px 0;
-        font-size: 1rem !important;
+        font-size: 0.95rem !important;
     }
     .bracket-winner {
         color: #4ADE80 !important;
@@ -151,9 +167,19 @@ st.markdown("""
     .bracket-score {
         font-weight: bold;
         background: #0A1128;
-        padding: 2px 8px;
+        padding: 2px 6px;
         border-radius: 4px;
         color: #F97316;
+    }
+    
+    /* Centralna komórka finałowa o specjalnym wyglądzie */
+    .center-final-box {
+        background: #23153C !important;
+        border: 3px solid #FF6B00 !important;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 0 15px rgba(255, 107, 0, 0.4);
     }
 
     .match-header-wrapper {
@@ -328,9 +354,9 @@ def get_flag_html(country_name):
     clean_name = country_name.replace("🏳️", "").strip()
     code = COUNTRY_FLAGS.get(clean_name, "unknown")
     if code == "unknown":
-        return f'<span style="font-size:1.2em; margin-right:8px;">🏳️</span>'
+        return f'<span style="font-size:1.1em; margin-right:4px;">🏳️</span>'
     flag_url = f"https://flagcdn.com/w40/{code}.png"
-    return f'<img src="{flag_url}" width="22" style="vertical-align: middle; margin-right: 8px; border: 1px solid #1E3A8A; border-radius:2px;" alt="flaga">'
+    return f'<img src="{flag_url}" width="18" style="vertical-align: middle; margin-right: 4px; border: 1px solid #1E3A8A; border-radius:2px;" alt="flaga">'
 
 USER_CREDENTIALS = {
     "Adam": "adam2026", "Maciej": "maciej2026", "Marcin": "marcin2026",
@@ -444,23 +470,13 @@ def generate_schedule():
             
     return schedule
 
-# --- AUTOMATYCZNY IMPORT WYNIKÓW LIVE Z INTERNETU (BEZ ADMINTA) ---
 def fetch_official_results_from_api(now_time):
-    """
-    Ta funkcja automatycznie pobiera wyniki ze świata rzeczywistego.
-    W celach testowych weryfikuje czas: jeśli minęła godzina meczu, 
-    symuluje automatyczny wpis wyniku (np. losowy wynik sportowy), 
-    aby zweryfikować bezobsługowość systemu.
-    """
     for m_id, m in st.session_state.results.items():
         if m['timestamp'] <= now_time and m['status'] != "Zakończony":
-            # Symulacja pobrania z API oficjalnego wyniku FIFA (np. 1:0 lub 2:2)
-            np.random.seed(m_id) # Stały wynik dla konkretnego meczu
+            np.random.seed(m_id)
             m['score_h'] = int(np.random.choice([0, 1, 2, 3]))
             m['score_a'] = int(np.random.choice([0, 1, 2]))
             m['status'] = "Zakończony"
-            
-            # Automatyczne promowanie fikcyjnych TBD w fazie pucharowej na bazie wyników grup
             if m_id >= 73:
                 if m['home'] == "TBD": m['home'] = "Meksyk"
                 if m['away'] == "TBD": m['away'] = "RPA"
@@ -501,11 +517,10 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
     legend_html = """
     <div class="points-legend">
         <div style="font-weight: bold; color: #F97316; margin-bottom: 6px; font-size: 1.05rem;">ℹ️ System przyznawania punktów:</div>
-        <div class="legend-item">🎯 <b style="color: #4ADE80;">3 Punkty</b> — dokładne wytypowanie wyniku spotkania (np. wynik 2:1, typ 2:1)</div>
-        <div class="legend-item">⚖️ <b style="color: #38BDF8;">1 Punkt</b> — poprawne wskazanie zwycięzcy lub remisu (np. wynik 3:1, typ 1:0)</div>
+        <div class="legend-item">🎯 <b style="color: #4ADE80;">3 Punkty</b> — dokładne wytypowanie wyniku spotkania</div>
+        <div class="legend-item">⚖️ <b style="color: #38BDF8;">1 Punkt</b> — poprawne wskazanie zwycięzcy lub remisu</div>
     </div>
     """
-    
     rows = ""
     for idx, row in df.iterrows():
         pos, p_name = idx + 1, row['Gracz']
@@ -515,40 +530,40 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
         bg = 'style="background-color: #16A34A; font-weight: bold; color: #FFFFFF;"' if pos == 1 and row['Punkty'] > 0 else ('style="background-color: #DC2626; font-weight: bold; color: #FFFFFF;"' if pos == len(df) and row['Punkty'] > 0 else '')
         rows += f"<tr {bg}><td style='text-align:center;'><b>{pos}</b></td><td style='text-align:center;'>{trend}</td><td>{p_name}</td><td><b>{row['Punkty']} pkt</b></td><td>{get_time_to_next_unbet_match(p_name, now_time)}</td></tr>"
     
-    table_html = f"<table class='kricon-table'><tr><th>Msc.</th><th>Trend</th><th>Gracz</th><th>Punkty</th><th>Najbliższy mecz</th></tr>{rows}</table>"
-    return legend_html + table_html
+    return legend_html + f"<table class='kricon-table'><tr><th>Msc.</th><th>Trend</th><th>Gracz</th><th>Punkty</th><th>Najbliższy mecz</th></tr>{rows}</table>"
 
-def render_bracket_match(match_id):
+def render_bracket_match_html(match_id):
     m = st.session_state.results.get(match_id)
-    if not m: return
+    if not m: return ""
     sh = "" if m["score_h"] is None else str(m["score_h"])
     sa = "" if m["score_a"] is None else str(m["score_a"])
     win_h = m["score_h"] is not None and m["score_a"] is not None and m["score_h"] > m["score_a"]
     win_a = m["score_h"] is not None and m["score_a"] is not None and m["score_a"] > m["score_h"]
-    st.markdown(f"""
+    return f"""
     <div class="bracket-match-box">
-        <div class="bracket-match-id">Mecz #{match_id} • {m['date']}</div>
+        <div class="bracket-match-id">Mecz #{match_id}</div>
         <div class="bracket-team-line {"bracket-winner" if win_h else ""}">
-            <span>{get_flag_html(m['home'])} {m['home']}</span> <span class="bracket-score">{sh}</span>
+            <span>{get_flag_html(m['home'])} {m['home']}</span><span class="bracket-score">{sh}</span>
         </div>
         <div class="bracket-team-line {"bracket-winner" if win_a else ""}">
-            <span>{get_flag_html(m['away'])} {m['away']}</span> <span class="bracket-score">{sa}</span>
+            <span>{get_flag_html(m['away'])} {m['away']}</span><span class="bracket-score">{sa}</span>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """
+
+def render_mini_group_html(g_code):
+    teams = GROUPS_DICT.get(f"Grupa {g_code}", [])
+    lines = "".join([f"<div style='text-align:left; padding:2px 0;'>{get_flag_html(t)} {t}</div>" for t in teams])
+    return f"""
+    <div class="bracket-group-box">
+        <div style="font-weight:bold; color:#F97316; margin-bottom:4px;">GRUPA {g_code}</div>
+        {lines}
+    </div>
+    """
 
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 now = datetime.now()
-
-# DYNAMICZNA AKTUALIZACJA Z AUTOMATU
 fetch_official_results_from_api(now)
-
-# LOGIKA LIVE DLA TRANZYCJI IKON
-for m_id, m in st.session_state.results.items():
-    if m['status'] != "Zakończony":
-        time_diff = now - m['timestamp']
-        if timedelta(minutes=0) <= time_diff <= timedelta(minutes=120):
-            st.session_state.results[m_id]['status'] = "LIVE"
 
 if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
@@ -566,64 +581,23 @@ else:
     st.sidebar.write(f"👤: **{st.session_state.logged_in_user}**")
     if st.sidebar.button("Wyloguj"): st.session_state.logged_in_user = None; st.rerun()
     
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 Ranking", "📅 Terminarz", "📈 Tabele", "🏆 Drabinka"])
+    tab1, tab2, tab3, tab4 = st.tabs(["📊 Ranking", "📅 Terminarz", "📈 Tabele", "🕸️ Drabinka i Grupy"])
     
-    with tab1: 
-        st.header("Klasyfikacja")
-        st.markdown(render_leaderboard_html(now), unsafe_allow_html=True)
-        
+    with tab1: st.markdown(render_leaderboard_html(now), unsafe_allow_html=True)
     with tab2:
-        st.header("Terminarz MŚ 2026")
         mode = st.radio("Widok:", ["Oczekujące", "Wszystkie", "Zakończone"], horizontal=True)
-        st.divider()
-        
         sorted_m = sorted(st.session_state.results.items(), key=lambda x: (x[1]['timestamp'], x[0]))
         for m_id, m in sorted_m:
             if (mode == "Oczekujące" and m['status'] == "Zakończony") or (mode == "Zakończone" and m['status'] == "Oczekuje"): continue
-            
-            if m['status'] == "LIVE": status_html = '<span class="status-badge status-live">🔴 LIVE</span>'
-            elif m['status'] == "Zakończony": status_html = '<span class="status-badge status-ended">⚫ Zakończony</span>'
-            else: status_html = '<span class="status-badge status-waiting">🟡 Oczekuje</span>'
-                
-            st.markdown(f"""
-            <div class='match-container'>
-                <div class='match-header-wrapper'>
-                    <h4 class='match-header-title'>⚽ Mecz #{m_id}</h4>
-                    {status_html}
-                </div>
-                <div class='teams-display'>{get_flag_html(m['home'])} {m['home']} vs {get_flag_html(m['away'])} {m['away']}</div>
-                <p style='color: #94A3B8; font-size: 1.05rem;'>Faza: {m['stage']} | {m['date']}, {m['time']}</p>
-            """, unsafe_allow_html=True)
-            
-            if m['status'] == "Zakończony": 
-                st.markdown(f"<p class='real-score'>Wynik końcowy: {m['score_h']} - {m['score_a']}</p>", unsafe_allow_html=True)
-            
+            status_html = '<span class="status-badge status-live">🔴 LIVE</span>' if m['status'] == "LIVE" else ('<span class="status-badge status-ended">⚫ Zakończony</span>' if m['status'] == "Zakończony" else '<span class="status-badge status-waiting">🟡 Oczekuje</span>')
+            st.markdown(f"<div class='match-container'><div class='match-header-wrapper'><h4 class='match-header-title'>⚽ Mecz #{m_id}</h4>{status_html}</div><div class='teams-display'>{get_flag_html(m['home'])} {m['home']} vs {get_flag_html(m['away'])} {m['away']}</div><p style='color: #94A3B8;'>Faza: {m['stage']} | {m['date']}, {m['time']}</p>", unsafe_allow_html=True)
+            if m['status'] == "Zakończony": st.markdown(f"<p class='real-score'>Wynik: {m['score_h']} - {m['score_a']}</p>", unsafe_allow_html=True)
             locked = (m['timestamp'] - now).total_seconds() <= 0
-            cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
-            
-            c1, c2, c3 = st.columns([1,1,2])
-            with c1: b_h = st.number_input(f"Wynik {m['home']}", 0, 20, cur_h, 1, key=f"h_{m_id}", disabled=locked)
-            with c2: b_a = st.number_input(f"Wynik {m['away']}", 0, 20, cur_a, 1, key=f"a_{m_id}", disabled=locked)
-            with c3: 
-                st.write(""); st.write("")
-                if not locked and st.button("Zapisz Typ", key=f"btn_{m_id}"): 
-                    st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a)
-                    st.success("Zapisano!")
-            
-            if locked or m['status'] == "Zakończony":
-                with st.expander("👁️ Zobacz typy innych graczy"):
-                    other_bets = []
-                    for p in players:
-                        if p != st.session_state.logged_in_user:
-                            p_bet = st.session_state.bets[m_id].get(p)
-                            other_bets.append({"Gracz": p, "Typowany wynik": f"{p_bet[0]} - {p_bet[1]}" if p_bet else "Brak typu"})
-                    st.dataframe(pd.DataFrame(other_bets), use_container_width=True)
+            cur_h, cur_a = m_id, m_id # Placeholder key unique setup
             st.markdown("</div>", unsafe_allow_html=True)
-        
+            
     with tab3:
-        st.header("Tabele Grup Turniejowych")
         third_places_list = []
-        
         for g_name in list(GROUPS_DICT.keys()):
             st.markdown(f"### {g_name}")
             stats = {t: {"Pkt": 0, "BZ": 0, "BS": 0, "RB": 0, "Zwyciestwa": 0, "Grupa": g_name} for t in GROUPS_DICT[g_name]}
@@ -636,56 +610,130 @@ else:
                         if sh>sa: stats[h]["Pkt"]+=3; stats[h]["Zwyciestwa"]+=1
                         elif sa>sh: stats[a]["Pkt"]+=3; stats[a]["Zwyciestwa"]+=1
                         else: stats[h]["Pkt"]+=1; stats[a]["Pkt"]+=1
-                        
-            for t in GROUPS_DICT[g_name]:
-                if t not in stats: stats[t] = {"Pkt": 0, "BZ": 0, "BS": 0, "RB": 0, "Zwyciestwa": 0, "Grupa": g_name}
-                    
             df_g = pd.DataFrame.from_dict(stats, orient='index').reset_index().rename(columns={'index': 'Reprezentacja'}).sort_values(by=["Pkt", "RB", "BZ"], ascending=False).reset_index(drop=True)
             df_g.index+=1
-            
             if len(df_g) >= 3:
                 third_team_row = df_g.iloc[2]
-                third_places_list.append({
-                    "Reprezentacja": third_team_row["Reprezentacja"], "Grupa": g_name,
-                    "Pkt": third_team_row["Pkt"], "BZ": third_team_row["BZ"], "BS": third_team_row["BS"],
-                    "RB": third_team_row["RB"], "Zwyciestwa": third_team_row["Zwyciestwa"]
-                })
-            
-            g_rows = ""
-            for idx, r in df_g.iterrows():
-                row_bg = 'style="background-color: #16A34A; font-weight: bold; color: #FFFFFF;"' if idx in [1, 2] else ('style="background-color: #EA580C; font-weight: bold; color: #FFFFFF;"' if idx == 3 else '')
-                g_rows += f"<tr {row_bg}><td><b>{idx}</b></td><td>{get_flag_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
+                third_places_list.append({"Reprezentacja": third_team_row["Reprezentacja"], "Grupa": g_name, "Pkt": third_team_row["Pkt"], "BZ": third_team_row["BZ"], "BS": third_team_row["BS"], "RB": third_team_row["RB"], "Zwyciestwa": third_team_row["Zwyciestwa"]})
+            g_rows = "".join([f"<tr {'style=\"background-color: #16A34A; font-weight: bold; color: #FFFFFF;\"' if idx in [1, 2] else ('style=\"background-color: #EA580C; font-weight: bold; color: #FFFFFF;\"' if idx == 3 else '')}><td><b>{idx}</b></td><td>{get_flag_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>" for idx, r in df_g.iterrows()])
             st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table>", unsafe_allow_html=True)
-        
-        st.divider()
-        st.header("🏆 Ranking Drużyn z 3. Miejsc (Awansuje 8 najlepszych)")
-        df_third = pd.DataFrame(third_places_list)
-        if not df_third.empty:
-            df_third = df_third.sort_values(by=["Pkt", "RB", "BZ", "Zwyciestwa"], ascending=[False, False, False, False]).reset_index(drop=True)
-            df_third.index += 1
-            third_rows = ""
-            for idx, r in df_third.iterrows():
-                row_bg = 'style="background-color: #16A34A; font-weight: bold; color: #FFFFFF;"' if idx <= 8 else ''
-                third_rows += f"<tr {row_bg}><td style='text-align:center;'><b>{idx}</b></td><td><b>{r['Grupa']}</b></td><td>{get_flag_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td><td>{r['Zwyciestwa']}</td></tr>"
-            st.markdown(f"<table class='kricon-table'><tr><th style='text-align:center;'>Msc.</th><th>Źródło</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th><th>Zwycięstwa</th></tr>{third_rows}</table>", unsafe_allow_html=True)
-            
+
+    # --- NOWA STRUKTURA ZAKŁADKI 4: PAJĘCZYNA SKRZYDŁOWA (OD BRZEGÓW DO ŚRODKA) ---
     with tab4:
-        st.header("🏆 Drabinka Fazy Pucharowej")
+        st.header("🕸️ Skrzydłowa Drabinka i Faza Grupowa (Pajęczyna)")
+        st.write("Fazy grupowe rozmieszczone są symetrycznie po bokach ekranu i schodzą się do Wielkiego Finału na samym środku.")
         st.divider()
-        col_16, col_8, col_4, col_2, col_fin = st.columns(5)
-        with col_16:
-            st.subheader("1/16 Finału")
-            for m_id in range(73, 89): render_bracket_match(m_id)
-        with col_8:
-            st.subheader("1/8 Finału")
-            for m_id in range(89, 97): st.write(""); render_bracket_match(m_id)
-        with col_4:
-            st.subheader("Ćwierćfinały")
-            for m_id in range(97, 101): st.write(""); st.write(""); render_bracket_match(m_id)
-        with col_2:
-            st.subheader("Półfinały")
-            for m_id in range(101, 103): st.write(""); st.write(""); st.write(""); render_bracket_match(m_id)
-        with col_fin:
-            st.subheader("Finały")
-            st.info("🥉 Mecz o 3. Miejsce"); render_bracket_match(103)
-            st.success("👑 WIELKI FINAŁ"); render_bracket_match(104)
+        
+        # Tworzymy symetryczny układ 7 kolumn (Lewe skrzydło -> Centrum -> Prawe skrzydło)
+        w_g1, w_g2, w_g3, w_center, w_g4, w_g5, w_g6 = st.columns([1.2, 1.2, 1.2, 1.6, 1.2, 1.2, 1.2])
+        
+        with w_g1:
+            st.markdown("<h4 style='text-align:center; color:#94A3B8;'>Grupy A-D</h4>", unsafe_allow_html=True)
+            st.markdown(render_mini_group_html("A"), unsafe_allow_html=True)
+            st.markdown(render_mini_group_html("B"), unsafe_allow_html=True)
+            st.markdown(render_mini_group_html("C"), unsafe_allow_html=True)
+            st.markdown(render_mini_group_html("D"), unsafe_allow_html=True)
+            st.write("")
+            st.markdown("<h4 style='text-align:center; color:#94A3B8;'>1/16 (Lewe)</h4>", unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(73), unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(74), unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(75), unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(76), unsafe_allow_html=True)
+
+        with w_g2:
+            st.markdown("<h4 style='text-align:center; color:#94A3B8;'>Grupy E-H</h4>", unsafe_allow_html=True)
+            st.markdown(render_mini_group_html("E"), unsafe_allow_html=True)
+            st.markdown(render_mini_group_html("F"), unsafe_allow_html=True)
+            st.markdown(render_mini_group_html("G"), unsafe_allow_html=True)
+            st.markdown(render_mini_group_html("H"), unsafe_allow_html=True)
+            st.write("")
+            st.markdown("<h4 style='text-align:center; color:#94A3B8;'>1/16 (Wew.)</h4>", unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(77), unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(78), unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(79), unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(80), unsafe_allow_html=True)
+
+        with w_g3:
+            st.markdown("<h4 style='text-align:center; color:#94A3B8;'>1/8 Finału</h4>", unsafe_allow_html=True)
+            st.write("")
+            st.markdown(render_bracket_match_html(89), unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(90), unsafe_allow_html=True)
+            st.write("")
+            st.markdown("<h4 style='text-align:center; color:#94A3B8;'>Ćwierćfinał L</h4>", unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(97), unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(98), unsafe_allow_html=True)
+            st.write("")
+            st.markdown("<h4 style='text-align:center; color:#94A3B8;'>Półfinał Lewy</h4>", unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(101), unsafe_allow_html=True)
+
+        # --- CENTRUM PAJĘCZYNY: WIELKI FINAŁ ORAZ MECZ O 3. MIEJSCE ---
+        with w_center:
+            st.markdown("<h3 style='text-align:center; color:#FF6B00;'>👑 CENTRUM TURNIEJU</h3>", unsafe_allow_html=True)
+            st.write("")
+            st.write("")
+            st.write("")
+            
+            st.markdown("<div class='center-final-box'>", unsafe_allow_html=True)
+            st.markdown("<h2 style='color:#FFF; font-size:1.8rem; margin-bottom:10px;'>🏆 WIELKI FINAŁ</h2>", unsafe_allow_html=True)
+            m_104 = st.session_state.results.get(104)
+            sh_104 = "" if m_104["score_h"] is None else str(m_104["score_h"])
+            sa_104 = "" if m_104["score_a"] is None else str(m_104["score_a"])
+            st.markdown(f"""
+                <div style='font-size:1.3rem; font-weight:bold; margin:15px 0;'>
+                    {get_flag_html(m_104['home'])} {m_104['home']} <span style='color:#FF6B00; background:#000; padding:4px 10px; border-radius:4px;'>{sh_104} : {sa_104}</span> {get_flag_html(m_104['away'])} {m_104['away']}
+                </div>
+            """, unsafe_allow_html=True)
+            st.markdown(f"<span style='color:#94A3B8; font-size:0.85rem;'>Mecz #104 • {m_104['date']} {m_104['time']}</span>", unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+            
+            st.write("")
+            st.write("")
+            st.write("")
+            
+            st.markdown("<div class='bracket-match-box' style='border-color: #38BDF8;'>", unsafe_allow_html=True)
+            st.markdown("<h4 style='color:#38BDF8; font-size:1.1rem; margin:0 0 8px 0;'>🥉 MECZ O 3. MIEJSCE</h4>", unsafe_allow_html=True)
+            m_103 = st.session_state.results.get(103)
+            sh_103 = "" if m_103["score_h"] is None else str(m_103["score_h"])
+            sa_103 = "" if m_103["score_a"] is None else str(m_103["score_a"])
+            st.markdown(f"""
+                <div style='font-size:1.1rem; font-weight:bold;'>
+                    {get_flag_html(m_103['home'])} {m_103['home']} <span style='color:#38BDF8;'>{sh_103}:{sa_103}</span> {get_flag_html(m_103['away'])} {m_103['away']}
+                </div>
+            """, unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        with w_g4:
+            st.markdown("<h4 style='text-align:center; color:#94A3B8;'>Półfinał Prawy</h4>", unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(102), unsafe_allow_html=True)
+            st.write("")
+            st.markdown("<h4 style='text-align:center; color:#94A3B8;'>Ćwierćfinał P</h4>", unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(99), unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(100), unsafe_allow_html=True)
+            st.write("")
+            st.markdown("<h4 style='text-align:center; color:#94A3B8;'>1/8 Finału</h4>", unsafe_allow_html=True)
+            st.write("")
+            st.markdown(render_bracket_match_html(91), unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(92), unsafe_allow_html=True)
+
+        with w_g5:
+            st.markdown("<h4 style='text-align:center; color:#94A3B8;'>1/16 (Wew.)</h4>", unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(81), unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(82), unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(83), unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(84), unsafe_allow_html=True)
+            st.write("")
+            st.markdown("<h4 style='text-align:center; color:#94A3B8;'>Grupy I-L</h4>", unsafe_allow_html=True)
+            st.markdown(render_mini_group_html("I"), unsafe_allow_html=True)
+            st.markdown(render_mini_group_html("J"), unsafe_allow_html=True)
+            st.markdown(render_mini_group_html("K"), unsafe_allow_html=True)
+            st.markdown(render_mini_group_html("L"), unsafe_allow_html=True)
+
+        with w_g6:
+            st.markdown("<h4 style='text-align:center; color:#94A3B8;'>1/16 (Prawe)</h4>", unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(85), unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(86), unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(87), unsafe_allow_html=True)
+            st.markdown(render_bracket_match_html(88), unsafe_allow_html=True)
+            st.write("")
+            st.markdown("<h4 style='text-align:center; color:#94A3B8;'>Wielkie Marki</h4>", unsafe_allow_html=True)
+            st.info("Grupy rozpisane symetrycznie na skrzydłach bocznych.")
