@@ -12,7 +12,6 @@ st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", lay
 
 st.markdown("""
     <style>
-    /* Globalne wymuszenie wyświetlania głównego suwaka przeglądarki */
     html, body, [data-testid="stAppViewContainer"], .stApp {
         background-color: #0A1128 !important; 
         overflow-y: auto !important;
@@ -24,12 +23,11 @@ st.markdown("""
         background-color: #0A1128 !important;
     }
     
-    /* Kolor tekstów globalnych */
     h1, h2, h3, h4, h5, h6, p, span, label, div {
         color: #F8FAFC !important;
     }
 
-    /* --- FIX: POPRAWKA WIDOCZNOŚCI LISTY ROZWIJANEJ (LOGOWANIE) --- */
+    /* Poprawka widoczności listy rozwijanej (Logowanie) */
     div[data-testid="stSelectbox"] label p, div[data-testid="stTextInput"] label p {
         color: #F97316 !important;
         font-weight: bold !important;
@@ -40,122 +38,103 @@ st.markdown("""
         border: 2px solid #F97316 !important;
         border-radius: 6px !important;
     }
-    /* Tekst wewnątrz zamkniętego selectboxa */
     div[data-baseweb="select"] div {
         color: #F97316 !important;
         font-weight: bold !important;
     }
-    /* Okno rozwijane z listą graczy - wymuszenie ciemnego tła i pomarańczowych napisów */
     div[role="listbox"], ul[role="listbox"], div[data-baseweb="popover"] {
         background-color: #060B19 !important;
-        background: #060B19 !important;
         border: 2px solid #F97316 !important;
     }
     div[role="option"], li[role="option"] {
         color: #F97316 !important;
         background-color: #060B19 !important;
         font-weight: bold !important;
-        font-size: 1.1rem !important;
     }
     div[role="option"]:hover, li[role="option"]:hover {
         background-color: #F97316 !important;
         color: #0A1128 !important;
     }
     
-    /* --- STYLIZACJA KLASYCZNYCH PRZYCISKÓW ZAPISU --- */
+    /* Stylizacja klasycznych przycisków zapisu */
     .stButton>button {
         background-color: #F97316 !important;
         color: #FFFFFF !important;
         border-radius: 6px !important;
         border: none !important;
         font-weight: 700 !important;
-        font-size: 1rem !important;
         padding: 0.6rem 1.8rem !important;
-        transition: all 0.2s ease !important;
-        display: inline-block !important;
+        width: 100% !important;
     }
     .stButton>button:hover {
         background-color: #EA580C !important;
-        color: #FFFFFF !important;
-        transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4) !important;
     }
     
-    /* --- FIX: SKUTECZNE, AGRESYWNE MRYGANIE PRZYCISKU ZAPISZ --- */
-    div.pulsing-save-btn button, div.pulsing-save-btn .stButton > button {
+    /* Pulsujący jaskrawy banner ostrzegawczy zamiast mrygającego przycisku */
+    .pulse-warning-banner {
         background-color: #FF4500 !important;
-        color: #FFFFFF !important;
-        font-weight: 900 !important;
-        border: 2px solid #FFFFFF !important;
-        animation: neon-pulsing-blink 1s infinite ease-in-out !important;
-    }
-    
-    @keyframes neon-pulsing-blink {
-        0% {
-            transform: scale(1);
-            box-shadow: 0 0 4px #FF4500, 0 0 10px #FF4500;
-            background-color: #FF4500 !important;
-        }
-        50% {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px #FF7F50, 0 0 40px #FF4500;
-            background-color: #FF7F50 !important;
-        }
-        100% {
-            transform: scale(1);
-            box-shadow: 0 0 4px #FF4500, 0 0 10px #FF4500;
-            background-color: #FF4500 !important;
-        }
-    }
-    
-    /* Przyciski wewnątrz pól st.number_input (+ i -) */
-    div[data-testid="stNumberInput"] button {
-        background-color: #1E3A8A !important;
-        color: #F8FAFC !important;
-        border: 1px solid #F97316 !important;
-    }
-    div[data-testid="stNumberInput"] button:hover {
-        background-color: #F97316 !important;
-        color: #0A1128 !important;
-    }
-    div[data-testid="stNumberInput"] input {
-        color: #F8FAFC !important;
-        background-color: #0A1128 !important;
+        color: white !important;
         font-weight: bold !important;
+        text-align: center !important;
+        padding: 6px !important;
+        border-radius: 4px !important;
+        font-size: 0.85rem !important;
+        margin-bottom: 8px !important;
+        animation: simple-blink 1.2s infinite ease-in-out;
+    }
+    @keyframes simple-blink {
+        0% { opacity: 0.4; }
+        50% { opacity: 1; box-shadow: 0 0 10px #FF4500; }
+        100% { opacity: 0.4; }
     }
     
-    /* --- SYSTEM POŁĄCZEŃ LINIAMI W DRABINCE --- */
-    .bracket-column-wrapper {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        height: 100%;
-        min-height: 1400px; 
-        position: relative;
-    }
-    .bracket-connector-cell { position: relative; padding: 10px 0; width: 100%; }
-    .bracket-match-box {
+    /* Nowe czyste i stabilne karty drabinki turniejowej */
+    .bracket-match-card {
         background: #172554 !important;
         border: 2px solid #1E3A8A !important;
         border-radius: 8px;
-        padding: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.4);
-        position: relative; z-index: 2;
+        padding: 10px;
+        margin: 8px 0;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+    .bracket-match-title {
+        font-size: 0.75rem !important;
+        color: #F97316 !important;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+    .bracket-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 3px 0;
+        font-size: 0.9rem !important;
+    }
+    .bracket-score-cell {
+        background: #0A1128;
+        color: #F97316;
+        font-weight: bold;
+        padding: 2px 6px;
+        border-radius: 4px;
+        min-width: 20px;
+        text-align: center;
+    }
+    .bracket-team-winner {
+        color: #4ADE80 !important;
+        font-weight: bold;
     }
     
-    .left-wing-branch .bracket-match-box::after { content: ""; position: absolute; top: 50%; right: -20px; width: 20px; height: 2px; background-color: #F97316; z-index: 1; }
-    .right-wing-branch .bracket-match-box::before { content: ""; position: absolute; top: 50%; left: -20px; width: 20px; height: 2px; background-color: #F97316; z-index: 1; }
-    .left-wing-connect::before { content: ""; position: absolute; top: 12%; bottom: 12%; left: -20px; width: 2px; background-color: #F97316; z-index: 1; }
-    .right-wing-connect::after { content: ""; position: absolute; top: 12%; bottom: 12%; right: -20px; width: 2px; background-color: #F97316; z-index: 1; }
+    .center-final-card {
+        background: #23153C !important;
+        border: 3px solid #FF6B00 !important;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 0 15px rgba(255, 107, 0, 0.4);
+    }
 
-    .bracket-group-box { background: #0D1B3E !important; border: 1px solid #F97316 !important; border-radius: 8px; padding: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-    .bracket-match-id { font-size: 0.75rem !important; color: #F97316 !important; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
-    .bracket-team-line { display: flex; justify-content: space-between; align-items: center; padding: 2px 0; font-size: 0.95rem !important; }
-    .bracket-winner { color: #4ADE80 !important; font-weight: 900 !important; }
-    .bracket-score { font-weight: bold; background: #0A1128; padding: 2px 6px; border-radius: 4px; color: #F97316; }
-    .center-final-box { background: #23153C !important; border: 3px solid #FF6B00 !important; border-radius: 10px; padding: 25px; text-align: center; box-shadow: 0 0 20px rgba(255, 107, 0, 0.5); margin-bottom: 30px; }
-
-    .match-container { background: #172554 !important; border: 1px solid #1E3A8A !important; border-radius: 10px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+    .match-container { background: #172554 !important; border: 1px solid #1E3A8A !important; border-radius: 10px; padding: 20px; margin-bottom: 25px; }
     .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
     .status-live { background-color: #DC2626 !important; color: white !important; }
     .status-ended { background-color: #111827 !important; color: #94A3B8 !important; }
@@ -163,27 +142,14 @@ st.markdown("""
     
     .teams-display { font-size: 1.6rem !important; font-weight: bold !important; }
     .real-score { font-size: 1.3rem; font-weight: bold; background-color: #F97316 !important; color: #0A1128 !important; padding: 6px 12px; border-radius: 6px; display: inline-block; }
-    
     .kricon-table { width: 100%; border-collapse: collapse; margin: 15px 0 35px 0; background-color: #172554 !important; border-radius: 8px; overflow: hidden; }
     .kricon-table th { background-color: #F97316 !important; color: #0A1128 !important; padding: 12px; font-weight: 800; }
     .kricon-table td { padding: 11px 12px; border-bottom: 1px solid #1E3A8A !important; }
-    
     .points-legend { background-color: #060B19; border-left: 5px solid #F97316; padding: 12px; margin-bottom: 15px; border-radius: 4px; }
-    .legend-item { margin: 4px 0; font-size: 0.95rem; }
     
-    .badge-trend { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; font-size: 0.9rem; font-weight: bold; }
-    .trend-box-up { background-color: #16A34A; color: white; }
-    .trend-box-down { background-color: #DC2626; color: white; }
-    .trend-box-stable { background-color: #374151; color: #94A3B8; }
-    .time-ok { color: #4ADE80 !important; font-weight: bold; }
-    .time-warning { color: #FF6B00 !important; font-weight: bold; }
-    .time-normal { color: #CBD5E1 !important; }
-    
-    /* Suwak boczny */
     ::-webkit-scrollbar { width: 16px !important; display: block !important; }
     ::-webkit-scrollbar-track { background: #060B19 !important; }
     ::-webkit-scrollbar-thumb { background-color: #FF6B00 !important; border-radius: 8px !important; border: 2px solid #060B19 !important; }
-    ::-webkit-scrollbar-thumb:hover { background-color: #FF8833 !important; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -193,7 +159,6 @@ def save_backup_local_and_github():
     try:
         serializable_bets = {str(m_id): bets for m_id in st.session_state.bets.keys() for bets in [st.session_state.bets[m_id]]}
         json_string = json.dumps(serializable_bets, ensure_ascii=False, indent=4)
-        
         with open(BACKUP_FILE, "w", encoding="utf-8") as f:
             f.write(json_string)
             
@@ -201,18 +166,11 @@ def save_backup_local_and_github():
             cfg = st.secrets["github"]
             url = f"https://api.github.com/repos/{cfg['repo']}/contents/{BACKUP_FILE}"
             headers = {"Authorization": f"token {cfg['token']}", "Accept": "application/vnd.github.v3+json"}
-            
             res_get = requests.get(url, headers=headers)
             sha = res_get.json().get("sha", None) if res_get.status_code == 200 else None
-            
             content_b64 = base64.b64encode(json_string.encode("utf-8")).decode("utf-8")
-            payload = {
-                "message": f"🤖 Automatyczna kopia zapasowa typów: {datetime.now().strftime('%Y-%m-%d %H:%M')}",
-                "content": content_b64
-            }
-            if sha:
-                payload["sha"] = sha
-                
+            payload = {"message": f"🤖 Backup typów: {datetime.now().strftime('%Y-%m-%d %H:%M')}", "content": content_b64}
+            if sha: payload["sha"] = sha
             requests.put(url, headers=headers, json=payload)
     except Exception:
         pass
@@ -396,34 +354,38 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
     
     return legend_html + f"<table class='kricon-table'><tr><th>Msc.</th><th>Trend</th><th>Gracz</th><th>Punkty</th><th>Najbliższy mecz</th></tr>{rows}</table>"
 
-def get_bracket_match_html_string(match_id):
+# --- FIX: ZABEZPIECZONA I CZYSTA FUNKCJA BLOKU DRABINKI PUCHAROWEJ ---
+def render_bracket_match_html_clean(match_id):
     m = st.session_state.results.get(match_id)
     if not m: return ""
-    sh = "" if m["score_h"] is None else str(m["score_h"])
-    sa = "" if m["score_a"] is None else str(m["score_a"])
-    win_h = m["score_h"] is not None and m["score_a"] is not None and m["score_h"] > m["score_a"]
-    win_a = m["score_h"] is not None and m["score_a"] is not None and m["score_a"] > m["score_h"]
     
-    home_name = m['home'] if m['home'] else "TBD"
-    away_name = m['away'] if m['away'] else "TBD"
+    # Bezpieczne czytanie kluczy za pomocą metody .get() - eliminuje błąd TypeError
+    sh = "" if m.get("score_h") is None else str(m.get("score_h"))
+    sa = "" if m.get("score_a") is None else str(m.get("score_a"))
     
-    return f"""
-    <div class="bracket-connector-cell">
-        <div class="bracket-match-box">
-            <div class="bracket-match-id">Mecz #{match_id}</div>
-            <div class="bracket-team-line {"bracket-winner" if win_h else ""}">
-                <span>{get_flag_html(home_name)} {home_name}</span><span class="bracket-score">{sh}</span>
-            </div>
-            <div class="bracket-team-line {"bracket-winner" if win_a else ""}">
-                <span>{get_flag_html(away_name)} {away_name}</span><span class="bracket-score">{sa}</span>
-            </div>
+    win_h = m.get("score_h") is not None and m.get("score_a") is not None and m.get("score_h") > m.get("score_a")
+    win_a = m.get("score_h") is not None and m.get("score_a") is not None and m.get("score_a") > m.get("score_h")
+    
+    home_name = m.get('home', 'TBD')
+    away_name = m.get('away', 'TBD')
+    
+    st.markdown(f"""
+    <div class="bracket-match-card">
+        <div class="bracket-match-title">Mecz #{match_id}</div>
+        <div class="bracket-row {"bracket-team-winner" if win_h else ""}">
+            <span>{get_flag_html(home_name)} {home_name}</span>
+            <span class="bracket-score-cell">{sh}</span>
+        </div>
+        <div class="bracket-row {"bracket-team-winner" if win_a else ""}">
+            <span>{get_flag_html(away_name)} {away_name}</span>
+            <span class="bracket-score-cell">{sa}</span>
         </div>
     </div>
-    """
+    """, unsafe_allow_html=True)
 
 def get_mini_group_html_string(g_code):
     teams = GROUPS_DICT.get(f"Grupa {g_code}", [])
-    lines = "".join([f"<div style='text-align:left; padding:2px 0; font-size:0.9rem;'>{get_flag_html(t)} {t}</div>" for t in teams])
+    lines = "".join([f"<div style='text-align:left; padding:3px 0; font-size:0.9rem;'>{get_flag_html(t)} {t}</div>" for t in teams])
     return f"""
     <div class="bracket-group-box">
         <div style="font-weight:bold; color:#F97316; margin-bottom:4px; font-size:0.85rem;">GRUPA {g_code}</div>
@@ -455,17 +417,13 @@ if st.session_state.logged_in_user is None:
         st.subheader("📊 Ranking")
         st.markdown(render_leaderboard_html(now), unsafe_allow_html=True)
 else:
-    # --- PANEL BOCZNY (SIDEBAR) Z WARUNKIEM DOSTĘPU DLA ADMINA ---
     st.sidebar.write(f"👤 Zalogowany jako: **{st.session_state.logged_in_user}**")
     st.sidebar.markdown("---")
     
     if st.session_state.logged_in_user == "admin":
         st.sidebar.subheader("💾 System Bezpieczeństwa")
-        if os.path.exists(BACKUP_FILE):
-            st.sidebar.success("Kopia lokalna: OK")
-        if "github" in st.secrets:
-            st.sidebar.success("GitHub Cloud Sync: OK")
-            
+        if os.path.exists(BACKUP_FILE): st.sidebar.success("Kopia lokalna: OK")
+        if "github" in st.secrets: st.sidebar.success("GitHub Cloud Sync: OK")
         if st.sidebar.button("Wymuś przywrócenie danych (Backup)"):
             if load_backup_local(): st.sidebar.success("Pomyślnie odtworzono typy!")
             else: st.sidebar.error("Błąd odczytu bazy.")
@@ -473,7 +431,6 @@ else:
         
     if st.sidebar.button("Wyloguj się"): st.session_state.logged_in_user = None; st.rerun()
     
-    # --- USUNIĘTE SŁOWO PAJĘCZYNA - ZMIANA NA "DRABINKA" ---
     tab1, tab2, tab3, tab4 = st.tabs(["📊 Ranking", "📅 Terminarz", "📈 Tabele", "🏆 Drabinka Turniejowa"])
     
     with tab1: 
@@ -493,8 +450,6 @@ else:
             if m['status'] == "Zakończony": st.markdown(f"<p class='real-score'>Wynik: {m['score_h']} - {m['score_a']}</p>", unsafe_allow_html=True)
             
             locked = (m['timestamp'] - now).total_seconds() <= 0
-            
-            # Sprawdzenie czy istnieje już zapisany typ dla tego meczu w sesji
             has_existing_bet = st.session_state.bets[m_id].get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
             
@@ -506,15 +461,14 @@ else:
                 if locked:
                     st.button("Zablokowane", disabled=True, key=f"lock_btn_{m_id}")
                 else:
-                    # MRYGANIE PRZYCISKU (TYLKO DLA NIEOBSTAWIONYCH MECZÓW)
-                    button_container_class = "" if has_existing_bet else "pulsing-save-btn"
-                    st.markdown(f"<div class='{button_container_class}'>", unsafe_allow_html=True)
+                    # WYMUSZENIE PULSOWANIA BANNERA OSTRZEGAWCZEGO NAD STATYCZNYM PRZYCISKIEM
+                    if not has_existing_bet:
+                        st.markdown("<div class='pulse-warning-banner'>⚠️ NIEODDANY TYP</div>", unsafe_allow_html=True)
                     if st.button("Zapisz Typ", key=f"btn_{m_id}"): 
                         st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a)
                         save_backup_local_and_github() 
                         st.success("Zapisano!")
                         st.rerun()
-                    st.markdown("</div>", unsafe_allow_html=True)
                     
             if locked or m['status'] == "Zakończony":
                 with st.expander("👁️ Zobacz typy innych graczy"):
@@ -541,10 +495,8 @@ else:
                         if sh>sa: stats[h]["Pkt"]+=3; stats[h]["Zwyciestwa"]+=1
                         elif sa>sh: stats[a]["Pkt"]+=3; stats[a]["Zwyciestwa"]+=1
                         else: stats[h]["Pkt"]+=1; stats[a]["Pkt"]+=1
-                        
             for t in GROUPS_DICT[g_name]:
                 if t not in stats: stats[t] = {"Pkt": 0, "BZ": 0, "BS": 0, "RB": 0, "Zwyciestwa": 0, "Grupa": g_name}
-                    
             df_g = pd.DataFrame.from_dict(stats, orient='index').reset_index().rename(columns={'index': 'Reprezentacja'}).sort_values(by=["Pkt", "RB", "BZ"], ascending=False).reset_index(drop=True)
             df_g.index+=1
             if len(df_g) >= 3:
@@ -553,87 +505,86 @@ else:
             g_rows = "".join([f"<tr {'style=\"background-color: #16A34A; font-weight: bold; color: #FFFFFF;\"' if idx in [1, 2] else ('style=\"background-color: #EA580C; font-weight: bold; color: #FFFFFF;\"' if idx == 3 else '')}><td><b>{idx}</b></td><td>{get_flag_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>" for idx, r in df_g.iterrows()])
             st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table>", unsafe_allow_html=True)
 
-        st.divider()
-        st.header("🏆 Ranking Drużyn z 3. Miejsc (Awansuje 8 najlepszych)")
-        df_third = pd.DataFrame(third_places_list)
-        if not df_third.empty:
-            df_third = df_third.sort_values(by=["Pkt", "RB", "BZ", "Zwyciestwa"], ascending=[False, False, False, False]).reset_index(drop=True)
-            df_third.index += 1
-            third_rows = ""
-            for idx, r in df_third.iterrows():
-                row_bg = 'style="background-color: #16A34A; font-weight: bold; color: #FFFFFF;"' if idx <= 8 else ''
-                third_rows += f"<tr {row_bg}><td style='text-align:center;'><b>{idx}</b></td><td><b>{r['Grupa']}</b></td><td>{get_flag_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td><td>{r['Zwyciestwa']}</td></tr>"
-            st.markdown(f"<table class='kricon-table'><tr><th style='text-align:center;'>Msc.</th><th>Źródło</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th><th>Zwycięstwa</th></tr>{third_rows}</table>", unsafe_allow_html=True)
-
-    # --- ZAKŁADKA DRABINKI (ZAKTUALIZOWANA NAZWA I BEZPIECZNE STRUNY) ---
+    # --- FIX: CAŁKOWICIE NOWA, KRYSTALICZNIE CZYSTA DRABINKA TABELARYCZNA ---
     with tab4:
-        st.header("🏆 Oficjalna Drabinka Skrzydłowa z Połączeniami")
+        st.header("🏆 Drabinka Fazy Pucharowej")
+        st.write("Wyrównany, symetryczny układ sportowy ze schodzącymi się skrzydłami.")
         st.divider()
-        col_l_group, col_l_16, col_l_8, col_center, col_r_8, col_r_16, col_r_group = st.columns([1.2, 1.3, 1.3, 1.8, 1.3, 1.3, 1.2])
         
-        with col_l_group:
-            st.markdown("<div class='bracket-column-wrapper'>", unsafe_allow_html=True)
-            st.markdown(get_mini_group_html_string("A") + get_mini_group_html_string("B") + get_mini_group_html_string("C") + get_mini_group_html_string("D") + get_mini_group_html_string("E") + get_mini_group_html_string("F"), unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+        c_g1, c_16l, c_8l, c_mid, c_8r, c_r16, c_g2 = st.columns([1.1, 1.3, 1.3, 1.8, 1.3, 1.3, 1.1])
+        
+        with c_g1:
+            st.markdown("<h5 style='text-align:center; color:#F97316;'>Grupy A-F</h5>", unsafe_allow_html=True)
+            st.markdown(get_mini_group_html_string("A"), unsafe_allow_html=True)
+            st.markdown(get_mini_group_html_string("B"), unsafe_allow_html=True)
+            st.markdown(get_mini_group_html_string("C"), unsafe_allow_html=True)
+            st.markdown(get_mini_group_html_string("D"), unsafe_allow_html=True)
+            st.markdown(get_mini_group_html_string("E"), unsafe_allow_html=True)
+            st.markdown(get_mini_group_html_string("F"), unsafe_allow_html=True)
             
-        with col_l_16:
-            st.markdown("<div class='bracket-column-wrapper left-wing-branch'>", unsafe_allow_html=True)
-            html_l_16 = "".join([get_bracket_match_html_string(i) for i in range(73, 81)])
-            st.markdown(html_l_16, unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+        with c_16l:
+            st.markdown("<h5 style='text-align:center; color:#94A3B8;'>1/16 Finału</h5>", unsafe_allow_html=True)
+            for i in range(73, 81): render_bracket_match_html_clean(i)
             
-        with col_l_8:
-            st.markdown("<div class='bracket-column-wrapper left-wing-branch left-wing-connect'>", unsafe_allow_html=True)
-            html_l_8 = "".join([get_bracket_match_html_string(i) for i in range(89, 93)])
-            html_l_4 = "".join([get_bracket_match_html_string(i) for i in range(97, 99)])
-            st.markdown(html_l_8 + "<hr style='border:1px dashed #F97316;'>" + html_l_4 + "<hr style='border:1px dashed #F97316;'>" + get_bracket_match_html_string(101), unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+        with c_8l:
+            st.markdown("<h5 style='text-align:center; color:#94A3B8;'>1/8 Finału</h5>", unsafe_allow_html=True)
+            for i in range(89, 93): render_bracket_match_html_clean(i)
+            st.write("---")
+            st.markdown("<h5 style='text-align:center; color:#94A3B8;'>Ćwierćfinały</h5>", unsafe_allow_html=True)
+            for i in range(97, 99): render_bracket_match_html_clean(i)
+            st.write("---")
+            st.markdown("<h5 style='text-align:center; color:#94A3B8;'>Półfinał</h5>", unsafe_allow_html=True)
+            render_bracket_match_html_clean(101)
             
-        with col_center:
-            st.markdown("<div style='text-align: center; padding-top: 180px;'>", unsafe_allow_html=True)
-            st.markdown("<div class='center-final-box'>", unsafe_allow_html=True)
-            st.markdown("<h2 style='color:#FFF; font-size:1.8rem; margin-bottom:10px;'>🏆 WIELKI FINAŁ</h2>", unsafe_allow_html=True)
+        with c_mid:
+            st.markdown("<div style='padding-top: 120px;'>", unsafe_allow_html=True)
+            st.markdown("<div class='center-final-card'>", unsafe_allow_html=True)
+            st.markdown("<h2 style='color:#FFF; font-size:1.6rem; margin-bottom:5px;'>🏆 WIELKI FINAŁ</h2>", unsafe_allow_html=True)
             
-            # Zabezpieczenie przed błędem TypeError dla meczów pucharowych TBD
-            m_104 = st.session_state.results.get(104)
-            home_final = m_104['home'] if (m_104 and m_104['home']) else "TBD"
-            away_final = m_104['away'] if (m_104 and m_104['away']) else "TBD"
-            sh_104 = "" if m_104['score_h'] is None else m_104['score_h']
-            sa_104 = "" if m_104['score_a'] is None else m_104['score_a']
+            m_104 = st.session_state.results.get(104, {})
+            h_f = m_104.get('home', 'TBD')
+            a_f = m_104.get('away', 'TBD')
+            sh_f = "" if m_104.get('score_h') is None else str(m_104.get('score_h'))
+            sa_f = "" if m_104.get('score_a') is None else str(m_104.get('score_a'))
             
             st.markdown(f"""
-                <div style='font-size:1.4rem; font-weight:bold; margin:15px 0;'>
-                    {get_flag_html(home_final)} {home_final} 
-                    <span style='color:#FF6B00; background:#060B19; padding:6px 14px; border-radius:4px; border:1px solid #F97316;'>
-                        {sh_104} : {sa_104}
+                <div style='font-size:1.25rem; font-weight:bold; margin:15px 0;'>
+                    {get_flag_html(h_f)} {h_f} 
+                    <span style='color:#FF6B00; background:#060B19; padding:4px 10px; border-radius:4px; border:1px solid #F97316;'>
+                        {sh_f} : {sa_f}
                     </span> 
-                    {get_flag_html(away_final)} {away_final}
+                    {get_flag_html(a_f)} {a_f}
                 </div>
             """, unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
             
-            st.markdown("<div class='bracket-match-box' style='border-color: #38BDF8; margin-top: 100px;'>", unsafe_allow_html=True)
-            st.markdown("<h4 style='color:#38BDF8; margin:0 0 6px 0;'>🥉 MECZ O 3. MIEJSCE</h4>", unsafe_allow_html=True)
-            m_103 = st.session_state.results.get(103)
-            home_3rd = m_103['home'] if (m_103 and m_103['home']) else "TBD"
-            away_3rd = m_103['away'] if (m_103 and m_103['away']) else "TBD"
-            st.markdown(f"<b>{home_3rd} vs {away_3rd}</b>", unsafe_allow_html=True)
+            st.markdown("<div class='bracket-match-card' style='border-color: #38BDF8; margin-top: 150px;'>", unsafe_allow_html=True)
+            st.markdown("<h5 style='color:#38BDF8; margin:0 0 4px 0;'>🥉 MECZ O 3. MIEJSCE</h5>", unsafe_allow_html=True)
+            m_103 = st.session_state.results.get(103, {})
+            h_3 = m_103.get('home', 'TBD')
+            a_3 = m_103.get('away', 'TBD')
+            st.markdown(f"<b>{h_3} vs {a_3}</b>", unsafe_allow_html=True)
             st.markdown("</div></div>", unsafe_allow_html=True)
             
-        with col_r_8:
-            st.markdown("<div class='bracket-column-wrapper right-wing-branch right-wing-connect'>", unsafe_allow_html=True)
-            html_r_8 = "".join([get_bracket_match_html_string(i) for i in range(93, 97)])
-            html_r_4 = "".join([get_bracket_match_html_string(i) for i in range(99, 101)])
-            st.markdown(html_r_8 + "<hr style='border:1px dashed #F97316;'>" + html_r_4 + "<hr style='border:1px dashed #F97316;'>" + get_bracket_match_html_string(102), unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+        with c_8r:
+            st.markdown("<h5 style='text-align:center; color:#94A3B8;'>Półfinał</h5>", unsafe_allow_html=True)
+            render_bracket_match_html_clean(102)
+            st.write("---")
+            st.markdown("<h5 style='text-align:center; color:#94A3B8;'>Ćwierćfinały</h5>", unsafe_allow_html=True)
+            for i in range(99, 101): render_bracket_match_html_clean(i)
+            st.write("---")
+            st.markdown("<h5 style='text-align:center; color:#94A3B8;'>1/8 Finału</h5>", unsafe_allow_html=True)
+            for i in range(93, 97): render_bracket_match_html_clean(i)
             
-        with col_r_16:
-            st.markdown("<div class='bracket-column-wrapper right-wing-branch'>", unsafe_allow_html=True)
-            html_r_16 = "".join([get_bracket_match_html_string(i) for i in range(81, 89)])
-            st.markdown(html_r_16, unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+        with c_r16:
+            st.markdown("<h5 style='text-align:center; color:#94A3B8;'>1/16 Finału</h5>", unsafe_allow_html=True)
+            for i in range(81, 89): render_bracket_match_html_clean(i)
             
-        with col_r_group:
-            st.markdown("<div class='bracket-column-wrapper'>", unsafe_allow_html=True)
-            st.markdown(get_mini_group_html_string("G") + get_mini_group_html_string("H") + get_mini_group_html_string("I") + get_mini_group_html_string("J") + get_mini_group_html_string("K") + get_mini_group_html_string("L"), unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+        with c_g2:
+            st.markdown("<h5 style='text-align:center; color:#F97316;'>Grupy G-L</h5>", unsafe_allow_html=True)
+            st.markdown(get_mini_group_html_string("G"), unsafe_allow_html=True)
+            st.markdown(get_mini_group_html_string("H"), unsafe_allow_html=True)
+            st.markdown(get_mini_group_html_string("I"), unsafe_allow_html=True)
+            st.markdown(get_mini_group_html_string("J"), unsafe_allow_html=True)
+            st.markdown(get_mini_group_html_string("K"), unsafe_allow_html=True)
+            st.markdown(get_mini_group_html_string("L"), unsafe_allow_html=True)
