@@ -52,19 +52,17 @@ st.markdown("""
         background-color: #060B19 !important;
         font-weight: bold !important;
     }
-    div[role="option"]:hover, li[role="option"]:hover {
-        background-color: #F97316 !important;
-        color: #0A1128 !important;
-    }
     
-    /* Stylizacja przycisków zapisu */
+    /* Wyrównanie wysokości i stylów dla przycisków i bannerów w jednej linii */
     .stButton>button {
         background-color: #F97316 !important;
         color: #FFFFFF !important;
         border-radius: 4px !important;
         border: none !important;
         font-weight: 700 !important;
-        padding: 0.25rem 0.8rem !important;
+        height: 32px !important;
+        line-height: 32px !important;
+        padding: 0 15px !important;
         width: 100% !important;
     }
     .stButton>button:hover {
@@ -72,15 +70,16 @@ st.markdown("""
         box-shadow: 0 3px 8px rgba(249, 115, 22, 0.4) !important;
     }
     
-    /* --- ELEMENTY STATUSU TYPOWANIA W JEDNEJ LINII --- */
+    /* --- BANNERY SFORMATOWANE DO TEJ SAMEJ WYSOKOŚCI CO PRZYCISK (32px) --- */
     .missing-bet-banner {
         background-color: #DC2626 !important;
         color: #FFFFFF !important;
         font-weight: bold !important;
         text-align: center !important;
-        padding: 3px 6px !important;
+        height: 32px !important;
+        line-height: 32px !important;
         border-radius: 4px !important;
-        font-size: 0.8rem !important;
+        font-size: 0.85rem !important;
         display: block !important;
         width: 100% !important;
         animation: simple-blink 1.2s infinite ease-in-out;
@@ -90,9 +89,10 @@ st.markdown("""
         color: #FFFFFF !important;
         font-weight: bold !important;
         text-align: center !important;
-        padding: 3px 6px !important;
+        height: 32px !important;
+        line-height: 32px !important;
         border-radius: 4px !important;
-        font-size: 0.8rem !important;
+        font-size: 0.85rem !important;
         display: block !important;
         width: 100% !important;
         border: 1px solid #22C55E;
@@ -103,13 +103,13 @@ st.markdown("""
         100% { opacity: 0.6; }
     }
     
-    /* --- MAKSYMALNIE CIASNY UKŁAD ELEMENTÓW LISTY MECZÓW --- */
+    /* Ciasny układ elementów listy meczów */
     .match-container { 
         background: #172554 !important; 
         border: 1px solid #1E3A8A !important; 
         border-radius: 4px; 
-        padding: 4px 10px !important; /* Minimalny padding wewnętrzny */
-        margin-bottom: 2px !important; /* Karty ciasno jedna pod drugą */
+        padding: 6px 12px !important; 
+        margin-bottom: 2px !important; 
         box-shadow: 0 1px 3px rgba(0,0,0,0.15);
     }
     .match-inline-main-row {
@@ -148,27 +148,23 @@ st.markdown("""
     }
     .match-meta-inline {
         color: #94A3B8;
-        font-size: 0.8 /rem;
+        font-size: 0.8rem;
         margin: 0;
     }
     
-    .bet-sub-row {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        margin-top: 2px;
-        padding-top: 2px;
-        border-top: 1px dashed #1E3A8A;
-    }
+    /* Wysokość pól tekstowych dopasowana do rzędu */
     .bet-label-text {
-        font-size: 0.8rem !important;
+        font-size: 0.85rem !important;
         color: #38BDF8 !important;
         font-weight: bold;
+        height: 32px !important;
+        line-height: 32px !important;
         margin: 0 !important;
     }
     
-    div[data-testid="stNumberInput"] button { background-color: #1E3A8A !important; color: #F8FAFC !important; }
-    div[data-testid="stNumberInput"] input { color: #F8FAFC !important; background-color: #0A1128 !important; font-size: 0.85rem !important; padding: 1px !important; }
+    div[data-testid="stNumberInput"] { height: 32px !important; }
+    div[data-testid="stNumberInput"] button { background-color: #1E3A8A !important; color: #F8FAFC !important; height: 32px !important; }
+    div[data-testid="stNumberInput"] input { color: #F8FAFC !important; background-color: #0A1128 !important; font-size: 0.85rem !important; height: 32px !important; }
     
     /* Drabinka i Tabele */
     .bracket-match-card { background: #172554 !important; border: 2px solid #1E3A8A !important; border-radius: 8px; padding: 10px; margin: 8px 0; }
@@ -393,10 +389,16 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
 def render_bracket_match_html_clean(match_id):
     m = st.session_state.results.get(match_id)
     if not m: return ""
-    sh = "" if m.get("score_h") is None else str(m.get("score_h"))
-    sa = "" if m.get("score_a") is None else str(m.get("score_a"))
-    win_h = m.get("score_h") is not None and m.get("score_a") is not None and m.get("score_h") > m.get("score_a")
-    win_a = m.get("score_h") is not None and m.get("score_a") is not None and m.get("score_a") > m.get("score_h")
+    
+    # --- AUTOMATYCZNY ZNAK ZAPYTANIA DLA NIEZAKOŃCZONEJ DRABINKI ---
+    if m.get("status") == "Zakończony":
+        sh = str(m.get("score_h", "?"))
+        sa = str(m.get("score_a", "?"))
+    else:
+        sh, sa = "?", "?"
+        
+    win_h = m.get("score_h") is not None and m.get("score_a") is not None and m.get("score_h") > m.get("score_a") and m.get("status") == "Zakończony"
+    win_a = m.get("score_h") is not None and m.get("score_a") is not None and m.get("score_a") > m.get("score_h") and m.get("status") == "Zakończony"
     
     home_name = m.get('home', 'TBD')
     away_name = m.get('away', 'TBD')
@@ -479,11 +481,14 @@ else:
             if (mode == "Oczekujące" and m['status'] == "Zakończony") or (mode == "Zakończone" and m['status'] == "Oczekuje"): continue
             status_html = '<span class="status-badge status-live">🔴 LIVE</span>' if m['status'] == "LIVE" else ('<span class="status-badge status-ended">⚫ Zakończony</span>' if m['status'] == "Zakończony" else '<span class="status-badge status-waiting">🟡 Oczekuje</span>')
             
-            sh_real = "" if m.get('score_h') is None else str(m.get('score_h'))
-            sa_real = "" if m.get('score_a') is None else str(m.get('score_a'))
-            oficjalny_wynik_tekst = f"{sh_real} : {sa_real}" if (sh_real != "") else "vs"
+            # --- AUTOMATYCZNY ZNAK ZAPYTANIA DLA SCHEDULERA TURNIEJOWEGO ---
+            if m.get('status') == "Zakończony":
+                sh_real = str(m.get('score_h', '?'))
+                sa_real = str(m.get('score_a', '?'))
+                oficjalny_wynik_tekst = f"{sh_real} : {sa_real}"
+            else:
+                oficjalny_wynik_tekst = "? : ?"
             
-            # --- LINIA 1 MAIN ROW ---
             st.markdown(f"""
             <div class='match-container'>
                 <div class='match-inline-main-row'>
@@ -505,7 +510,7 @@ else:
             has_existing_bet = st.session_state.bets[m_id].get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
             
-            # --- POPRAWKA: CAŁY SYSTEM TYPOWANIA ORAZ BANNER W JEDNEJ LINII ---
+            # --- ZFORMTOWANIE KOLUMN W JEDNOLITĄ WYSOKOŚĆ (LABELS, INPUTS, BTN, BANNER) ---
             c_label, c_input_h, c_input_a, c_btn, c_banner = st.columns([1.5, 0.8, 0.8, 1.5, 3.4])
             
             with c_label:
@@ -527,12 +532,11 @@ else:
                         st.rerun()
                     st.markdown("</div>", unsafe_allow_html=True)
             with c_banner:
-                # Banner umieszczony bezpośrednio po prawej stronie w tym samym rzędzie
                 if not locked:
                     if has_existing_bet:
                         st.markdown("<div class='success-bet-banner'>✔ TYP ZAPISANY</div>", unsafe_allow_html=True)
                     else:
-                        st.markdown("<div class='missing-bet-banner'>🔴 ⚠️ NIEODDANY TYP</div>", unsafe_allow_html=True)
+                        st.markdown("<div class='missing-bet-banner'>⚠️ NIEODDANY TYP</div>", unsafe_allow_html=True)
                         
             if locked or m['status'] == "Zakończony":
                 with st.expander("👁️ Zobacz typy innych graczy"):
@@ -617,8 +621,13 @@ else:
             m_104 = st.session_state.results.get(104, {})
             h_f = m_104.get('home', 'TBD')
             a_f = m_104.get('away', 'TBD')
-            sh_f = "" if m_104.get('score_h') is None else str(m_104.get('score_h'))
-            sa_f = "" if m_104.get('score_a') is None else str(m_104.get('score_a'))
+            
+            # --- ZNAK ZAPYTANIA DLA MECZU FINAŁOWEGO W DRABINCE ---
+            if m_104.get("status") == "Zakończony":
+                sh_f = str(m_104.get('score_h', '?'))
+                sa_f = str(m_104.get('score_a', '?'))
+            else:
+                sh_f, sa_f = "?", "?"
             
             st.markdown(f"""
                 <div style='font-size:1.25rem; font-weight:bold; margin:15px 0;'>
