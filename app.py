@@ -2,42 +2,107 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-# 1. Konfiguracja i Szata Graficzna Kricon BV
+# 1. Konfiguracja i Szata Graficzna zgodna z brandingiem KriCon Group
 st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", layout="wide")
 
+# CSS dla stylizacji brandingowej KriCon i loga
 st.markdown("""
     <style>
-    .reportview-container { background: #F4F6F9; }
-    .main .block-container { padding-top: 2rem; }
-    h1 {
-        color: #0F2042 !important;
+    /* Tło główne i kontenerów */
+    .reportview-container { background: #F8FAFC; }
+    .main .block-container { padding-top: 1rem; }
+    
+    /* Kontener loga i tytułu */
+    .logo-title-container {
+        display: flex;
+        align-items: center;
+        border-bottom: 4px solid #00A3E0;
+        padding-bottom: 15px;
+        margin-bottom: 25px;
+    }
+    .logo-container {
+        margin-right: 20px;
+    }
+    .logo-image {
+        max-height: 80px;
+    }
+    
+    /* Nagłówek H1 - Główny granat KriCon wewnątrz kontenera flex */
+    .logo-title-container h1 {
+        color: #0B1B3D !important;
         font-family: 'Segoe UI', Arial, sans-serif;
         font-weight: 700;
-        border-bottom: 3px solid #3498DB;
-        padding-bottom: 10px;
+        margin: 0 !important;
+        border: none !important;
+        padding: 0 !important;
     }
-    h2, h3 { color: #1B365D !important; }
+    
+    /* Pozostałe nagłówki */
+    h2, h3 { 
+        color: #0B1B3D !important;
+        font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    
+    /* Przyciski w kolorystyce KriCon (Granat przechodzący w jasny błękit na hover) */
     .stButton>button {
-        background-color: #0F2042 !important;
+        background-color: #0B1B3D !important;
         color: white !important;
         border-radius: 4px !important;
-        border: none !important;
+        border: 1px solid #0B1B3D !important;
+        font-weight: 600 !important;
+        padding: 0.5rem 1.5rem !important;
         transition: all 0.3s ease;
     }
     .stButton>button:hover {
-        background-color: #3498DB !important;
-        transform: scale(1.02);
+        background-color: #00A3E0 !important;
+        border-color: #00A3E0 !important;
+        color: white !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(0, 163, 224, 0.2);
     }
+    
+    /* Komunikaty i notyfikacje */
     div[data-testid="stNotification"] {
-        background-color: #EBF5FB !important;
-        color: #2C3E50 !important;
-        border-left: 5px solid #3498DB !important;
+        background-color: #F0F7FC !important;
+        color: #0B1B3D !important;
+        border-left: 5px solid #00A3E0 !important;
     }
-    .real-score { font-size: 1.2rem; color: #E74C3C; font-weight: bold; }
+    
+    /* Oficjalny wynik - kolor Emergency z witryny KriCon */
+    .real-score { 
+        font-size: 1.2rem; 
+        color: #D63031; 
+        font-weight: bold; 
+        background-color: #FDF2F2;
+        padding: 5px 10px;
+        border-radius: 4px;
+        display: inline-block;
+    }
+    
+    /* Zakładki (Tabs) dopasowane do stylu */
+    .stTabs [data-baseweb="tab"] {
+        color: #0B1B3D !important;
+        font-weight: 600;
+    }
+    .stTabs [data-baseweb="tab"][aria-selected="true"] {
+        border-bottom-color: #00A3E0 !important;
+        color: #00A3E0 !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-st.title("⚽ Kricon BV | World Cup 2026 Typer")
+# Definicja URL loga Kricon Group (pobranego z ich strony)
+KRICON_LOGO_URL = "https://kricongroup.com/wp-content/uploads/2022/03/logo.svg"
+
+# Wyświetlanie Loga i Tytułu przy użyciu HTML dla pełnej kontroli nad układem
+st.markdown(f"""
+    <div class="logo-title-container">
+        <div class="logo-container">
+            <img src="{KRICON_LOGO_URL}" alt="Kricon Group Logo" class="logo-image">
+        </div>
+        <h1>World Cup 2026 Typer</h1>
+    </div>
+""", unsafe_allow_html=True)
 
 # 2. Baza użytkowników
 USER_CREDENTIALS = {
@@ -47,33 +112,34 @@ USER_CREDENTIALS = {
 }
 players = [k for k in USER_CREDENTIALS.keys() if k != "admin"]
 
+# Oficjalny podział na grupy Mistrzostw Świata 2026
 GROUPS_DICT = {
-    "Grupa A": ["🇲🇽 Meksyk", "🇨🇭 Szwajcaria", "🇳🇬 Nigeria", "🇳🇿 Nowa Zelandia"],
-    "Grupa B": ["🇨🇦 Kanada", "🇩🇰 Dania", "🇨🇲 Kamerun", "🇶🇦 Katar"],
-    "Grupa C": ["🇺🇸 USA", "🇵🇱 Polska", "🇿🇦 RPA", "🇺🇿 Uzbekistan"],
-    "Grupa D": ["🇦🇷 Argentyna", "🇷🇸 Serbia", "🇩🇿 Algieria", "🇵🇦 Panama"],
-    "Grupa E": ["🇫🇷 Francja", "🇨🇴 Kolumbia", "🇮🇶 Irak", "🇯🇲 Jamajka"],
-    "Grupa F": ["🇧🇷 Brazylia", "🇦🇹 Austria", "🇬🇭 Ghana", "🇸🇦 Arabia Saudyjska"],
-    "Grupa G": ["🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglia", "🇪🇨 Ekwador", "🇲🇦 Maroko", "🇨🇷 Kostaryka"],
-    "Grupa H": ["🇪🇸 Hiszpania", "🇨🇱 Chile", "🇸🇳 Senegal", "🇦🇺 Australia"],
-    "Grupa I": ["🇩🇪 Niemcy", "🇺🇾 Urugwaj", "🇨🇮 WKS", "🇮🇷 Iran"],
-    "Grupa J": ["🇵🇹 Portugalia", "🇵🇪 Peru", "🇪🇬 Egipt", "🇯🇵 Japonia"],
-    "Grupa K": ["🇮🇹 Włochy", "🇻🇪 Wenezuela", "🇰🇷 Korea Płd.", "🇸🇪 Szwecja"],
-    "Grupa L": ["🇳🇱 Holandia", "🇭🇷 Chorwacja", "🇧🇪 Belgia", "🏴󠁧󠁢󠁷󠁬󠁳󠁿 Walia"]
+    "Grupa A": ["🇲🇽 Meksyk", "🇿🇦 RPA", "🇰🇷 Korea Południowa", "🇨🇿 Czechy"],
+    "Grupa B": ["🇨🇦 Kanada", "🇧🇦 Bośnia i Hercegowina", "🇶🇦 Katar", "🇨🇭 Szwajcaria"],
+    "Grupa C": ["🇧🇷 Brazylia", "🇲🇦 Maroko", "🇭🇹 Haiti", "🏴󠁧󠁢󠁳󠁣󠁴󠁿 Szkocja"],
+    "Grupa D": ["🇺🇸 USA", "🇵🇾 Paragwaj", "🇦🇺 Australia", "🇹🇷 Turcja"],
+    "Grupa E": ["🇩🇪 Niemcy", "🇨🇼 Curaçao", "🇨🇮 WKS", "🇪🇨 Ekwador"],
+    "Grupa F": ["🇳🇱 Holandia", "🇯🇵 Japonia", "🇸🇪 Szwecja", "🇹🇳 Tunezja"],
+    "Grupa G": ["🇧🇪 Belgia", "🇪🇬 Egipt", "🇮🇷 Iran", "🇳🇿 Nowa Zelandia"],
+    "Grupa H": ["🇪🇸 Hiszpania", "🇨🇻 Wyspy Zielonego Przylądka", "🇸🇦 Arabia Saudyjska", "🇺🇾 Urugwaj"],
+    "Grupa I": ["🇫🇷 Francja", "🇸🇳 Senegal", "🇮🇶 Irak", "🇳🇴 Norwegia"],
+    "Grupa J": ["🇦🇷 Argentyna", "🇩🇿 Algieria", "🇦🇹 Austria", "🇯🇴 Jordania"],
+    "Grupa K": ["🇵🇹 Portugalia", "🇨🇩 DR Konga", "🇺🇿 Uzbekistan", "🇨🇴 Kolumbia"],
+    "Grupa L": ["🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglia", "🇭🇷 Chorwacja", "🇬🇭 Ghana", "🇵🇦 Panama"]
 }
 
-# 3. Generator Harmonogramu 104 Meczów z Datami
+# 3. Generator Harmonogramu 104 Meczów z Oficjalnymi Ramami Datowymi
 def generate_schedule():
     schedule = {}
     match_id = 1
     
-    # Przykładowe rozbicie dat (Czerwiec - Lipiec)
+    # Faza grupowa: 11 - 27 Czerwca
     dates_group = [f"{d} Czerwca" for d in range(11, 28)]
     
     matchups = [(0,1), (2,3), (0,2), (1,3), (0,3), (1,2)]
     date_idx = 0
     
-    # Faza Grupowa
+    # Faza Grupowa (72 mecze przy 12 grupach)
     for m_round in range(6):
         for group_name, teams in GROUPS_DICT.items():
             t1_idx, t2_idx = matchups[m_round]
@@ -86,9 +152,9 @@ def generate_schedule():
             match_id += 1
             if match_id % 4 == 0: date_idx += 1
 
-    # Faza Pucharowa z datami
+    # Oficjalne ramy czasowe fazy pucharowej MŚ 2026
     ko_stages = [
-        ("1/16 Finału", 16, ["28 Czerwca", "29 Czerwca", "30 Czerwca", "1 Lipca"]), 
+        ("1/16 Finału", 16, ["28 Czerwca", "29 Czerwca", "30 Czerwca", "1 Lipca", "2 Lipca", "3 Lipca"]), 
         ("1/8 Finału", 8, ["4 Lipca", "5 Lipca", "6 Lipca", "7 Lipca"]), 
         ("Ćwierćfinały", 4, ["9 Lipca", "10 Lipca", "11 Lipca"]), 
         ("Półfinały", 2, ["14 Lipca", "15 Lipca"]), 
@@ -166,21 +232,21 @@ else:
                     if player in st.session_state.bets[match_id]:
                         p_h, p_a = st.session_state.bets[match_id][player]
                         scores[player] += calculate_points(p_h, p_a, r_h, r_a)
-                    
+                        
         df_scores = pd.DataFrame(list(scores.items()), columns=["Gracz", "Punkty"])
         df_scores = df_scores.sort_values(by="Punkty", ascending=False).reset_index(drop=True)
         df_scores.index += 1
         
         def highlight_rows(row):
             if row.name == 1 and row['Punkty'] > 0:
-                return ['background-color: #A9DFBF; font-weight: bold;'] * len(row) 
+                return ['background-color: #D4EDDA; color: #155724; font-weight: bold;'] * len(row) 
             elif row.name == len(df_scores) and row['Punkty'] > 0:
-                return ['background-color: #F5B7B1;'] * len(row)
+                return ['background-color: #F8D7DA; color: #721C24;'] * len(row)
             return [''] * len(row)
 
         st.dataframe(df_scores.style.apply(highlight_rows, axis=1), use_container_width=True)
 
-    # ZAKŁADKA 2: TERMINARZ I TYPY (Po datach + podgląd innych)
+    # ZAKŁADKA 2: TERMINARZ I TYPY
     with tab2:
         if current_user == "admin":
             st.warning("Zaloguj się jako gracz, aby typować.")
@@ -232,10 +298,10 @@ else:
                             
                     st.divider()
 
-    # ZAKŁADKA 3: TABELE GRUP (Automatyczne przeliczanie)
+    # ZAKŁADKA 3: TABele GRUP
     with tab3:
         st.header("📈 Tabele Fazy Grupowej")
-        st.write("Aktualizowane na żywo po wpisaniu oficjalnych wyników.")
+        st.write("Aktualizowane na żywo po wpisaniu oficjalnych wyników przez Admina.")
         
         group_sel = st.selectbox("Wybierz grupę:", list(GROUPS_DICT.keys()))
         
@@ -267,7 +333,7 @@ else:
                     
         df_group = pd.DataFrame.from_dict(teams_stats, orient='index').reset_index()
         df_group.rename(columns={'index': 'Reprezentacja'}, inplace=True)
-        # Sortowanie wg zasad (Punkty -> Różnica Bramek -> Bramki Zdobyte)
+        # Sortowanie (Punkty -> Różnica Bramek -> Bramki Zdobyte)
         df_group = df_group.sort_values(by=["Punkty", "RB", "BZ"], ascending=[False, False, False]).reset_index(drop=True)
         df_group.index += 1
         
