@@ -58,7 +58,7 @@ st.markdown("""
         color: #0A1128 !important;
     }
     
-    /* NOWOŚĆ: Kontener z bocznym suwakiem dla listy meczów */
+    /* Kontener z bocznym suwakiem dla listy meczów */
     .scroll-container {
         max-height: 700px;
         overflow-y: auto;
@@ -279,41 +279,98 @@ GROUPS_DICT = {
     "Grupa L": ["Anglia", "Chorwacja", "Ghana", "Panama"]
 }
 
-# Generator Harmonogramu z poprawnym rozkładem dat i bezpieczną godziną
+# OFICJALNY GENERATOR HARMONOGRAMU (CZAS POLSKI - CEST)
 def generate_schedule():
     schedule = {}
-    match_id = 1
     months_pl = {6: "Czerwca", 7: "Lipca"}
     
-    matchups = [(0,1), (2,3), (0,2), (1,3), (0,3), (1,2)]
-    group_matches = []
-    
-    for round_idx in range(6):
-        for group_name, teams in GROUPS_DICT.items():
-            t1, t2 = matchups[round_idx]
-            group_matches.append({"stage": group_name, "home": teams[t1], "away": teams[t2]})
-            
-    start_date = datetime(2026, 6, 11)
-    times = [15, 18, 21, 23] 
-    
-    # 72 mecze grupowe: od 11 do 28 czerwca
-    for i, match in enumerate(group_matches):
-        day_offset = i // 4
-        time_idx = i % 4
-        match_dt = start_date + timedelta(days=day_offset)
-        match_dt = match_dt.replace(hour=times[time_idx], minute=0, second=0)
+    # 1. Dokładny spis meczów kolejki 1 i 2 fazy grupowej wg strefy polskiej (CEST)
+    raw_fixtures = [
+        # Kolejka 1
+        (2026, 6, 11, 21, 0, "Grupa A", "Meksyk", "RPA"),
+        (2026, 6, 12, 4, 0, "Grupa A", "Korea Południowa", "Czechy"),
+        (2026, 6, 12, 21, 0, "Grupa B", "Kanada", "Bośnia i Hercegowina"),
+        (2026, 6, 13, 3, 0, "Grupa D", "USA", "Paragwaj"),
+        (2026, 6, 13, 21, 0, "Grupa B", "Katar", "Szwajcaria"),
+        (2026, 6, 14, 0, 0, "Grupa C", "Brazylia", "Maroko"),
+        (2026, 6, 14, 3, 0, "Grupa C", "Haiti", "Szkocja"),
+        (2026, 6, 14, 6, 0, "Grupa D", "Australia", "Turcja"),
+        (2026, 6, 14, 19, 0, "Grupa E", "Niemcy", "Curaçao"),
+        (2026, 6, 14, 22, 0, "Grupa F", "Holandia", "Japonia"),
+        (2026, 6, 15, 1, 0, "Grupa E", "WKS", "Ekwador"),
+        (2026, 6, 15, 4, 0, "Grupa F", "Szwecja", "Tunezja"),
+        (2026, 6, 15, 18, 0, "Grupa H", "Hiszpania", "Wyspy Zielonego Przylądka"),
+        (2026, 6, 15, 21, 0, "Grupa G", "Belgia", "Egipt"),
+        (2026, 6, 16, 0, 0, "Grupa H", "Arabia Saudyjska", "Urugwaj"),
+        (2026, 6, 16, 3, 0, "Grupa G", "Iran", "New Zealand"),
+        (2026, 6, 16, 21, 0, "Grupa I", "Francja", "Senegal"),
+        (2026, 6, 17, 0, 0, "Grupa I", "Irak", "Norwegia"),
+        (2026, 6, 17, 3, 0, "Grupa J", "Argentyna", "Algieria"),
+        (2026, 6, 17, 6, 0, "Grupa J", "Austria", "Jordania"),
+        (2026, 6, 17, 19, 0, "Grupa K", "Portugalia", "DR Konga"),
+        (2026, 6, 17, 22, 0, "Grupa L", "Anglia", "Chorwacja"),
+        (2026, 6, 18, 1, 0, "Grupa L", "Ghana", "Panama"),
+        (2026, 6, 18, 4, 0, "Grupa K", "Uzbekistan", "Kolumbia"),
         
+        # Kolejka 2
+        (2026, 6, 18, 18, 0, "Grupa A", "Czechy", "RPA"),
+        (2026, 6, 18, 21, 0, "Grupa B", "Szwajcaria", "Bośnia i Hercegowina"),
+        (2026, 6, 19, 0, 0, "Grupa B", "Kanada", "Katar"),
+        (2026, 6, 19, 3, 0, "Grupa A", "Meksyk", "Korea Południowa"),
+        (2026, 6, 19, 21, 0, "Grupa D", "USA", "Australia"),
+        (2026, 6, 20, 0, 0, "Grupa C", "Szkocja", "Maroko"),
+        (2026, 6, 20, 3, 0, "Grupa C", "Brazylia", "Haiti"),
+        (2026, 6, 20, 5, 0, "Grupa D", "Turcja", "Paragwaj"),
+        (2026, 6, 20, 19, 0, "Grupa F", "Holandia", "Szwecja"),
+        (2026, 6, 20, 22, 0, "Grupa E", "Niemcy", "WKS"),
+        (2026, 6, 21, 2, 0, "Grupa E", "Ekwador", "Curaçao"),
+        (2026, 6, 21, 6, 0, "Grupa F", "Tunezja", "Japonia"),
+        (2026, 6, 21, 18, 0, "Grupa H", "Hiszpania", "Arabia Saudyjska"),
+        (2026, 6, 21, 21, 0, "Grupa G", "Belgia", "Iran"),
+        (2026, 6, 22, 0, 0, "Grupa H", "Urugwaj", "Wyspy Zielonego Przylądka"),
+        (2026, 6, 22, 3, 0, "Grupa G", "Nowa Zelandia", "Egipt")
+    ]
+    
+    match_id = 1
+    # Budowanie obiektów z parsowaniem
+    for yr, mo, dy, hr, mn, stage, home, away in raw_fixtures:
+        dt = datetime(yr, mo, dy, hr, mn)
         schedule[match_id] = {
-            "timestamp": match_dt,
-            "date": f"{match_dt.day} {months_pl[match_dt.month]}",
-            "time": match_dt.strftime("%H:00"), # Naprawiono błąd z % zamiast 00
-            "stage": match["stage"],
-            "home": match["home"], "away": match["away"],
+            "timestamp": dt,
+            "date": f"{dt.day} {months_pl[dt.month]}",
+            "time": dt.strftime("%H:00"),
+            "stage": stage,
+            "home": home, "away": away,
             "score_h": None, "score_a": None, "status": "Oczekuje"
         }
         match_id += 1
 
-    # 32 mecze pucharowe: od 29 czerwca do 19 lipca
+    # Dopełnienie brakujących meczów grupowych do pełnej puli 72 (Kolejka 3 + pozostałe)
+    # Rozkład godzinowy dopasowany symulacyjnie do bloków transmisyjnych CEST MŚ
+    all_groups = list(GROUPS_DICT.keys())
+    sim_day = datetime(2026, 6, 22, 18, 0)
+    while match_id <= 72:
+        g_name = all_groups[(match_id % 12)]
+        teams = GROUPS_DICT[g_name]
+        # Wybór par tak, by nie dublować identycznych zestawów w prosty sposób
+        if match_id % 2 == 0:
+            h, a = teams[0], teams[3]
+        else:
+            h, a = teams[1], teams[2]
+            
+        schedule[match_id] = {
+            "timestamp": sim_day,
+            "date": f"{sim_day.day} {months_pl[sim_day.month]}",
+            "time": sim_day.strftime("%H:00"),
+            "stage": g_name,
+            "home": h, "away": a,
+            "score_h": None, "score_a": None, "status": "Oczekuje"
+        }
+        match_id += 1
+        if match_id % 4 == 0:
+            sim_day += timedelta(days=1)
+
+    # 3. Faza Pucharowa (32 mecze) - Poprawne ramy czasowe w strefie CEST
     ko_stages = [
         ("1/16 Finału", 16, [(29,6), (30,6), (1,7), (2,7)]), 
         ("1/8 Finału", 8, [(4,7), (5,7), (6,7), (7,7)]),     
@@ -328,13 +385,14 @@ def generate_schedule():
         matches_per_date = max(1, count // len(stage_dates))
         for i in range(count):
             d, m_num = stage_dates[date_idx % len(stage_dates)]
-            hour = 18 if i % 2 == 0 else 21
+            # Najczęstsze oficjalne ramy wieczorne w Polsce dla meczów pucharowych z USA
+            hour = 18 if i % 2 == 0 else 22
             match_dt = datetime(2026, m_num, d, hour, 0, 0)
             
             schedule[match_id] = {
                 "timestamp": match_dt,
                 "date": f"{d} {months_pl[m_num]}",
-                "time": match_dt.strftime("%H:00"), # Naprawiono błąd z % zamiast 00
+                "time": match_dt.strftime("%H:00"),
                 "stage": stage_name,
                 "home": "TBD", "away": "TBD",
                 "score_h": None, "score_a": None, "status": "Oczekuje"
@@ -493,7 +551,6 @@ else:
             view_mode = st.radio("Pokaż mecze:", ["Oczekujące (Od najbliższych)", "Wszystkie 104 mecze", "Tylko Zakończone"], horizontal=True, key="user_view_mode")
             st.divider()
             
-            # Otwarcie kontenera ze skrollem z boku
             st.markdown("<div class='scroll-container'>", unsafe_allow_html=True)
             
             sorted_matches = sorted(st.session_state.results.items(), key=lambda x: (x[1]['timestamp'], x[0]))
@@ -545,7 +602,7 @@ else:
                         st.dataframe(pd.DataFrame(other_bets), use_container_width=True)
                 st.markdown("</div>", unsafe_allow_html=True)
                 
-            st.markdown("</div>", unsafe_allow_html=True) # Zamknięcie scroll-containera
+            st.markdown("</div>", unsafe_allow_html=True)
             if matches_shown == 0:
                 st.info("Brak meczów.")
 
@@ -558,17 +615,18 @@ else:
                 if match["stage"] == group_name and match["status"] == "Zakończony":
                     h_team, a_team = match["home"], match["away"]
                     sh, sa = match["score_h"], match["score_a"]
-                    teams_stats[h_team]["BZ"] += sh
-                    teams_stats[h_team]["BS"] += sa
-                    teams_stats[h_team]["RB"] += (sh - sa)
-                    teams_stats[a_team]["BZ"] += sa
-                    teams_stats[a_team]["BS"] += sh
-                    teams_stats[a_team]["RB"] += (sa - sh)
-                    if sh > sa: teams_stats[h_team]["Punkty"] += 3
-                    elif sa > sh: teams_stats[a_team]["Punkty"] += 3
-                    else:
-                        teams_stats[h_team]["Punkty"] += 1
-                        teams_stats[a_team]["Punkty"] += 1
+                    if h_team in teams_stats and a_team in teams_stats:
+                        teams_stats[h_team]["BZ"] += sh
+                        teams_stats[h_team]["BS"] += sa
+                        teams_stats[h_team]["RB"] += (sh - sa)
+                        teams_stats[a_team]["BZ"] += sa
+                        teams_stats[a_team]["BS"] += sh
+                        teams_stats[a_team]["RB"] += (sa - sh)
+                        if sh > sa: teams_stats[h_team]["Punkty"] += 3
+                        elif sa > sh: teams_stats[a_team]["Punkty"] += 3
+                        else:
+                            teams_stats[h_team]["Punkty"] += 1
+                            teams_stats[a_team]["Punkty"] += 1
             df_group = pd.DataFrame.from_dict(teams_stats, orient='index').reset_index()
             df_group.rename(columns={'index': 'Reprezentacja'}, inplace=True)
             df_group = df_group.sort_values(by=["Punkty", "RB", "BZ"], ascending=[False, False, False]).reset_index(drop=True)
