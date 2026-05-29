@@ -6,16 +6,10 @@ import requests
 # 1. Konfiguracja i Szata Graficzna Kricon BV
 st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", layout="wide")
 
-# Wstrzyknięcie stylów CSS Kricon BV (Granat, błękit, czysta biel)
-# POPRAWKA: Użyto poprawnego parametru unsafe_allow_html=True
 st.markdown("""
     <style>
-    .reportview-container {
-        background: #F4F6F9;
-    }
-    .main .block-container {
-        padding-top: 2rem;
-    }
+    .reportview-container { background: #F4F6F9; }
+    .main .block-container { padding-top: 2rem; }
     h1 {
         color: #0F2042 !important;
         font-family: 'Segoe UI', Arial, sans-serif;
@@ -23,9 +17,7 @@ st.markdown("""
         border-bottom: 3px solid #3498DB;
         padding-bottom: 10px;
     }
-    h2, h3 {
-        color: #1B365D !important;
-    }
+    h2, h3 { color: #1B365D !important; }
     .stButton>button {
         background-color: #0F2042 !important;
         color: white !important;
@@ -47,30 +39,75 @@ st.markdown("""
 
 st.title("⚽ Kricon BV | World Cup 2026 Typer")
 
-# 2. Baza użytkowników i haseł
+# 2. Baza użytkowników
 USER_CREDENTIALS = {
-    "Adam": "adam2026",
-    "Maciej": "maciej2026",
-    "Marcin": "marcin2026",
-    "Kamil": "kamil2026",
-    "Kuba M": "kubam2026",
-    "Tomek": "tomek2026",
-    "Kuba K": "kubak2026",
-    "Rafał": "rafal2026",
-    "admin": "kriconadmin"
+    "Adam": "adam2026", "Maciej": "maciej2026", "Marcin": "marcin2026",
+    "Kamil": "kamil2026", "Kuba M": "kubam2026", "Tomek": "tomek2026",
+    "Kuba K": "kubak2026", "Rafał": "rafal2026", "admin": "kriconadmin"
 }
 players = [k for k in USER_CREDENTIALS.keys() if k != "admin"]
 
-# Inicjalizacja baz danych w pamięci chmury
-if 'bets' not in st.session_state:
-    st.session_state.bets = {1: {}, 2: {}, 3: {}} 
-
-if 'results' not in st.session_state:
-    st.session_state.results = {
-        1: {"home": "🇲🇽 Meksyk", "away": "🇨🇭 Szwajcaria", "score_h": None, "score_a": None, "status": "Oczekuje"},
-        2: {"home": "🇵🇱 Polska", "away": "🇺🇸 USA", "score_h": None, "score_a": None, "status": "Oczekuje"},
-        3: {"home": "🇦🇷 Argentyna", "away": "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglia", "score_h": None, "score_a": None, "status": "Oczekuje"}
+# 3. Generator Harmonogramu 104 Meczów (MŚ 2026)
+def generate_schedule():
+    schedule = {}
+    match_id = 1
+    
+    # Podział 48 drużyn na 12 Grup (A-L)
+    groups = {
+        "Grupa A": ["🇲🇽 Meksyk", "🇨🇭 Szwajcaria", "🇳🇬 Nigeria", "🇳🇿 Nowa Zelandia"],
+        "Grupa B": ["🇨🇦 Kanada", "🇩🇰 Dania", "🇨🇲 Kamerun", "🇶🇦 Katar"],
+        "Grupa C": ["🇺🇸 USA", "🇵🇱 Polska", "🇿🇦 RPA", "🇺🇿 Uzbekistan"],
+        "Grupa D": ["🇦🇷 Argentyna", "🇷🇸 Serbia", "🇩🇿 Algieria", "🇵🇦 Panama"],
+        "Grupa E": ["🇫🇷 Francja", "🇨🇴 Kolumbia", "🇮🇶 Irak", "🇯🇲 Jamajka"],
+        "Grupa F": ["🇧🇷 Brazylia", "🇦🇹 Austria", "🇬🇭 Ghana", "🇸🇦 Arabia Saudyjska"],
+        "Grupa G": ["🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglia", "🇪🇨 Ekwador", "🇲🇦 Maroko", "🇨🇷 Kostaryka"],
+        "Grupa H": ["🇪🇸 Hiszpania", "🇨🇱 Chile", "🇸🇳 Senegal", "🇦🇺 Australia"],
+        "Grupa I": ["🇩🇪 Niemcy", "🇺🇾 Urugwaj", "🇨🇮 WKS", "🇮🇷 Iran"],
+        "Grupa J": ["🇵🇹 Portugalia", "🇵🇪 Peru", "🇪🇬 Egipt", "🇯🇵 Japonia"],
+        "Grupa K": ["🇮🇹 Włochy", "🇻🇪 Wenezuela", "🇰🇷 Korea Płd.", "🇸🇪 Szwecja"],
+        "Grupa L": ["🇳🇱 Holandia", "🇭🇷 Chorwacja", "🇧🇪 Belgia", "🏴󠁧󠁢󠁷󠁬󠁳󠁿 Walia"]
     }
+    
+    # Faza Grupowa (72 mecze - po 6 w każdej grupie w formacie każdy z każdym)
+    matchups = [(0,1), (2,3), (0,2), (1,3), (0,3), (1,2)]
+    for group_name, teams in groups.items():
+        for t1_idx, t2_idx in matchups:
+            schedule[match_id] = {
+                "stage": group_name,
+                "home": teams[t1_idx], "away": teams[t2_idx],
+                "score_h": None, "score_a": None, "status": "Oczekuje"
+            }
+            match_id += 1
+
+    # Faza Pucharowa (32 mecze)
+    ko_stages = [
+        ("1/16 Finału", 16), ("1/8 Finału", 8), 
+        ("Ćwierćfinały", 4), ("Półfinały", 2), 
+        ("Mecz o 3. miejsce", 1), ("Finał", 1)
+    ]
+    for stage_name, count in ko_stages:
+        for _ in range(count):
+            schedule[match_id] = {
+                "stage": stage_name,
+                "home": "TBD (Kwalifikant)", "away": "TBD (Kwalifikant)",
+                "score_h": None, "score_a": None, "status": "Oczekuje"
+            }
+            match_id += 1
+            
+    return schedule
+
+# Inicjalizacja baz danych w pamięci chmury
+if 'results' not in st.session_state:
+    st.session_state.results = generate_schedule()
+
+if 'bets' not in st.session_state:
+    st.session_state.bets = {m_id: {} for m_id in st.session_state.results.keys()}
+
+# Wyciągnięcie unikalnych etapów (Filtry)
+all_stages = []
+for m in st.session_state.results.values():
+    if m["stage"] not in all_stages:
+        all_stages.append(m["stage"])
 
 # Funkcja obliczania punktów
 def calculate_points(pred_h, pred_a, real_h, real_a):
@@ -82,7 +119,7 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
         return 1
     return 0
 
-# 3. System Logowania
+# 4. System Logowania
 if 'logged_in_user' not in st.session_state:
     st.session_state.logged_in_user = None
 
@@ -98,15 +135,13 @@ if st.session_state.logged_in_user is None:
         else:
             st.error("Błędne hasło. Spróbuj ponownie.")
 else:
-    # Użytkownik jest zalogowany
     current_user = st.session_state.logged_in_user
     st.sidebar.write(f"👤 Zalogowany jako: **{current_user}**")
     if st.sidebar.button("Wyloguj się"):
         st.session_state.logged_in_user = None
         st.rerun()
 
-    # Nawigacja zakładkowa
-    tab1, tab2, tab3 = st.tabs(["📊 Klasyfikacja Generalna", "🎯 Moje Typy", "🔄 Live Score Sync"])
+    tab1, tab2, tab3 = st.tabs(["📊 Klasyfikacja Generalna", "🎯 Moje Typy", "⚙️ Panel Admina (Wyniki)"])
 
     # ZAKŁADKA 1: KLASYFIKACJA
     with tab1:
@@ -125,67 +160,77 @@ else:
         
         def highlight_rows(row):
             if row.name == 1 and row['Punkty'] > 0:
-                return ['background-color: #A9DFBF; font-weight: bold;'] * len(row) # Lider
+                return ['background-color: #A9DFBF; font-weight: bold;'] * len(row) 
             elif row.name == len(df_scores) and row['Punkty'] > 0:
-                return ['background-color: #F5B7B1;'] * len(row) # Ostatni
+                return ['background-color: #F5B7B1;'] * len(row)
             return [''] * len(row)
 
         st.dataframe(df_scores.style.apply(highlight_rows, axis=1), use_container_width=True)
 
-    # ZAKŁADKA 2: MOJE TYPY (Edycja zablokowana dla innych osób)
+    # ZAKŁADKA 2: MOJE TYPY 
     with tab2:
         if current_user == "admin":
             st.warning("Jesteś zalogowany jako admin. Aby typować, zaloguj się na swoje imienne konto.")
         else:
             st.header(f"Twoje Typy - {current_user}")
-            st.info("Tutaj możesz bezpiecznie edytować swoje wyniki. Inni gracze nie mają dostępu do tego panelu z Twojego konta.")
+            # Zastosowanie filtra dla wygody użytkowania
+            selected_stage = st.selectbox("Wybierz fazę turnieju do typowania:", all_stages)
+            st.divider()
             
             for match_id, match in st.session_state.results.items():
-                st.write(f"**Mecz {match_id}: {match['home']} vs {match['away']}** (Status: {match['status']})")
-                
-                curr_h, curr_a = st.session_state.bets[match_id].get(current_user, (None, None))
-                
-                c1, c2, c3 = st.columns([1, 1, 2])
-                with c1:
-                    bet_h = st.number_input(f"Wynik {match['home']}", min_value=0, step=1, key=f"h_{match_id}", value=curr_h if curr_h is not None else 0)
-                with c2:
-                    bet_a = st.number_input(f"Wynik {match['away']}", min_value=0, step=1, key=f"a_{match_id}", value=curr_a if curr_a is not None else 0)
-                with c3:
-                    st.write("")
-                    st.write("")
-                    if match['status'] == "Zakończony":
-                        st.button("Mecz zakończony - blokada", disabled=True, key=f"dis_{match_id}")
-                    else:
-                        if st.button("Zapisz mój typ", key=f"btn_{match_id}"):
-                            st.session_state.bets[match_id][current_user] = (bet_h, bet_a)
-                            st.success("Zapisano Twój typ!")
-                st.divider()
+                if match["stage"] == selected_stage:
+                    st.write(f"**Mecz #{match_id}: {match['home']} vs {match['away']}** (Status: {match['status']})")
+                    
+                    curr_h, curr_a = st.session_state.bets[match_id].get(current_user, (None, None))
+                    
+                    c1, c2, c3 = st.columns([1, 1, 2])
+                    with c1:
+                        bet_h = st.number_input(f"Bramki {match['home']}", min_value=0, step=1, key=f"h_{match_id}", value=curr_h if curr_h is not None else 0)
+                    with c2:
+                        bet_a = st.number_input(f"Bramki {match['away']}", min_value=0, step=1, key=f"a_{match_id}", value=curr_a if curr_a is not None else 0)
+                    with c3:
+                        st.write("")
+                        st.write("")
+                        if match['status'] == "Zakończony":
+                            st.button("Zablokowane", disabled=True, key=f"dis_{match_id}")
+                        else:
+                            if st.button("Zapisz", key=f"btn_{match_id}"):
+                                st.session_state.bets[match_id][current_user] = (bet_h, bet_a)
+                                st.success("Zapisano typ!")
+                    st.markdown("---")
 
-    # ZAKŁADKA 3: AKTUALIZACJA WYNIKÓW (Automatyczna synchronizacja live)
+    # ZAKŁADKA 3: AKTUALIZACJA WYNIKÓW (Panel Administratora)
     with tab3:
-        st.header("🔄 Synchronizacja Wyników Live")
-        st.write("Kliknij poniższy przycisk, aby pobrać najświeższe wyniki meczów i zaktualizować punkty graczy.")
-        
-        if st.button("Pobierz i zaktualizuj wyniki z bazy live"):
-            with st.spinner("Pobieranie danych ze źródeł meczowych..."):
-                try:
-                    # Legalne, stabilne darmowe API dostarczające wyniki w formacie JSON
-                    # Na potrzeby turnieju wkleja się tu wygenerowany token z np. football-data.org
-                    # response = requests.get("https://api.football-data.org/v4/matches", headers={"X-Auth-Token": "TWÓJ_TOKEN_API"}, timeout=5)
+        if current_user != "admin":
+            st.error("Brak dostępu. Zaloguj się jako 'admin', aby wpisywać oficjalne wyniki meczów.")
+        else:
+            st.header("⚙️ Zarządzanie Oficjalnymi Wynikami")
+            admin_stage = st.selectbox("Wybierz fazę turnieju do edycji:", all_stages, key="admin_stage")
+            st.divider()
+            
+            for match_id, match in st.session_state.results.items():
+                if match["stage"] == admin_stage:
                     
-                    # Symulacja przetworzenia danych (gdy brak tokenu, skrypt uaktualnia mecze testowe)
-                    st.session_state.results[1]["score_h"] = 2
-                    st.session_state.results[1]["score_a"] = 1
-                    st.session_state.results[1]["status"] = "Zakończony"
+                    # Opcja dla fazy pucharowej - edycja nazw drużyn, które awansowały
+                    if "TBD" in match["home"] or "Finał" in match["stage"] or "1/" in match["stage"]:
+                        new_home = st.text_input(f"Drużyna 1 (Mecz #{match_id})", value=match["home"], key=f"edit_h_{match_id}")
+                        new_away = st.text_input(f"Drużyna 2 (Mecz #{match_id})", value=match["away"], key=f"edit_a_{match_id}")
+                        st.session_state.results[match_id]["home"] = new_home
+                        st.session_state.results[match_id]["away"] = new_away
+
+                    st.write(f"**Mecz #{match_id}: {match['home']} vs {match['away']}**")
                     
-                    st.session_state.results[2]["score_h"] = 1
-                    st.session_state.results[2]["score_a"] = 1
-                    st.session_state.results[2]["status"] = "Zakończony"
-                    
-                    st.success("Wyniki zostały zaktualizowane pomyślnie na podstawie bazy meczowej! Tabele zostały przeliczone.")
-                except Exception as e:
-                    # Awaryjne przypisanie wyników (Fallback), jeśli internet/API chwilowo nie odpowie
-                    st.session_state.results[1]["score_h"] = 2
-                    st.session_state.results[1]["score_a"] = 1
-                    st.session_state.results[1]["status"] = "Zakończony"
-                    st.info("Pobrano oficjalne zweryfikowane wyniki. Punkty przeliczone pomyślnie!")
+                    c1, c2, c3 = st.columns([1, 1, 2])
+                    with c1:
+                        res_h = st.number_input(f"Wynik {match['home']}", min_value=0, step=1, key=f"res_h_{match_id}", value=match['score_h'] if match['score_h'] is not None else 0)
+                    with c2:
+                        res_a = st.number_input(f"Wynik {match['away']}", min_value=0, step=1, key=f"res_a_{match_id}", value=match['score_a'] if match['score_a'] is not None else 0)
+                    with c3:
+                        st.write("")
+                        st.write("")
+                        if st.button("Zatwierdź Wynik i Zamknij Mecz", key=f"res_btn_{match_id}"):
+                            st.session_state.results[match_id]['score_h'] = res_h
+                            st.session_state.results[match_id]['score_a'] = res_a
+                            st.session_state.results[match_id]['status'] = "Zakończony"
+                            st.success("Tabela przeliczona!")
+                    st.markdown("---")
