@@ -58,41 +58,51 @@ st.markdown("""
         color: #0A1128 !important;
     }
     
-    /* --- ZAKTUALIZOWANE: GRUBSZY POMARAŃCZOWY SUWAK --- */
+    /* --- TOTALNA WYMUSZONA WIDOCZNOŚĆ DLA GRUBYCH POMARAŃCZOWYCH SUWAKÓW --- */
     .scroll-container, .table-scroll-container {
         max-height: 650px;
-        overflow-y: auto;
-        padding-right: 15px;
-        border: 1px solid #1E3A8A;
+        overflow-y: scroll !important; /* Wymuszenie ciągłego wyświetlania pionowego paska */
+        padding-right: 20px;
+        border: 2px solid #1E3A8A;
         border-radius: 12px;
         background-color: #0D1B3E;
         padding: 20px;
         margin-bottom: 25px;
-        scrollbar-width: auto; /* Firefox */
-        scrollbar-color: #F97316 #0A1128; /* Firefox */
+        
+        /* Firefox: Wymuszenie grubego, widocznego paska */
+        scrollbar-width: thick !important;
+        scrollbar-color: #F97316 #1E3A8A !important;
     }
     
     .table-scroll-container {
         max-height: 300px;
     }
     
-    /* Webkit (Chrome, Safari, Edge, Opera) */
+    /* Webkit (Chrome, Safari, Edge, Opera) - pełne formatowanie paska */
     .scroll-container::-webkit-scrollbar, .table-scroll-container::-webkit-scrollbar {
-        width: 16px !important; /* Grubszy suwak */
+        width: 16px !important; /* Grubość paska */
+        display: block !important;
     }
+    
+    /* Tor suwaka (Tło pod paskiem) - ustawione na jasny kontrastowy kolor, by pomarańcz był widoczny */
     .scroll-container::-webkit-scrollbar-track, .table-scroll-container::-webkit-scrollbar-track {
-        background: #0A1128 !important;
+        background: #1E3A8A !important;
         border-radius: 10px !important;
     }
+    
+    /* Suwak (Uchwyt do przesuwania) - Jaskrawy Pomarańczowy */
     .scroll-container::-webkit-scrollbar-thumb, .table-scroll-container::-webkit-scrollbar-thumb {
         background-color: #F97316 !important;
         border-radius: 10px !important;
-        border: 3px solid #0A1128 !important; /* Margines wokół suwaka */
+        border: 2px solid #1E3A8A !important; /* Odstęp od krawędzi toru */
     }
+    
+    /* Efekt najechania na suwak */
     .scroll-container::-webkit-scrollbar-thumb:hover, .table-scroll-container::-webkit-scrollbar-thumb:hover {
         background-color: #EA580C !important;
+        cursor: pointer !important;
     }
-    /* -------------------------------------------------- */
+    /* ---------------------------------------------------------------------- */
     
     /* Kontener loga i tytułu */
     .logo-title-container {
