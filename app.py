@@ -58,7 +58,7 @@ st.markdown("""
         color: #0A1128 !important;
     }
     
-    /* Globalne kontenery z bocznym suwakiem */
+    /* --- ZAKTUALIZOWANE: GRUBSZY POMARAŃCZOWY SUWAK --- */
     .scroll-container, .table-scroll-container {
         max-height: 650px;
         overflow-y: auto;
@@ -68,35 +68,31 @@ st.markdown("""
         background-color: #0D1B3E;
         padding: 20px;
         margin-bottom: 25px;
+        scrollbar-width: auto; /* Firefox */
+        scrollbar-color: #F97316 #0A1128; /* Firefox */
     }
     
-    /* Dla tabel zmniejszamy wysokość kontenera by zmieścił się idealnie bez marnowania przestrzeni */
     .table-scroll-container {
-        max-height: 280px;
+        max-height: 300px;
     }
     
-    /* POMARAŃCZOWY SUWAK (Dla silników WebKit - Chrome, Safari, Edge, nowy Opera) */
+    /* Webkit (Chrome, Safari, Edge, Opera) */
     .scroll-container::-webkit-scrollbar, .table-scroll-container::-webkit-scrollbar {
-        width: 10px;
+        width: 16px !important; /* Grubszy suwak */
     }
     .scroll-container::-webkit-scrollbar-track, .table-scroll-container::-webkit-scrollbar-track {
-        background: #0A1128;
-        border-radius: 10px;
+        background: #0A1128 !important;
+        border-radius: 10px !important;
     }
     .scroll-container::-webkit-scrollbar-thumb, .table-scroll-container::-webkit-scrollbar-thumb {
-        background: #F97316;
-        border-radius: 10px;
-        border: 2px solid #0A1128;
+        background-color: #F97316 !important;
+        border-radius: 10px !important;
+        border: 3px solid #0A1128 !important; /* Margines wokół suwaka */
     }
     .scroll-container::-webkit-scrollbar-thumb:hover, .table-scroll-container::-webkit-scrollbar-thumb:hover {
-        background: #EA580C;
+        background-color: #EA580C !important;
     }
-
-    /* Wsparcie dla Firefox (wersje nowoczesne) */
-    .scroll-container, .table-scroll-container {
-        scrollbar-width: thin;
-        scrollbar-color: #F97316 #0A1128;
-    }
+    /* -------------------------------------------------- */
     
     /* Kontener loga i tytułu */
     .logo-title-container {
@@ -295,9 +291,7 @@ GROUPS_DICT = {
 def generate_schedule():
     schedule = {}
     months_pl = {6: "Czerwca", 7: "Lipca"}
-    
     raw_fixtures = [
-        # Kolejka 1
         (2026, 6, 11, 21, 0, "Grupa A", "Meksyk", "RPA"),
         (2026, 6, 12, 4, 0, "Grupa A", "Korea Południowa", "Czechy"),
         (2026, 6, 12, 21, 0, "Grupa B", "Kanada", "Bośnia i Hercegowina"),
@@ -322,8 +316,6 @@ def generate_schedule():
         (2026, 6, 17, 22, 0, "Grupa L", "Anglia", "Chorwacja"),
         (2026, 6, 18, 1, 0, "Grupa L", "Ghana", "Panama"),
         (2026, 6, 18, 4, 0, "Grupa K", "Uzbekistan", "Kolumbia"),
-        
-        # Kolejka 2
         (2026, 6, 18, 18, 0, "Grupa A", "Czechy", "RPA"),
         (2026, 6, 18, 21, 0, "Grupa B", "Szwajcaria", "Bośnia i Hercegowina"),
         (2026, 6, 19, 0, 0, "Grupa B", "Kanada", "Katar"),
@@ -341,51 +333,31 @@ def generate_schedule():
         (2026, 6, 22, 0, 0, "Grupa H", "Urugwaj", "Wyspy Zielonego Przylądka"),
         (2026, 6, 22, 3, 0, "Grupa G", "Nowa Zelandia", "Egipt")
     ]
-    
     match_id = 1
     for yr, mo, dy, hr, mn, stage, home, away in raw_fixtures:
         dt = datetime(yr, mo, dy, hr, mn)
         schedule[match_id] = {
-            "timestamp": dt,
-            "date": f"{dt.day} {months_pl[dt.month]}",
-            "time": dt.strftime("%H:00"),
-            "stage": stage,
-            "home": home, "away": away,
-            "score_h": None, "score_a": None, "status": "Oczekuje"
+            "timestamp": dt, "date": f"{dt.day} {months_pl[dt.month]}", "time": dt.strftime("%H:00"),
+            "stage": stage, "home": home, "away": away, "score_h": None, "score_a": None, "status": "Oczekuje"
         }
         match_id += 1
-
     all_groups = list(GROUPS_DICT.keys())
     sim_day = datetime(2026, 6, 22, 18, 0)
     while match_id <= 72:
         g_name = all_groups[(match_id % 12)]
         teams = GROUPS_DICT[g_name]
-        if match_id % 2 == 0:
-            h, a = teams[0], teams[3]
-        else:
-            h, a = teams[1], teams[2]
-            
+        h, a = (teams[0], teams[3]) if match_id % 2 == 0 else (teams[1], teams[2])
         schedule[match_id] = {
-            "timestamp": sim_day,
-            "date": f"{sim_day.day} {months_pl[sim_day.month]}",
-            "time": sim_day.strftime("%H:00"),
-            "stage": g_name,
-            "home": h, "away": a,
-            "score_h": None, "score_a": None, "status": "Oczekuje"
+            "timestamp": sim_day, "date": f"{sim_day.day} {months_pl[sim_day.month]}", "time": sim_day.strftime("%H:00"),
+            "stage": g_name, "home": h, "away": a, "score_h": None, "score_a": None, "status": "Oczekuje"
         }
         match_id += 1
-        if match_id % 4 == 0:
-            sim_day += timedelta(days=1)
-
+        if match_id % 4 == 0: sim_day += timedelta(days=1)
     ko_stages = [
-        ("1/16 Finału", 16, [(29,6), (30,6), (1,7), (2,7)]), 
-        ("1/8 Finału", 8, [(4,7), (5,7), (6,7), (7,7)]),     
-        ("Ćwierćfinały", 4, [(9,7), (10,7)]),                
-        ("Półfinały", 2, [(14,7), (15,7)]),                  
-        ("Mecz o 3. miejsce", 1, [(18,7)]),                  
-        ("Finał", 1, [(19,7)])                               
+        ("1/16 Finału", 16, [(29,6), (30,6), (1,7), (2,7)]), ("1/8 Finału", 8, [(4,7), (5,7), (6,7), (7,7)]),     
+        ("Ćwierćfinały", 4, [(9,7), (10,7)]), ("Półfinały", 2, [(14,7), (15,7)]),                  
+        ("Mecz o 3. miejsce", 1, [(18,7)]), ("Finał", 1, [(19,7)])                               
     ]
-    
     for stage_name, count, stage_dates in ko_stages:
         date_idx = 0
         matches_per_date = max(1, count // len(stage_dates))
@@ -393,292 +365,134 @@ def generate_schedule():
             d, m_num = stage_dates[date_idx % len(stage_dates)]
             hour = 18 if i % 2 == 0 else 22
             match_dt = datetime(2026, m_num, d, hour, 0, 0)
-            
             schedule[match_id] = {
-                "timestamp": match_dt,
-                "date": f"{d} {months_pl[m_num]}",
-                "time": match_dt.strftime("%H:00"),
-                "stage": stage_name,
-                "home": "TBD", "away": "TBD",
-                "score_h": None, "score_a": None, "status": "Oczekuje"
+                "timestamp": match_dt, "date": f"{d} {months_pl[m_num]}", "time": match_dt.strftime("%H:00"),
+                "stage": stage_name, "home": "TBD", "away": "TBD", "score_h": None, "score_a": None, "status": "Oczekuje"
             }
             match_id += 1
-            if (i + 1) % matches_per_date == 0:
-                date_idx += 1
-            
+            if (i + 1) % matches_per_date == 0: date_idx += 1
     return schedule
 
 if 'results' not in st.session_state or len(st.session_state.results) != 104:
     st.session_state.results = generate_schedule()
-
 if 'bets' not in st.session_state or len(st.session_state.bets) != 104:
     st.session_state.bets = {m_id: {} for m_id in st.session_state.results.keys()}
-
 if 'last_positions' not in st.session_state:
     st.session_state.last_positions = {player: idx + 1 for idx, player in enumerate(players)}
 
 def calculate_points(pred_h, pred_a, real_h, real_a):
-    if real_h is None or real_a is None or pred_h is None or pred_a is None:
-        return 0
-    if pred_h == real_h and pred_a == real_a:
-        return 3
-    if np.sign(pred_h - pred_a) == np.sign(real_h - real_a):
-        return 1
+    if real_h is None or real_a is None or pred_h is None or pred_a is None: return 0
+    if pred_h == real_h and pred_a == real_a: return 3
+    if np.sign(pred_h - pred_a) == np.sign(real_h - real_a): return 1
     return 0
 
 def get_time_to_next_unbet_match(player_name, now_time):
-    upcoming_matches = sorted(
-        [m for m in st.session_state.results.values() if m["status"] == "Oczekuje" and m["timestamp"] > now_time],
-        key=lambda x: x["timestamp"]
-    )
-    for match in upcoming_matches:
-        match_id = [k for k, v in st.session_state.results.items() if v == match][0]
-        player_bet = st.session_state.bets[match_id].get(player_name, (None, None))
-        if player_bet == (None, None):
+    upcoming = sorted([m for m in st.session_state.results.values() if m["status"] == "Oczekuje" and m["timestamp"] > now_time], key=lambda x: x["timestamp"])
+    for match in upcoming:
+        m_id = [k for k, v in st.session_state.results.items() if v == match][0]
+        if st.session_state.bets[m_id].get(player_name, (None, None)) == (None, None):
             diff = match["timestamp"] - now_time
-            hours = int(diff.total_seconds() // 3600)
-            minutes = int((diff.total_seconds() % 3600) // 60)
-            if diff <= timedelta(hours=1):
-                return f'<span class="time-warning">⏳ Za {hours}h {minutes}m!</span>'
-            else:
-                return f'<span class="time-normal">Za {hours}h {minutes}m</span>'
+            h, m = int(diff.total_seconds() // 3600), int((diff.total_seconds() % 3600) // 60)
+            return f'<span class="{"time-warning" if diff <= timedelta(hours=1) else "time-normal"}">Za {h}h {m}m</span>'
     return '<span class="time-ok">✔ Wszystko obstawione</span>'
 
 def render_leaderboard_html(now_time, new_positions_dict_dest=None):
-    scores = {player: 0 for player in players}
-    for match_id, result in st.session_state.results.items():
-        r_h, r_a = result['score_h'], result['score_a']
-        if result['status'] == "Zakończony":
-            for player in players:
-                if player in st.session_state.bets[match_id]:
-                    p_h, p_a = st.session_state.bets[match_id][player]
-                    scores[player] += calculate_points(p_h, p_a, r_h, r_a)
-                    
-    df_scores = pd.DataFrame(list(scores.items()), columns=["Gracz", "Punkty"])
-    df_scores = df_scores.sort_values(by="Punkty", ascending=False).reset_index(drop=True)
-    
-    html_rows = ""
-    for idx, row in df_scores.iterrows():
-        pos = idx + 1
-        player_name = row['Gracz']
-        if new_positions_dict_dest is not None:
-            new_positions_dict_dest[player_name] = pos
-        old_pos = st.session_state.last_positions.get(player_name, pos)
-        
-        if old_pos > pos:
-            trend_html = '<div class="badge-trend trend-box-up">▲</div>'  
-        elif old_pos < pos:
-            trend_html = '<div class="badge-trend trend-box-down">▼</div>'  
-        else:
-            trend_html = '<div class="badge-trend trend-box-stable">•</div>'  
-            
-        bg_style = ""
-        if pos == 1 and row['Punkty'] > 0:
-            bg_style = 'style="background-color: #16A34A; font-weight: bold; color: #FFFFFF;"' 
-        elif pos == len(df_scores) and row['Punkty'] > 0:
-            bg_style = 'style="background-color: #DC2626; font-weight: bold; color: #FFFFFF;"' 
-            
-        countdown_html = get_time_to_next_unbet_match(player_name, now_time)
-        html_rows += f"""
-        <tr {bg_style}>
-            <td style="text-align:center;"><b>{pos}</b></td>
-            <td style="text-align:center;">{trend_html}</td>
-            <td>{player_name}</td>
-            <td><b>{row['Punkty']} pkt</b></td>
-            <td>{countdown_html}</td>
-        </tr>
-        """
-    return f"""
-        <table class="kricon-table">
-            <tr>
-                <th style="width:10%; text-align:center;">Msc.</th>
-                <th style="width:10%; text-align:center;">Trend</th>
-                <th>Gracz</th>
-                <th>Punkty</th>
-                <th>Najbliższy mecz</th>
-            </tr>
-            {html_rows}
-        </table>
-    """
+    scores = {p: 0 for p in players}
+    for m_id, res in st.session_state.results.items():
+        if res['status'] == "Zakończony":
+            for p in players:
+                if p in st.session_state.bets[m_id]:
+                    scores[p] += calculate_points(st.session_state.bets[m_id][p][0], st.session_state.bets[m_id][p][1], res['score_h'], res['score_a'])
+    df = pd.DataFrame(list(scores.items()), columns=["Gracz", "Punkty"]).sort_values(by="Punkty", ascending=False).reset_index(drop=True)
+    rows = ""
+    for idx, row in df.iterrows():
+        pos, p_name = idx + 1, row['Gracz']
+        if new_positions_dict_dest is not None: new_positions_dict_dest[p_name] = pos
+        old_pos = st.session_state.last_positions.get(p_name, pos)
+        trend = '<div class="badge-trend trend-box-up">▲</div>' if old_pos > pos else ('<div class="badge-trend trend-box-down">▼</div>' if old_pos < pos else '<div class="badge-trend trend-box-stable">•</div>')
+        bg = 'style="background-color: #16A34A; font-weight: bold; color: #FFFFFF;"' if pos == 1 and row['Punkty'] > 0 else ('style="background-color: #DC2626; font-weight: bold; color: #FFFFFF;"' if pos == len(df) and row['Punkty'] > 0 else '')
+        rows += f"<tr {bg}><td style='text-align:center;'><b>{pos}</b></td><td style='text-align:center;'>{trend}</td><td>{p_name}</td><td><b>{row['Punkty']} pkt</b></td><td>{get_time_to_next_unbet_match(p_name, now_time)}</td></tr>"
+    return f"<table class='kricon-table'><tr><th>Msc.</th><th>Trend</th><th>Gracz</th><th>Punkty</th><th>Najbliższy mecz</th></tr>{rows}</table>"
 
-if 'logged_in_user' not in st.session_state:
-    st.session_state.logged_in_user = None
-
+if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 now = datetime.now()
 
 if st.session_state.logged_in_user is None:
-    col_login, col_board = st.columns([2, 3], gap="large")
-    with col_login:
-        st.subheader("🔒 Logowanie do systemu Kricon Typer")
-        username = st.selectbox("Wybierz użytkownika:", [""] + list(USER_CREDENTIALS.keys()))
-        password = st.text_input("Wpisz hasło:", type="password")
+    c1, c2 = st.columns([2, 3], gap="large")
+    with c1:
+        st.subheader("🔒 Logowanie")
+        user = st.selectbox("Użytkownik:", [""] + list(USER_CREDENTIALS.keys()))
+        pw = st.text_input("Hasło:", type="password")
         if st.button("Zaloguj się"):
-            if USER_CREDENTIALS.get(username) == password:
-                st.session_state.logged_in_user = username
-                st.rerun()
-            else:
-                st.error("Błędne hasło. Spróbuj ponownie.")
-    with col_board:
-        st.subheader("📊 Aktualna Klasyfikacja i Stan Obstawień")
+            if USER_CREDENTIALS.get(user) == pw: st.session_state.logged_in_user = user; st.rerun()
+            else: st.error("Błąd logowania.")
+    with c2:
+        st.subheader("📊 Ranking")
         st.markdown(render_leaderboard_html(now), unsafe_allow_html=True)
 else:
-    current_user = st.session_state.logged_in_user
-    st.sidebar.write(f"👤 Zalogowany jako: **{current_user}**")
-    if st.sidebar.button("Wyloguj się"):
-        st.session_state.logged_in_user = None
-        st.rerun()
-
-    for match_id, match in st.session_state.results.items():
-        if match["status"] == "Oczekuje":
-            try:
-                time_to_match = match["timestamp"] - now
-                if timedelta(hours=0) < time_to_match <= timedelta(hours=1):
-                    for player in players:
-                        if player not in st.session_state.bets[match_id] or st.session_state.bets[match_id][player] == (None, None):
-                            match_name = f"{match['home']} - {match['away']}"
-                            st.toast(f"Hej {player}, zapomniałeś obstawić mecz {match_name}!", icon="⚠️")
-                            st.warning(f"Hej {player}, zapomniałeś obstawić mecz {match_name}!")
-            except Exception:
-                pass 
-
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 Klasyfikacja", "📅 Lista Meczów (Terminarz)", "📈 Tabele Grup", "⚙️ Admin"])
-
-    with tab1:
-        st.header("Tabela Wyników Typera")
-        new_positions = {}
-        st.markdown(render_leaderboard_html(now, new_positions), unsafe_allow_html=True)
-
+    st.sidebar.write(f"👤: **{st.session_state.logged_in_user}**")
+    if st.sidebar.button("Wyloguj"): st.session_state.logged_in_user = None; st.rerun()
+    tab1, tab2, tab3, tab4 = st.tabs(["📊 Ranking", "📅 Terminarz", "📈 Tabele", "⚙️ Admin"])
+    with tab1: st.header("Klasyfikacja"); st.markdown(render_leaderboard_html(now), unsafe_allow_html=True)
     with tab2:
-        if current_user == "admin":
-            st.warning("Zaloguj się jako gracz, aby typować.")
-        else:
-            st.header("Terminarz Mistrzostw Świata 2026")
-            view_mode = st.radio("Pokaż mecze:", ["Oczekujące (Od najbliższych)", "Wszystkie 104 mecze", "Tylko Zakończone"], horizontal=True, key="user_view_mode")
-            st.divider()
-            
-            st.markdown("<div class='scroll-container'>", unsafe_allow_html=True)
-            
-            sorted_matches = sorted(st.session_state.results.items(), key=lambda x: (x[1]['timestamp'], x[0]))
-            matches_shown = 0
-            
-            for match_id, match in sorted_matches:
-                if view_mode == "Oczekujące (Od najbliższych)" and match['status'] == "Zakończony":
-                    continue
-                if view_mode == "Tylko Zakończone" and match['status'] == "Oczekuje":
-                    continue
-                
-                matches_shown += 1
-                is_lock_time = (match['timestamp'] - now).total_seconds() <= 0
-                
-                st.markdown(f"<div class='match-container'>", unsafe_allow_html=True)
-                st.markdown(f"<div class='match-header'>⚽ Mecz #{match_id}</div>", unsafe_allow_html=True)
-                st.markdown(f"### {get_flag_html(match['home'])} vs {get_flag_html(match['away'])}", unsafe_allow_html=True)
-                st.markdown(f"<p style='color: #94A3B8; margin-bottom:15px;'>Faza: <b>{match['stage']}</b> | Data: {match['date']}, {match['time']}</p>", unsafe_allow_html=True)
-                
-                if match['status'] == "Zakończony":
-                    st.markdown(f"<p class='real-score'>Oficjalny wynik: {match['score_h']} - {match['score_a']}</p>", unsafe_allow_html=True)
-                elif is_lock_time:
-                    st.markdown("<p style='color: #F87171; font-weight: bold;'>⚠️ Obstawianie tego meczu zostało zablokowane.</p>", unsafe_allow_html=True)
-                
-                curr_h, curr_a = st.session_state.bets[match_id].get(current_user, (None, None))
-                
-                c1, c2, c3 = st.columns([1, 1, 2])
-                with c1:
-                    bet_h = st.number_input(f"Typ: {match['home']}", min_value=0, step=1, key=f"h_{match_id}", value=curr_h if curr_h is not None else 0, disabled=is_lock_time)
-                with c2:
-                    bet_a = st.number_input(f"Typ: {match['away']}", min_value=0, step=1, key=f"a_{match_id}", value=curr_a if curr_a is not None else 0, disabled=is_lock_time)
-                with c3:
-                    st.write("")
-                    st.write("")
-                    if match['status'] == "Zakończony" or is_lock_time:
-                        st.button("Zablokowane", disabled=True, key=f"dis_{match_id}")
-                    else:
-                        if st.button("Zapisz typ", key=f"btn_{match_id}"):
-                            st.session_state.bets[match_id][current_user] = (bet_h, bet_a)
-                            st.success("Zapisano!")
-                
-                if is_lock_time or match['status'] == "Zakończony":
-                    with st.expander("👁️ Zobacz typy innych graczy"):
-                        other_bets = []
-                        for p in players:
-                            if p != current_user:
-                                p_bet = st.session_state.bets[match_id].get(p)
-                                other_bets.append({"Gracz": p, "Typ": f"{p_bet[0]} - {p_bet[1]}" if p_bet else "Brak typu"})
-                        st.dataframe(pd.DataFrame(other_bets), use_container_width=True)
-                st.markdown("</div>", unsafe_allow_html=True)
-                
+        st.header("Terminarz MŚ 2026")
+        mode = st.radio("Widok:", ["Oczekujące", "Wszystkie", "Zakończone"], horizontal=True)
+        st.markdown("<div class='scroll-container'>", unsafe_allow_html=True)
+        sorted_m = sorted(st.session_state.results.items(), key=lambda x: (x[1]['timestamp'], x[0]))
+        for m_id, m in sorted_m:
+            if (mode == "Oczekujące" and m['status'] == "Zakończony") or (mode == "Zakończone" and m['status'] == "Oczekuje"): continue
+            st.markdown(f"<div class='match-container'><div class='match-header'>⚽ Mecz #{m_id}</div>### {get_flag_html(m['home'])} vs {get_flag_html(m['away'])}<p style='color: #94A3B8;'>Faza: {m['stage']} | {m['date']}, {m['time']}</p>", unsafe_allow_html=True)
+            if m['status'] == "Zakończony": st.markdown(f"<p class='real-score'>Wynik: {m['score_h']} - {m['score_a']}</p>", unsafe_allow_html=True)
+            locked = (m['timestamp'] - now).total_seconds() <= 0
+            cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
+            c1, c2, c3 = st.columns([1,1,2])
+            with c1: b_h = st.number_input(f"H", 0, 20, cur_h, 1, key=f"h_{m_id}", disabled=locked)
+            with c2: b_a = st.number_input(f"A", 0, 20, cur_a, 1, key=f"a_{m_id}", disabled=locked)
+            with c3: 
+                st.write(""); st.write("")
+                if not locked and st.button("Zapisz", key=f"btn_{m_id}"): st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a); st.success("OK")
+            if locked or m['status'] == "Zakończony":
+                with st.expander("Typy innych"):
+                    st.dataframe(pd.DataFrame([{"Gracz": p, "Typ": f"{st.session_state.bets[m_id].get(p, (None,None))[0]} - {st.session_state.bets[m_id].get(p, (None,None))[1]}"} for p in players if p != st.session_state.logged_in_user]), use_container_width=True)
             st.markdown("</div>", unsafe_allow_html=True)
-            if matches_shown == 0:
-                st.info("Brak meczów.")
-
+        st.markdown("</div>", unsafe_allow_html=True)
     with tab3:
-        st.header("📈 Tabele Fazy Grupowej")
-        for group_name in list(GROUPS_DICT.keys()):
-            st.markdown(f"### {group_name}")
-            
-            # NOWOŚĆ: Każda tabela zamknięta w małym, dedykowanym kontenerze z pomarańczowym suwakiem
+        st.header("Tabele Grup")
+        for g_name in list(GROUPS_DICT.keys()):
+            st.markdown(f"### {g_name}")
             st.markdown("<div class='table-scroll-container'>", unsafe_allow_html=True)
-            
-            teams_stats = {t: {"Punkty": 0, "BZ": 0, "BS": 0, "RB": 0} for t in GROUPS_DICT[group_name]}
-            for match in st.session_state.results.values():
-                if match["stage"] == group_name and match["status"] == "Zakończony":
-                    h_team, a_team = match["home"], match["away"]
-                    sh, sa = match["score_h"], match["score_a"]
-                    if h_team in teams_stats and a_team in teams_stats:
-                        teams_stats[h_team]["BZ"] += sh
-                        teams_stats[h_team]["BS"] += sa
-                        teams_stats[h_team]["RB"] += (sh - sa)
-                        teams_stats[a_team]["BZ"] += sa
-                        teams_stats[a_team]["BS"] += sh
-                        teams_stats[a_team]["RB"] += (sa - sh)
-                        if sh > sa: teams_stats[h_team]["Punkty"] += 3
-                        elif sa > sh: teams_stats[a_team]["Punkty"] += 3
-                        else:
-                            teams_stats[h_team]["Punkty"] += 1
-                            teams_stats[a_team]["Punkty"] += 1
-            df_group = pd.DataFrame.from_dict(teams_stats, orient='index').reset_index()
-            df_group.rename(columns={'index': 'Reprezentacja'}, inplace=True)
-            df_group = df_group.sort_values(by=["Punkty", "RB", "BZ"], ascending=[False, False, False]).reset_index(drop=True)
-            df_group.index += 1
-            
-            group_rows = ""
-            for idx, row in df_group.iterrows():
-                group_rows += f"<tr><td><b>{idx}</b></td><td>{get_flag_html(row['Reprezentacja'])}</td><td><b>{row['Punkty']}</b></td><td>{row['BZ']}</td><td>{row['BS']}</td><td>{row['RB']}</td></tr>"
-            st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Reprezentacja</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{group_rows}</table>", unsafe_allow_html=True)
-            
-            st.markdown("</div>", unsafe_allow_html=True) # Zamknięcie kontenera tabeli grupowej
-
+            stats = {t: {"Pkt": 0, "BZ": 0, "BS": 0, "RB": 0} for t in GROUPS_DICT[g_name]}
+            for m in st.session_state.results.values():
+                if m["stage"] == g_name and m["status"] == "Zakończony":
+                    h, a, sh, sa = m["home"], m["away"], m["score_h"], m["score_a"]
+                    if h in stats and a in stats:
+                        stats[h]["BZ"]+=sh; stats[h]["BS"]+=sa; stats[h]["RB"]+=(sh-sa)
+                        stats[a]["BZ"]+=sa; stats[a]["BS"]+=sh; stats[a]["RB"]+=(sa-sh)
+                        if sh>sa: stats[h]["Pkt"]+=3
+                        elif sa>sh: stats[a]["Pkt"]+=3
+                        else: stats[h]["Pkt"]+=1; stats[a]["Pkt"]+=1
+            df_g = pd.DataFrame.from_dict(stats, orient='index').reset_index().rename(columns={'index': 'Reprezentacja'}).sort_values(by=["Pkt", "RB", "BZ"], ascending=False).reset_index(drop=True)
+            df_g.index+=1
+            g_rows = "".join([f"<tr><td><b>{idx}</b></td><td>{get_flag_html(r['Reprezentacja'])}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>" for idx, r in df_g.iterrows()])
+            st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table></div>", unsafe_allow_html=True)
     with tab4:
-        if current_user != "admin":
-            st.error("Wymagane uprawnienia administratora.")
-        else:
-            st.header("⚙️ Panel Wyników (Admin)")
-            search_query = st.text_input("Wyszukaj mecz:").lower()
-            
+        if st.session_state.logged_in_user == "admin":
             st.markdown("<div class='scroll-container'>", unsafe_allow_html=True)
-            sorted_admin_matches = sorted(st.session_state.results.items(), key=lambda x: (x[1]['timestamp'], x[0]))
-            for match_id, match in sorted_admin_matches:
-                if search_query and search_query not in f"mecz #{match_id} {match['stage']} {match['home']} {match['away']}".lower():
-                    continue
-                st.markdown(f"<div class='match-container' style='padding: 15px;'>", unsafe_allow_html=True)
-                st.markdown(f"<span style='color: #F97316; font-weight: bold;'>Mecz #{match_id}</span> | **{get_flag_html(match['home'])} vs {get_flag_html(match['away'])}** ({match['stage']})", unsafe_allow_html=True)
-                
-                if "TBD" in match["home"] or "Finał" in match["stage"] or "1/" in match["stage"]:
+            for m_id, m in sorted(st.session_state.results.items(), key=lambda x: (x[1]['timestamp'], x[0])):
+                st.markdown(f"<div class='match-container'>Mecz #{m_id} | {m['home']} vs {m['away']}", unsafe_allow_html=True)
+                if "TBD" in m["home"] or "/" in m["stage"]:
                     c_h, c_a = st.columns(2)
-                    with c_h: match["home"] = st.text_input("Drużyna 1", value=match["home"], key=f"edit_h_{match_id}")
-                    with c_a: match["away"] = st.text_input("Drużyna 2", value=match["away"], key=f"edit_a_{match_id}")
-
-                c1, c2, c3 = st.columns([1, 1, 2])
-                with c1: res_h = st.number_input("Wynik H", min_value=0, step=1, key=f"res_h_{match_id}", value=match['score_h'] if match['score_h'] is not None else 0)
-                with c2: res_a = st.number_input("Wynik A", min_value=0, step=1, key=f"res_a_{match_id}", value=match['score_a'] if match['score_a'] is not None else 0)
+                    with c_h: m["home"] = st.text_input("D1", m["home"], key=f"ad_h_{m_id}")
+                    with c_a: m["away"] = st.text_input("D2", m["away"], key=f"ad_a_{m_id}")
+                c1, c2, c3 = st.columns([1,1,2])
+                with c1: rh = st.number_input("H", 0, 20, m['score_h'] if m['score_h'] else 0, 1, key=f"rh_{m_id}")
+                with c2: ra = st.number_input("A", 0, 20, m['score_a'] if m['score_a'] else 0, 1, key=f"ra_{m_id}")
                 with c3:
                     st.write(""); st.write("")
-                    if st.button("Zatwierdź", key=f"res_btn_{match_id}"):
-                        match['score_h'], match['score_a'], match['status'] = res_h, res_a, "Zakończony"
-                        temp_positions = {}
-                        render_leaderboard_html(now, temp_positions)
-                        st.session_state.last_positions = temp_positions
-                        st.success("Przeliczono!")
-                        st.rerun()
+                    if st.button("Zatwierdź", key=f"rb_{m_id}"):
+                        m['score_h'], m['score_a'], m['status'] = rh, ra, "Zakończony"
+                        temp_p = {}
+                        render_leaderboard_html(now, temp_p)
+                        st.session_state.last_positions = temp_p; st.rerun()
                 st.markdown("</div>", unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
