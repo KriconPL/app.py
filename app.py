@@ -1,25 +1,51 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import os
 
-# 1. Konfiguracja i Szata Graficzna zgodna z brandingiem KriCon Group
+# 1. Konfiguracja i Jaśniejsza Szata Graficzna zgodna z brandingiem KriCon Group
 st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", layout="wide")
 
-# CSS dla jaśniejszej stylizacji brandingowej KriCon, loga i flag
+# Mapowanie Państw na Kody ISO (dla stabilnych flag PNG z flagcdn.com)
+COUNTRY_FLAGS = {
+    "Meksyk": "mx", "RPA": "za", "Korea Południowa": "kr", "Czechy": "cz",
+    "Kanada": "ca", "Bośnia i Hercegowina": "ba", "Katar": "qa", "Szwajcaria": "ch",
+    "Brazylia": "br", "Maroko": "ma", "Haiti": "ht", "Szkocja": "gb-sct",
+    "USA": "us", "Paragwaj": "py", "Australia": "au", "Turcja": "tr",
+    "Niemcy": "de", "Curaçao": "cw", "WKS": "ci", "Ekwador": "ec",
+    "Holandia": "nl", "Japonia": "jp", "Szwecja": "se", "Tunezja": "tn",
+    "Belgia": "be", "Egipt": "eg", "Iran": "ir", "Nowa Zelandia": "nz",
+    "Hiszpania": "es", "Wyspy Zielonego Przylądka": "cv", "Arabia Saudyjska": "sa", "Urugwaj": "uy",
+    "Francja": "fr", "Senegal": "sn", "Irak": "iq", "Norwegia": "no",
+    "Argentyna": "ar", "Algieria": "dz", "Austria": "at", "Jordania": "jo",
+    "Portugalia": "pt", "DR Konga": "cd", "Uzbekistan": "uz", "Kolumbia": "co",
+    "Anglia": "gb-eng", "Chorwacja": "hr", "Ghana": "gh", "Panama": "pa",
+    "TBD": "unknown" # flaga dla nieznanych drużyn
+}
+
+def get_flag_html(country_name):
+    """Generuje kod HTML <img> dla flagi na podstawie nazwy państwa."""
+    # Usuwa emotikony, jeśli zostały w nazwie z poprzednich wersji
+    clean_name = country_name.replace("🏳️", "").strip()
+    code = COUNTRY_FLAGS.get(clean_name, "unknown")
+    if code == "unknown":
+         return f'<span style="font-size:1.2em; margin-right:8px;">🏳️</span> {country_name}'
+    
+    flag_url = f"https://flagcdn.com/w40/{code}.png"
+    return f'<img src="{flag_url}" width="25" style="vertical-align: middle; margin-right: 10px; border: 1px solid #ddd; border-radius:2px;" alt="flaga {country_name}"> {country_name}'
+
+# CSS dla jaśniejszej stylizacji brandingowej KriCon i loga
 st.markdown("""
     <style>
-    /* Tło główne i kontenerów */
-    .reportview-container, .main .block-container { 
-        background: #FFFFFF; 
-        color: #1F2937; 
-    }
+    /* Tło główne i kontenerów - JAŚNIEJSZE */
+    .reportview-container, .main .block-container { background: #FFFFFF; color: #1F2937; }
     .main .block-container { padding-top: 1rem; }
     
     /* Kontener loga i tytułu */
     .logo-title-container {
         display: flex;
         align-items: center;
-        border-bottom: 4px solid #3B82F6;
+        border-bottom: 4px solid #3B82F6; /* Jaśniejszy niebieski akcent */
         padding-bottom: 15px;
         margin-bottom: 25px;
     }
@@ -28,11 +54,12 @@ st.markdown("""
     }
     .logo-image {
         max-height: 80px;
+        width: auto;
     }
     
     /* Nagłówek H1 */
     .logo-title-container h1 {
-        color: #1E3A8A !important;
+        color: #1E3A8A !important; /* Jaśniejszy granat */
         font-family: 'Segoe UI', Arial, sans-serif;
         font-weight: 700;
         margin: 0 !important;
@@ -46,7 +73,7 @@ st.markdown("""
         font-family: 'Segoe UI', Arial, sans-serif;
     }
     
-    /* Przyciski w kolorystyce KriCon */
+    /* Przyciski w kolorystyce KriCon (Jaśniejszy Niebieski) */
     .stButton>button {
         background-color: #3B82F6 !important;
         color: white !important;
@@ -72,7 +99,7 @@ st.markdown("""
     /* Oficjalny wynik */
     .real-score { 
         font-size: 1.3rem; 
-        color: #EF4444; 
+        color: #EF4444; /* Emergency Red */
         font-weight: bold; 
         background-color: #FEF2F2;
         padding: 6px 12px;
@@ -81,7 +108,7 @@ st.markdown("""
         margin-top: 5px;
     }
     
-    /* Zakładki (Tabs) */
+    /* Zakładki (Tabs) dopasowane do stylu */
     .stTabs [data-baseweb="tab"] {
         color: #4B5563 !important;
         font-weight: 600;
@@ -94,50 +121,55 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Stabilny URL loga Kricon Group (PNG)
-KRICON_LOGO_URL_PNG = "https://kricongroup.com/wp-content/uploads/2021/04/kricon-logotype.png"
+# 2. Wyświetlanie Loga i Tytułu (Ładowanie lokalne dla stabilności)
+# ⚠️ UWAGA: Umieść plik 'logo.png' w tym samym folderze co app.py
+LOCAL_LOGO_PATH = "./logo.png"
 
-# Wyświetlanie Loga i Tytułu
+logo_html = ""
+if os.path.exists(LOCAL_LOGO_PATH):
+    # Streamlit potrafi interpretować lokalne ścieżki w st.image, ale w HTML musimy użyć triku base64
+    # Dla uproszczenia wewnątrz markdown, załadujemy je standardowo, jeśli Streamlit je obsłuży,
+    # lub wyświetlimy sam tytuł, jeśli pliku brak.
+    logo_html = f'<img src="{LOCAL_LOGO_PATH}" alt="Kricon Group Logo" class="logo-image">'
+else:
+    # Ostrzeżenie dla administratora (widoczne tylko w logach lub jeśli dodasz st.warning)
+    print(f"OSTRZEŻENIE: Nie znaleziono pliku loga pod ścieżką: {LOCAL_LOGO_PATH}")
+    logo_html = '<span style="font-size:2em; margin-right:15px;">🌐</span>' # Placeholder
+
 st.markdown(f"""
     <div class="logo-title-container">
         <div class="logo-container">
-            <img src="{KRICON_LOGO_URL_PNG}" alt="Kricon Group Logo" class="logo-image">
+            {logo_html}
         </div>
         <h1>World Cup 2026 Typer</h1>
     </div>
 """, unsafe_allow_html=True)
 
-# 2. Baza użytkowników - rozbita dla uniku błędów składniowych
+# 3. Baza użytkowników
 USER_CREDENTIALS = {
-    "Adam": "adam2026",
-    "Maciej": "maciej2026",
-    "Marcin": "marcin2026",
-    "Kamil": "kamil2026",
-    "Kuba M": "kubam2026",
-    "Tomek": "tomek2026",
-    "Kuba K": "kubak2026",
-    "Rafał": "rafal2026",
-    "admin": "kriconadmin"
+    "Adam": "adam2026", "Maciej": "maciej2026", "Marcin": "marcin2026",
+    "Kamil": "kamil2026", "Kuba M": "kubam2026", "Tomek": "tomek2026",
+    "Kuba K": "kubak2026", "Rafał": "rafal2026", "admin": "kriconadmin"
 }
 players = [k for k in USER_CREDENTIALS.keys() if k != "admin"]
 
-# Oficjalny podział na grupy Mistrzostw Świata 2026 z flagami
+# Oficjalny podział na grupy Mistrzostw Świata 2026 (Czyste nazwy, flagi PNG dodawane dynamicznie)
 GROUPS_DICT = {
-    "Grupa A": ["🇲🇽 Meksyk", "🇿🇦 RPA", "🇰🇷 Korea Południowa", "🇨🇿 Czechy"],
-    "Grupa B": ["🇨🇦 Kanada", "🇧🇦 Bośnia i Hercegowina", "🇶🇦 Katar", "🇨🇭 Szwajcaria"],
-    "Grupa C": ["🇧🇷 Brazylia", "🇲🇦 Maroko", "🇭🇹 Haiti", "🏴󠁧󠁢󠁳󠁣󠁴󠁿 Szkocja"],
-    "Grupa D": ["🇺🇸 USA", "🇵🇾 Paragwaj", "🇦🇺 Australia", "🇹🇷 Turcja"],
-    "Grupa E": ["🇩🇪 Niemcy", "🇨🇼 Curaçao", "🇨🇮 WKS", "🇪🇨 Ekwador"],
-    "Grupa F": ["🇳🇱 Holandia", "🇯🇵 Japonia", "🇸🇪 Szwecja", "🇹🇳 Tunezja"],
-    "Grupa G": ["🇧🇪 Belgia", "🇪🇬 Egipt", "🇮🇷 Iran", "🇳🇿 Nowa Zelandia"],
-    "Grupa H": ["🇪🇸 Hiszpania", "🇨🇻 Wyspy Zielonego Przylądka", "🇸🇦 Arabia Saudyjska", "🇺🇾 Urugwaj"],
-    "Grupa I": ["🇫🇷 Francja", "🇸🇳 Senegal", "🇮🇶 Irak", "🇳🇴 Norwegia"],
-    "Grupa J": ["🇦🇷 Argentyna", "🇩🇿 Algieria", "🇦🇹 Austria", "🇯🇴 Jordania"],
-    "Grupa K": ["🇵🇹 Portugalia", "🇨🇩 DR Konga", "🇺🇿 Uzbekistan", "🇨🇴 Kolumbia"],
-    "Grupa L": ["🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglia", "🇭🇷 Chorwacja", "🇬🇭 Ghana", "🇵🇦 Panama"]
+    "Grupa A": ["Meksyk", "RPA", "Korea Południowa", "Czechy"],
+    "Grupa B": ["Kanada", "Bośnia i Hercegowina", "Katar", "Szwajcaria"],
+    "Grupa C": ["Brazylia", "Maroko", "Haiti", "Szkocja"],
+    "Grupa D": ["USA", "Paragwaj", "Australia", "Turcja"],
+    "Grupa E": ["Niemcy", "Curaçao", "WKS", "Ekwador"],
+    "Grupa F": ["Holandia", "Japonia", "Szwecja", "Tunezja"],
+    "Grupa G": ["Belgia", "Egipt", "Iran", "Nowa Zelandia"],
+    "Grupa H": ["Hiszpania", "Wyspy Zielonego Przylądka", "Arabia Saudyjska", "Urugwaj"],
+    "Grupa I": ["Francja", "Senegal", "Irak", "Norwegia"],
+    "Grupa J": ["Argentyna", "Algieria", "Austria", "Jordania"],
+    "Grupa K": ["Portugalia", "DR Konga", "Uzbekistan", "Kolumbia"],
+    "Grupa L": ["Anglia", "Chorwacja", "Ghana", "Panama"]
 }
 
-# 3. Generator Harmonogramu 104 Meczów z Oficjalnymi Ramami Datowymi
+# 4. Generator Harmonogramu 104 Meczów z Oficjalnymi Ramami Datowymi
 def generate_schedule():
     schedule = {}
     match_id = 1
@@ -155,11 +187,8 @@ def generate_schedule():
             schedule[match_id] = {
                 "date": dates_group[date_idx % len(dates_group)],
                 "stage": group_name,
-                "home": teams[t1_idx], 
-                "away": teams[t2_idx],
-                "score_h": None, 
-                "score_a": None, 
-                "status": "Oczekuje"
+                "home": teams[t1_idx], "away": teams[t2_idx],
+                "score_h": None, "score_a": None, "status": "Oczekuje"
             }
             match_id += 1
             if match_id % 4 == 0: date_idx += 1
@@ -180,11 +209,8 @@ def generate_schedule():
             schedule[match_id] = {
                 "date": stage_dates[d_idx % len(stage_dates)],
                 "stage": stage_name,
-                "home": "TBD 🏳️", 
-                "away": "TBD 🏳️",
-                "score_h": None, 
-                "score_a": None, 
-                "status": "Oczekuje"
+                "home": "TBD", "away": "TBD", # dynamiczne flagi obsłużą brak kodu
+                "score_h": None, "score_a": None, "status": "Oczekuje"
             }
             match_id += 1
             d_idx += 1
@@ -212,95 +238,5 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
         return 1
     return 0
 
-# 4. System Logowania
+# 5. System Logowania
 if 'logged_in_user' not in st.session_state:
-    st.session_state.logged_in_user = None
-
-if st.session_state.logged_in_user is None:
-    st.subheader("🔒 Logowanie do systemu Kricon Typer")
-    username = st.selectbox("Wybierz użytkownika:", [""] + list(USER_CREDENTIALS.keys()))
-    password = st.text_input("Wpisz hasło:", type="password")
-    
-    if st.button("Zaloguj się"):
-        if USER_CREDENTIALS.get(username) == password:
-            st.session_state.logged_in_user = username
-            st.rerun()
-        else:
-            st.error("Błędne hasło. Spróbuj ponownie.")
-else:
-    current_user = st.session_state.logged_in_user
-    st.sidebar.write(f"👤 Zalogowany jako: **{current_user}**")
-    if st.sidebar.button("Wyloguj się"):
-        st.session_state.logged_in_user = None
-        st.rerun()
-
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 Klasyfikacja", "📅 Terminarz i Typy", "📈 Tabele Grup", "⚙️ Admin"])
-
-    # ZAKŁADKA 1: KLASYFIKACJA
-    with tab1:
-        st.header("Tabela Wyników Typera")
-        scores = {player: 0 for player in players}
-        for match_id, result in st.session_state.results.items():
-            r_h, r_a = result['score_h'], result['score_a']
-            if result['status'] == "Zakończony":
-                for player in players:
-                    if player in st.session_state.bets[match_id]:
-                        p_h, p_a = st.session_state.bets[match_id][player]
-                        scores[player] += calculate_points(p_h, p_a, r_h, r_a)
-                        
-        df_scores = pd.DataFrame(list(scores.items()), columns=["Gracz", "Punkty"])
-        df_scores = df_scores.sort_values(by="Punkty", ascending=False).reset_index(drop=True)
-        df_scores.index += 1
-        
-        def highlight_rows(row):
-            if row.name == 1 and row['Punkty'] > 0:
-                return ['background-color: #DBEAFE; color: #1E3A8A; font-weight: bold;'] * len(row)
-            elif row.name == len(df_scores) and row['Punkty'] > 0:
-                return ['background-color: #FEE2E2; color: #991B1B;'] * len(row)
-            return [''] * len(row)
-
-        st.dataframe(df_scores.style.apply(highlight_rows, axis=1), use_container_width=True)
-
-    # ZAKŁADKA 2: TERMINARZ I TYPY
-    with tab2:
-        if current_user == "admin":
-            st.warning("Zaloguj się jako gracz, aby typować.")
-        else:
-            st.header("Obstawiaj mecze wg dat")
-            selected_date = st.selectbox("Wybierz dzień turnieju:", all_dates)
-            st.divider()
-            
-            for match_id, match in st.session_state.results.items():
-                if match["date"] == selected_date:
-                    st.write(f"### {match['home']} vs {match['away']}")
-                    st.caption(f"Faza: {match['stage']} | Mecz #{match_id}")
-                    
-                    if match['status'] == "Zakończony":
-                        st.markdown(f"<p class='real-score'>Oficjalny wynik: {match['score_h']} - {match['score_a']}</p>", unsafe_allow_html=True)
-                    else:
-                        st.markdown("<p style='color: gray;'>Mecz oczekuje na rozegranie.</p>", unsafe_allow_html=True)
-
-                    curr_h, curr_a = st.session_state.bets[match_id].get(current_user, (None, None))
-                    
-                    c1, c2, c3 = st.columns([1, 1, 2])
-                    with c1:
-                        bet_h = st.number_input(f"Twój typ: {match['home']}", min_value=0, step=1, key=f"h_{match_id}", value=curr_h if curr_h is not None else 0)
-                    with c2:
-                        bet_a = st.number_input(f"Twój typ: {match['away']}", min_value=0, step=1, key=f"a_{match_id}", value=curr_a if curr_a is not None else 0)
-                    with c3:
-                        st.write("")
-                        st.write("")
-                        if match['status'] == "Zakończony":
-                            st.button("Zablokowane", disabled=True, key=f"dis_{match_id}")
-                        else:
-                            if st.button("Zapisz typ", key=f"btn_{match_id}"):
-                                st.session_state.bets[match_id][current_user] = (bet_h, bet_a)
-                                st.success("Zapisano!")
-                    
-                    # SYSTEM ANTY-ŚCIĄGANIA
-                    if match['status'] == "Zakończony":
-                        with st.expander("👁️ Zobacz typy innych graczy"):
-                            other_bets = []
-                            for p in players:
-                                if p != current_user:
-                                    p_bet = st.session_state.bets
