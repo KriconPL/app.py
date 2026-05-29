@@ -82,7 +82,6 @@ st.markdown("""
         font-size: 0.85rem !important;
         display: block !important;
         width: 100% !important;
-        animation: simple-blink 1.2s infinite ease-in-out;
     }
     .success-bet-banner {
         background-color: #16A34A !important;
@@ -97,21 +96,24 @@ st.markdown("""
         width: 100% !important;
         border: 1px solid #22C55E;
     }
-    @keyframes simple-blink {
-        0% { opacity: 0.6; }
-        50% { opacity: 1; }
-        100% { opacity: 0.6; }
-    }
     
-    /* --- ULTRA CIASNY UKŁAD PIONOWY LISTY MECZÓW --- */
+    /* --- HARMONIJNY I ULTRA CIASNY UKŁAD TERMINARZA MS 2026 --- */
     .match-container { 
         background: #172554 !important; 
         border: 1px solid #1E3A8A !important; 
         border-radius: 4px; 
         padding: 4px 12px !important; 
-        margin-bottom: 1px !important; /* Ściskanie kontenerów jeden pod drugim */
+        margin-bottom: 0px !important; /* Likwidacja wolnej przestrzeni pod kartą */
+        margin-top: 0px !important;
         box-shadow: 0 1px 2px rgba(0,0,0,0.15);
     }
+    
+    /* Wymuszenie redukcji przerw generowanych natywnie przez Streamlit block container */
+    [data-testid="stVerticalBlock"] > div {
+        padding-bottom: 1px !important;
+        padding-top: 1px !important;
+    }
+    
     .match-inline-main-row {
         display: flex;
         justify-content: space-between;
@@ -152,7 +154,6 @@ st.markdown("""
         margin: 0;
     }
     
-    /* --- HARMONIJNE USTAWIENIE SIATKI DLA DOLNEJ LINII --- */
     .flex-bet-label {
         font-size: 0.85rem !important;
         color: #38BDF8 !important;
@@ -267,7 +268,7 @@ def generate_schedule():
     months_pl = {6: "Czerwca", 7: "Lipca"}
     raw_fixtures = [
         (2026, 6, 11, 21, 0, "Grupa A", "Meksyk", "RPA"), (2026, 6, 12, 4, 0, "Grupa A", "Korea Południowa", "Czechy"),
-        (2026, 6, 12, 21, 0, "Grupa B", "Kanada", "Bosnie i Hercegowine"), (2026, 6, 13, 3, 0, "Grupa D", "USA", "Paragwaj"),
+        (2026, 6, 12, 21, 0, "Grupa B", "Kanada", "Bośnia i Hercegowina"), (2026, 6, 13, 3, 0, "Grupa D", "USA", "Paragwaj"),
         (2026, 6, 13, 21, 0, "Grupa B", "Katar", "Szwajcaria"), (2026, 6, 14, 0, 0, "Grupa C", "Brazylia", "Maroko"),
         (2026, 6, 14, 3, 0, "Grupa C", "Haiti", "Szkocja"), (2026, 6, 14, 6, 0, "Grupa D", "Australia", "Turcja"),
         (2026, 6, 14, 19, 0, "Grupa E", "Niemcy", "Curaçao"), (2026, 6, 14, 22, 0, "Grupa F", "Holandia", "Japonia"),
@@ -503,10 +504,8 @@ else:
             has_existing_bet = st.session_state.bets[m_id].get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
             
-            # --- ŻELAZNE SZTYWNE WYRÓWNANIE PROJEKTU: POLA, ETYKIETA I PRZYCISK W JEDNYM LAYOUCIE ---
-            st.markdown("<div class='flex-bet-inline-row'>", unsafe_allow_html=True)
-            
-            c_label, c_input_h, c_input_a, c_btn, c_banner = st.columns([2.5, 0.7, 0.7, 1.2, 4.9])
+            # --- ZMODYFIKOWANA SIATKA LAYOUTU DLA IDEALNEGO WYRÓWNANIA PIONOWEGO ---
+            c_label, c_input_h, c_input_a, c_btn, c_banner = st.columns([4.3, 0.7, 0.7, 1.3, 5.0])
             
             with c_label:
                 st.markdown("<div class='flex-bet-label'>➔ Twój Typ:</div>", unsafe_allow_html=True)
