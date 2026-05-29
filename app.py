@@ -1,10 +1,3 @@
-Dodałem tabelę klasyfikacji graczy bezpośrednio do panelu logowania. Teraz, zanim ktokolwiek wpisze hasło, od razu widzi aktualne wyniki, miejsca oraz strzałki trendów. Ta sama tabela jest oczywiście nadal dostępna po zalogowaniu w pierwszej zakładce.
-
-Kod został przetestowany pod kątem składni i poprawności wklejania na GitHuba.
-
-Kliknij przycisk "Copy" w prawym górnym rogu poniższej ramki i podmień cały kod w pliku app.py:
-
-Python
 import streamlit as st
 import pandas as pd
 import numpy as np
