@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 # 1. Konfiguracja aplikacji i Szata Graficzna Dark Navy & Orange
 st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", layout="wide")
 
-# BAZA DANYCH KONTA I HASŁA (Przeniesione na samą górę - blokuje NameError)
+# BAZA DANYCH KONTA I HASŁA
 USER_CREDENTIALS = {
     "Adam": "adam2026", "Maciej": "maciej2026", "Marcin": "marcin2026",
     "Kamil": "kamil2026", "Kuba M": "kubam2026", "Tomek": "tomek2026",
@@ -251,6 +251,90 @@ st.markdown("""
 
 BACKUP_FILE = "typer_backup.json"
 
+# --- DEKLARACJE FUNKCJI (PRZENIESIONE GLOBALNIE NA GÓRĘ PLIKU - LIKWIDACJA NAMEERROR) ---
+def calculate_points(pred_h, pred_a, real_h, real_a):
+    if real_h is None or real_a is None or pred_h is None or pred_a is None: return 0
+    if pred_h == real_h and pred_a == real_a: return 3
+    if np.sign(pred_h - pred_a) == np.sign(real_h - real_a): return 1
+    return 0
+
+def get_time_to_next_unbet_match(player_name, now_time):
+    upcoming = sorted([m for m in st.session_state.results.values() if m["timestamp"] > now_time], key=lambda x: x["timestamp"])
+    for match in upcoming:
+        m_id = [k for k, v in st.session_state.results.items() if v == match][0]
+        if st.session_state.bets[m_id].get(player_name, (None, None)) == (None, None):
+            diff = match["timestamp"] - now_time
+            if diff.total_seconds() <= 0: continue
+            h, m = int(diff.total_seconds() // 3600), int((diff.total_seconds() % 3600) // 60)
+            return f'<span class="{"time-warning" if diff <= timedelta(hours=1) else "time-normal"}">Za {h}h {m}m</span>'
+    return '<span class="time-ok">✔ Wszystko obstawione</span>'
+
+def render_leaderboard_html(now_time, new_positions_dict_dest=None):
+    scores = {p: 0 for p in players}
+    for m_id, res in st.session_state.results.items():
+        if res['status'] == "Zakończony":
+            for p in players:
+                if p in st.session_state.bets[m_id]:
+                    scores[p] += calculate_points(st.session_state.bets[m_id][p][0], st.session_state.bets[m_id][p][1], res['score_h'], res['score_a'])
+    df = pd.DataFrame(list(scores.items()), columns=["Gracz", "Punkty"]).sort_values(by="Punkty", ascending=False).reset_index(drop=True)
+    
+    legend_html = """
+    <div class="points-legend">
+        <div style="font-weight: bold; color: #F97316; margin-bottom: 6px; font-size: 1.05rem;">ℹ️ System przyznawania punktów:</div>
+        <div class="legend-item">🎯 <b style="color: #4ADE80;">3 Punkty</b> — dokładne wytypowanie wyniku spotkania</div>
+        <div class="legend-item">⚖️ <b style="color: #38BDF8;">1 Punkt</b> — poprawne wskazanie zwycięzcy lub remisu</div>
+    </div>
+    """
+    rows = ""
+    for idx, row in df.iterrows():
+        pos, p_name = idx + 1, row['Gracz']
+        if new_positions_dict_dest is not None: new_positions_dict_dest[p_name] = pos
+        old_pos = st.session_state.last_positions.get(p_name, pos)
+        trend = '<div class="badge-trend trend-box-up">▲</div>' if old_pos > pos else ('<div class="badge-trend trend-box-down">▼</div>' if old_pos < pos else '<div class="badge-trend trend-box-stable">•</div>')
+        bg = 'style="background-color: #16A34A; font-weight: bold; color: #FFFFFF;"' if pos == 1 and row['Punkty'] > 0 else ('style="background-color: #DC2626; font-weight: bold; color: #FFFFFF;"' if pos == len(df) and row['Punkty'] > 0 else '')
+        rows += f"<tr {bg}><td style='text-align:center;'><b>{pos}</b></td><td style='text-align:center;'>{trend}</td><td>{p_name}</td><td><b>{row['Punkty']} pkt</b></td><td>{get_time_to_next_unbet_match(p_name, now_time)}</td></tr>"
+    
+    return legend_html + f"<table class='kricon-table'><tr><th>Msc.</th><th>Trend</th><th>Gracz</th><th>Punkty</th><th>Najbliższy mecz</th></tr>{rows}</table>"
+
+def render_bracket_match_html_clean(match_id):
+    m = st.session_state.results.get(match_id)
+    if not m: return ""
+    if m.get("status") == "Zakończony":
+        sh = str(m.get("score_h", "?"))
+        sa = str(m.get("score_a", "?"))
+    else:
+        sh, sa = "?", "?"
+        
+    win_h = m.get("score_h") is not None and m.get("score_a") is not None and m.get("score_h") > m.get("score_a") and m.get("status") == "Zakończony"
+    win_a = m.get("score_h") is not None and m.get("score_a") is not None and m.get("score_a") > m.get("score_h") and m.get("status") == "Zakończony"
+    
+    home_name = m.get('home', 'TBD')
+    away_name = m.get('away', 'TBD')
+    
+    st.markdown(f"""
+    <div class="bracket-match-card">
+        <div class="bracket-match-title">Mecz #{match_id}</div>
+        <div class="bracket-row {"bracket-team-winner" if win_h else ""}">
+            <span>{get_flag_html(home_name)} {home_name}</span>
+            <span class="bracket-score-cell">{sh}</span>
+        </div>
+        <div class="bracket-row {"bracket-team-winner" if win_a else ""}">
+            <span>{get_flag_html(away_name)} {away_name}</span>
+            <span class="bracket-score-cell">{sa}</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+def get_mini_group_html_string(g_code):
+    teams = GROUPS_DICT.get(f"Grupa {g_code}", [])
+    lines = "".join([f"<div style='text-align:left; padding:3px 0; font-size:0.9rem;'>{get_flag_html(t)} {t}</div>" for t in teams])
+    return f"""
+    <div class="bracket-group-box">
+        <div style="font-weight:bold; color:#F97316; margin-bottom:4px; font-size:0.85rem;">GRUPA {g_code}</div>
+        {lines}
+    </div>
+    """
+
 def save_backup_local_and_github():
     try:
         serializable_bets = {str(m_id): bets for m_id in st.session_state.bets.keys() for bets in [st.session_state.bets[m_id]]}
@@ -284,29 +368,6 @@ def load_backup_local():
         except Exception:
             return False
     return False
-
-COUNTRY_FLAGS = {
-    "Meksyk": "mx", "RPA": "za", "Korea Południowa": "kr", "Czechy": "cz",
-    "Kanada": "ca", "Bośnia i Hercegowina": "ba", "Katar": "qa", "Szwajcaria": "ch",
-    "Brazylia": "br", "Maroko": "ma", "Haiti": "ht", "Szkocja": "gb-sct",
-    "USA": "us", "Paragwaj": "py", "Australia": "au", "Turcja": "tr",
-    "Niemcy": "de", "Curaçao": "cw", "WKS": "ci", "Ekwador": "ec",
-    "Holandia": "nl", "Japonia": "jp", "Szwecja": "se", "Tunezja": "tn",
-    "Belgia": "be", "Egipt": "eg", "Iran": "ir", "Nowa Zelandia": "nz",
-    "Hiszpania": "es", "Wyspy Zielonego Przylądka": "cv", "Arabia Saudyjska": "sa", "Urugwaj": "uy",
-    "Francja": "fr", "Senegal": "sn", "Irak": "iq", "Norwegia": "no",
-    "Argentyna": "ar", "Algieria": "dz", "Austria": "at", "Jordania": "jo",
-    "Portugalia": "pt", "DR Konga": "cd", "Uzbekistan": "uz", "Kolumbia": "co",
-    "Anglia": "gb-eng", "Chorwacja": "hr", "Ghana": "gh", "Panama": "pa", "TBD": "unknown"
-}
-
-def get_flag_html(country_name):
-    if not country_name or country_name == "TBD":
-        return f'<span style="font-size:1.1em; margin-right:4px;">🏳️</span>'
-    clean_name = country_name.replace("🏳️", "").strip()
-    code = COUNTRY_FLAGS.get(clean_name, "unknown")
-    if code == "unknown": return f'<span style="font-size:1.1em; margin-right:4px;">🏳️</span>'
-    return f'<img src="https://flagcdn.com/w40/{code}.png" width="18" style="vertical-align: middle; margin-right: 4px; border-radius:2px;">'
 
 def generate_schedule():
     schedule = {}
@@ -372,16 +433,8 @@ def generate_schedule():
             if (i + 1) % matches_per_date == 0: date_idx += 1
     return schedule
 
-def fetch_official_results_from_api(now_time):
-    for m_id, m in st.session_state.results.items():
-        if m['timestamp'] <= now_time and m['status'] != "Zakończony":
-            np.random.seed(m_id)
-            m['score_h'] = int(np.random.choice([0, 1, 2, 3]))
-            m['score_a'] = int(np.random.choice([0, 1, 2]))
-            m['status'] = "Zakończony"
-            if m_id >= 73:
-                if m['home'] == "TBD": m['home'] = "Meksyk"
-                if m['away'] == "TBD": m['away'] = "RPA"
+# --- INICJALIZACJA ZMIENNYCH CZASOWYCH I ROZRUCH STRONY ---
+now = datetime.now()
 
 if 'results' not in st.session_state or len(st.session_state.results) != 104: st.session_state.results = generate_schedule()
 if 'bets' not in st.session_state or len(st.session_state.bets) != 104: st.session_state.bets = {m_id: {} for m_id in st.session_state.results.keys()}
@@ -391,8 +444,6 @@ if 'backup_loaded' not in st.session_state:
     load_backup_local()
     st.session_state.backup_loaded = True
 
-# INICJALIZACJA ZMIENNYCH KRYTYCZNYCH DLA ROZRUCHU LIDERBOARDU
-now = datetime.now()
 fetch_official_results_from_api(now)
 
 # LOGIKA LIVE DLA TRANZYCJI IKON
@@ -404,6 +455,7 @@ for m_id, m in st.session_state.results.items():
 
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 
+# --- WŁAŚCIWY PODZIAŁ WIDOKU LOGOWANIE / PANEL GRACZA ---
 if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
     with c1:
@@ -469,7 +521,6 @@ else:
                 </div>
             """, unsafe_allow_html=True)
             
-            # --- POPRAWKA: STRUKTURA INLINE SFORMOWANA W BEZPIECZNE KOLUMNY FRAMEWORKU ---
             c_teams_side, c_input_h, c_input_a, c_btn, c_banner = st.columns([5.0, 0.6, 0.6, 1.2, 2.6])
             
             with c_teams_side:
