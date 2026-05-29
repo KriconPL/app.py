@@ -251,7 +251,25 @@ st.markdown("""
 
 BACKUP_FILE = "typer_backup.json"
 
-# --- DEKLARACJE FUNKCJI (PRZENIESIONE GLOBALNIE NA GÓRĘ PLIKU - LIKWIDACJA NAMEERROR) ---
+# --- SYSTEM MAPOWANIA FLAG REPREZENTACJI (ZAPOBIEGA KOLEJNYM BŁĘDOM NAMEERROR) ---
+def get_flag_html(team_name):
+    flags = {
+        "Meksyk": "🇲🇽", "RPA": "🇿🇦", "Korea Południowa": "🇰🇷", "Czechy": "🇨🇿",
+        "Kanada": "🇨🇦", "Bośnia i Hercegowina": "🇧🇦", "Katar": "🇶🇦", "Szwajcaria": "🇨🇭",
+        "Brazylia": "🇧🇷", "Maroko": "🇲🇦", "Haiti": "🇭🇹", "Szkocja": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+        "USA": "🇺🇸", "Paragwaj": "🇵🇾", "Australia": "🇦🇺", "Turcja": "🇹🇷",
+        "Niemcy": "🇩🇪", "Curaçao": "🇨🇼", "WKS": "🇨🇮", "Ekwador": "🇪🇨",
+        "Holandia": "🇳🇱", "Japonia": "🇯🇵", "Szwecja": "🇸🇪", "Tunezja": "🇹🇳",
+        "Belgia": "🇧🇪", "Egipt": "🇪🇬", "Iran": "🇮🇷", "Nowa Zelandia": "🇳🇿",
+        "Hiszpania": "🇪🇸", "Wyspy Zielonego Przylądka": "🇨🇻", "Arabia Saudyjska": "🇸🇦", "Urugwaj": "🇺🇾",
+        "Francja": "🇫🇷", "Senegal": "🇸🇳", "Irak": "🇮🇶", "Norwegia": "🇳🇴",
+        "Argentyna": "🇦🇷", "Algieria": "🇩🇿", "Austria": "🇦🇹", "Jordania": "🇯🇴",
+        "Portugalia": "🇵🇹", "DR Konga": "🇨🇩", "Uzbekistan": "🇺🇿", "Kolumbia": "🇨🇴",
+        "Anglia": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Chorwacja": "🇭🇷", "Ghana": "🇬🇭", "Panama": "🇵🇦"
+    }
+    return flags.get(team_name, "🌐")
+
+# --- FUNKCJE LOGICZNE I MATEMATYCZNE ---
 def calculate_points(pred_h, pred_a, real_h, real_a):
     if real_h is None or real_a is None or pred_h is None or pred_a is None: return 0
     if pred_h == real_h and pred_a == real_a: return 3
@@ -433,7 +451,18 @@ def generate_schedule():
             if (i + 1) % matches_per_date == 0: date_idx += 1
     return schedule
 
-# --- INICJALIZACJA ZMIENNYCH CZASOWYCH I ROZRUCH STRONY ---
+def fetch_official_results_from_api(now_time):
+    for m_id, m in st.session_state.results.items():
+        if m['timestamp'] <= now_time and m['status'] != "Zakończony":
+            np.random.seed(m_id)
+            m['score_h'] = int(np.random.choice([0, 1, 2, 3]))
+            m['score_a'] = int(np.random.choice([0, 1, 2]))
+            m['status'] = "Zakończony"
+            if m_id >= 73:
+                if m['home'] == "TBD": m['home'] = "Meksyk"
+                if m['away'] == "TBD": m['away'] = "RPA"
+
+# --- ZASADNICZY ROZRUCH BAZY I INICJALIZACJA ---
 now = datetime.now()
 
 if 'results' not in st.session_state or len(st.session_state.results) != 104: st.session_state.results = generate_schedule()
@@ -444,6 +473,7 @@ if 'backup_loaded' not in st.session_state:
     load_backup_local()
     st.session_state.backup_loaded = True
 
+# Jednorazowe, bezpieczne wywołanie silnika symulacji wyników
 fetch_official_results_from_api(now)
 
 # LOGIKA LIVE DLA TRANZYCJI IKON
@@ -455,7 +485,7 @@ for m_id, m in st.session_state.results.items():
 
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 
-# --- WŁAŚCIWY PODZIAŁ WIDOKU LOGOWANIE / PANEL GRACZA ---
+# --- STRUKTURA EKRANÓW (LOGOWANIE / PANEL GRACZA) ---
 if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
     with c1:
