@@ -322,6 +322,8 @@ GROUPS_DICT = {
 def generate_schedule():
     schedule = {}
     months_pl = {6: "Czerwca", 7: "Lipca"}
+    
+    # 1. Dokładna rozpiska Kolejki 1 i Kolejki 2 (Mecze 1-40)
     raw_fixtures = [
         (2026, 6, 11, 21, 0, "Grupa A", "Meksyk", "RPA"),
         (2026, 6, 12, 4, 0, "Grupa A", "Korea Południowa", "Czechy"),
@@ -364,6 +366,7 @@ def generate_schedule():
         (2026, 6, 22, 0, 0, "Grupa H", "Urugwaj", "Wyspy Zielonego Przylądka"),
         (2026, 6, 22, 3, 0, "Grupa G", "Nowa Zelandia", "Egipt")
     ]
+    
     match_id = 1
     for yr, mo, dy, hr, mn, stage, home, away in raw_fixtures:
         dt = datetime(yr, mo, dy, hr, mn)
@@ -372,22 +375,36 @@ def generate_schedule():
             "stage": stage, "home": home, "away": away, "score_h": None, "score_a": None, "status": "Oczekuje"
         }
         match_id += 1
-    all_groups = list(GROUPS_DICT.keys())
+
+    # 2. POPRAWIONY GENERATOR DLA KOLEJKI 3 (Mecze 41-72) - Gwarantuje udział wszystkich 4 drużyn w każdej grupie
+    # Każdy zespół musi zagrać swój 3. mecz (0 vs 2 oraz 1 vs 3)
     sim_day = datetime(2026, 6, 22, 18, 0)
-    while match_id <= 72:
-        g_name = all_groups[(match_id % 12)]
-        teams = GROUPS_DICT[g_name]
-        h, a = (teams[0], teams[3]) if match_id % 2 == 0 else (teams[1], teams[2])
+    for g_name, teams in GROUPS_DICT.items():
+        # Mecz 1 w grupie dla kolejki 3
         schedule[match_id] = {
             "timestamp": sim_day, "date": f"{sim_day.day} {months_pl[sim_day.month]}", "time": sim_day.strftime("%H:00"),
-            "stage": g_name, "home": h, "away": a, "score_h": None, "score_a": None, "status": "Oczekuje"
+            "stage": g_name, "home": teams[0], "away": teams[2], "score_h": None, "score_a": None, "status": "Oczekuje"
         }
         match_id += 1
-        if match_id % 4 == 0: sim_day += timedelta(days=1)
+        
+        # Mecz 2 w grupie dla kolejki 3
+        schedule[match_id] = {
+            "timestamp": sim_day, "date": f"{sim_day.day} {months_pl[sim_day.month]}", "time": sim_day.strftime("%H:00"),
+            "stage": g_name, "home": teams[1], "away": teams[3], "score_h": None, "score_a": None, "status": "Oczekuje"
+        }
+        match_id += 1
+        
+        # Przesunięcie czasu o 4 godziny co 2 mecze (czyli po obsłużeniu całej jednej grupy)
+        sim_day += timedelta(hours=4)
+
+    # 3. Faza Pucharowa (Mecze 73-104)
     ko_stages = [
-        ("1/16 Finału", 16, [(29,6), (30,6), (1,7), (2,7)]), ("1/8 Finału", 8, [(4,7), (5,7), (6,7), (7,7)]),     
-        ("Ćwierćfinały", 4, [(9,7), (10,7)]), ("Półfinały", 2, [(14,7), (15,7)]),                  
-        ("Mecz o 3. miejsce", 1, [(18,7)]), ("Finał", 1, [(19,7)])                               
+        ("1/16 Finału", 16, [(29,6), (30,6), (1,7), (2,7)]), 
+        ("1/8 Finału", 8, [(4,7), (5,7), (6,7), (7,7)]),     
+        ("Ćwierćfinały", 4, [(9,7), (10,7)]), 
+        ("Półfinały", 2, [(14,7), (15,7)]),                  
+        ("Mecz o 3. miejsce", 1, [(18,7)]), 
+        ("Finał", 1, [(19,7)])                               
     ]
     for stage_name, count, stage_dates in ko_stages:
         date_idx = 0
@@ -402,6 +419,7 @@ def generate_schedule():
             }
             match_id += 1
             if (i + 1) % matches_per_date == 0: date_idx += 1
+            
     return schedule
 
 if 'results' not in st.session_state or len(st.session_state.results) != 104:
@@ -559,6 +577,12 @@ else:
                         if sh>sa: stats[h]["Pkt"]+=3
                         elif sa>sh: stats[a]["Pkt"]+=3
                         else: stats[h]["Pkt"]+=1; stats[a]["Pkt"]+=1
+                        
+            # Jeśli w grupie żadne mecze nie są jeszcze zakończone, wymuszamy dodanie wszystkich 4 drużyn, by tabela nie była pusta
+            for t in GROUPS_DICT[g_name]:
+                if t not in stats:
+                    stats[t] = {"Pkt": 0, "BZ": 0, "BS": 0, "RB": 0}
+                    
             df_g = pd.DataFrame.from_dict(stats, orient='index').reset_index().rename(columns={'index': 'Reprezentacja'}).sort_values(by=["Pkt", "RB", "BZ"], ascending=False).reset_index(drop=True)
             df_g.index+=1
             
