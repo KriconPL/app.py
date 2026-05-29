@@ -26,7 +26,12 @@ st.markdown("""
         color: #F8FAFC !important;
     }
 
-    /* Poprawka widoczności pól formularza logowania (Selectbox, Text input) */
+    /* Poprawka widoczności pól formularza logowania i ich etykiet na kolor pomarańczowy */
+    div[data-testid="stSelectbox"] label p, div[data-testid="stTextInput"] label p {
+        color: #F97316 !important;
+        font-weight: bold !important;
+        font-size: 1.1rem !important;
+    }
     div[data-baseweb="select"] *, div[data-baseweb="input"] * {
         color: #F97316 !important; 
         font-weight: bold !important;
@@ -169,6 +174,11 @@ st.markdown("""
     .trend-box-up { background-color: #16A34A; color: white; }
     .trend-box-down { background-color: #DC2626; color: white; }
     .trend-box-stable { background-color: #374151; color: #94A3B8; }
+    
+    /* Kolorystyka czasu do meczu */
+    .time-ok { color: #4ADE80 !important; font-weight: bold; }
+    .time-warning { color: #F97316 !important; font-weight: bold; animation: blink 1.5s infinite; }
+    .time-normal { color: #CBD5E1 !important; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -207,7 +217,7 @@ COUNTRY_FLAGS = {
     "Niemcy": "de", "Curaçao": "cw", "WKS": "ci", "Ekwador": "ec",
     "Holandia": "nl", "Japonia": "jp", "Szwecja": "se", "Tunezja": "tn",
     "Belgia": "be", "Egipt": "eg", "Iran": "ir", "Nowa Zelandia": "nz",
-    "Hiszpania": "es", "Wyspy Zielonego Przylądka": "cv", "Arabia Saudyjska": "sa", "Urugwaj": "uy",
+    "Hiszpania": "es", "Wyspy Zielonego Przylążka": "cv", "Arabia Saudyjska": "sa", "Urugwaj": "uy",
     "Francja": "fr", "Senegal": "sn", "Irak": "iq", "Norwegia": "no",
     "Argentyna": "ar", "Algieria": "dz", "Austria": "at", "Jordania": "jo",
     "Portugalia": "pt", "DR Konga": "cd", "Uzbekistan": "uz", "Kolumbia": "co",
@@ -239,7 +249,7 @@ GROUPS_DICT = {
     "Grupa E": ["Niemcy", "Curaçao", "WKS", "Ekwador"],
     "Grupa F": ["Holandia", "Japonia", "Szwecja", "Tunezja"],
     "Grupa G": ["Belgia", "Egipt", "Iran", "Nowa Zelandia"],
-    "Grupa H": ["Hiszpania", "Wyspy Zielonego Przylądka", "Arabia Saudyjska", "Urugwaj"],
+    "Grupa H": ["Hiszpania", "Wyspy Zielonego Przylążka", "Arabia Saudyjska", "Urugwaj"],
     "Grupa I": ["Francja", "Senegal", "Irak", "Norwegia"],
     "Grupa J": ["Argentyna", "Algieria", "Austria", "Jordania"],
     "Grupa K": ["Portugalia", "DR Konga", "Uzbekistan", "Kolumbia"],
@@ -329,8 +339,34 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
         return 1
     return 0
 
-# Funkcja pomocnicza do generowania kodu tabeli klasyfikacji
-def render_leaderboard_html(new_positions_dict_dest=None):
+# Funkcja obliczająca czas do najbliższego nieobstawionego meczu gracza
+def get_time_to_next_unbet_match(player_name, now_time):
+    # Filtrujemy tylko mecze, które jeszcze się nie zaczęły
+    upcoming_matches = sorted(
+        [m for m in st.session_state.results.values() if m["status"] == "Oczekuje" and m["timestamp"] > now_time],
+        key=lambda x: x["timestamp"]
+    )
+    
+    for match in upcoming_matches:
+        match_id = [k for k, v in st.session_state.results.items() if v == match][0]
+        player_bet = st.session_state.bets[match_id].get(player_name, (None, None))
+        
+        # Jeśli gracz nie ma typu dla tego nadchodzącego meczu
+        if player_bet == (None, None):
+            diff = match["timestamp"] - now_time
+            hours = int(diff.total_seconds() // 3600)
+            minutes = int((diff.total_seconds() % 3600) // 60)
+            
+            # Stan alarmowy: Mniej niż godzina do meczu
+            if diff <= timedelta(hours=1):
+                return f'<span class="time-warning">⏳ Za {hours}h {minutes}m!</span>'
+            else:
+                return f'<span class="time-normal">Za {hours}h {minutes}m</span>'
+                
+    return '<span class="time-ok">✔ Wszystko obstawione</span>'
+
+# Funkcja pomocnicza do generowania kodu tabeli klasyfikacji z czasem do meczu
+def render_leaderboard_html(now_time, new_positions_dict_dest=None):
     scores = {player: 0 for player in players}
     for match_id, result in st.session_state.results.items():
         r_h, r_a = result['score_h'], result['score_a']
@@ -364,6 +400,9 @@ def render_leaderboard_html(new_positions_dict_dest=None):
             bg_style = 'style="background-color: #16A34A; font-weight: bold; color: #FFFFFF;"' 
         elif pos == len(df_scores) and row['Punkty'] > 0:
             bg_style = 'style="background-color: #DC2626; font-weight: bold; color: #FFFFFF;"' 
+            
+        # Pobieramy czas odliczania dla danego zawodnika
+        countdown_html = get_time_to_next_unbet_match(player_name, now_time)
         
         html_rows += f"""
         <tr {bg_style}>
@@ -371,6 +410,7 @@ def render_leaderboard_html(new_positions_dict_dest=None):
             <td style="text-align:center;">{trend_html}</td>
             <td>{player_name}</td>
             <td><b>{row['Punkty']} pkt</b></td>
+            <td>{countdown_html}</td>
         </tr>
         """
     return f"""
@@ -380,6 +420,7 @@ def render_leaderboard_html(new_positions_dict_dest=None):
                 <th style="width:10%; text-align:center;">Trend</th>
                 <th>Gracz</th>
                 <th>Punkty</th>
+                <th>Najbliższy mecz</th>
             </tr>
             {html_rows}
         </table>
@@ -389,8 +430,10 @@ def render_leaderboard_html(new_positions_dict_dest=None):
 if 'logged_in_user' not in st.session_state:
     st.session_state.logged_in_user = None
 
+now = datetime.now()
+
 if st.session_state.logged_in_user is None:
-    # PODZIAŁ OKNA LOGOWANIA: Formularz po lewej, klasyfikacja na żywo po prawej
+    # PODZIAŁ OKNA LOGOWANIA: Formularz po lewej, klasyfikacja na żywo z odliczaniem po prawej
     col_login, col_board = st.columns([2, 3], gap="large")
     
     with col_login:
@@ -406,8 +449,8 @@ if st.session_state.logged_in_user is None:
                 st.error("Błędne hasło. Spróbuj ponownie.")
                 
     with col_board:
-        st.subheader("📊 Aktualna Klasyfikacja Graczy")
-        st.markdown(render_leaderboard_html(), unsafe_allow_html=True)
+        st.subheader("📊 Aktualna Klasyfikacja i Stan Obstawień")
+        st.markdown(render_leaderboard_html(now), unsafe_allow_html=True)
 else:
     current_user = st.session_state.logged_in_user
     st.sidebar.write(f"👤 Zalogowany jako: **{current_user}**")
@@ -415,9 +458,7 @@ else:
         st.session_state.logged_in_user = None
         st.rerun()
 
-    now = datetime.now()
-    
-    # Przypomnienia 1h przed
+    # --- LOGIKA AUTOMATYCZNYCH PRZYPOMNIEŃ POP-UP ---
     for match_id, match in st.session_state.results.items():
         if match["status"] == "Oczekuje":
             try:
@@ -438,7 +479,7 @@ else:
     with tab1:
         st.header("Tabela Wyników Typera")
         new_positions = {}
-        st.markdown(render_leaderboard_html(new_positions), unsafe_allow_html=True)
+        st.markdown(render_leaderboard_html(now, new_positions), unsafe_allow_html=True)
 
     # ZAKŁADKA 2: TERMINARZ
     with tab2:
@@ -618,9 +659,8 @@ else:
                         st.session_state.results[match_id]['score_a'] = res_a
                         st.session_state.results[match_id]['status'] = "Zakończony"
                         
-                        # Pobranie aktualnego stanu do zmiennej pomocniczej przed wymuszeniem przeliczenia trendu
                         temp_positions = {}
-                        render_leaderboard_html(temp_positions)
+                        render_leaderboard_html(now, temp_positions)
                         st.session_state.last_positions = temp_positions
                         
                         st.success("Tabela i punkty przeliczone!")
