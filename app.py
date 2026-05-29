@@ -26,43 +26,48 @@ st.markdown("""
         color: #F8FAFC !important;
     }
 
-    /* --- BEZWZGLĘDNA POPRAWKA WIDOCZNOŚCI FORMULARZA LOGOWANIA (CZARNY TEKST) --- */
-    /* Nagłówki nad polami (Wybierz użytkownika / Wpisz hasło) */
+    /* --- OSTATECZNA NAPRAWA LISTY ROZWIJANEJ ( dropdown ) --- */
+    /* Etykiety nad polami (Wybierz użytkownika / Wpisz hasło) */
     div[data-testid="stSelectbox"] label p, div[data-testid="stTextInput"] label p {
         color: #F97316 !important;
         font-weight: bold !important;
         font-size: 1.2rem !important;
     }
     
-    /* Tło pól wprowadzania danych - czysta biel */
+    /* Główne okienka wyboru przed kliknięciem */
     div[data-baseweb="select"], div[data-baseweb="input"] {
-        background-color: #FFFFFF !important;
+        background-color: #172554 !important;
         border: 2px solid #F97316 !important;
         border-radius: 6px !important;
     }
     
-    /* Wymuszenie czarnego koloru czcionki wewnątrz pól oraz w menu rozwijanym */
-    div[data-baseweb="select"] *, div[data-baseweb="input"] input {
-        color: #000000 !important; 
+    /* Tekst wewnątrz zamkniętego okienka */
+    div[data-baseweb="select"] div, div[data-baseweb="input"] input {
+        color: #F8FAFC !important; 
         font-weight: bold !important;
         font-size: 1.1rem !important;
     }
 
-    /* Globalne wymuszenie czarnego tekstu na białym tle dla wyskakującej listy rozwijanej (Streamlit BaseWeb Dropdown) */
-    div[role="listbox"] {
-        background-color: #FFFFFF !important;
+    /* Wymuszenie CIEMNEGO tła dla rozwijanego menu (Zapobiega zlewaniu się bieli) */
+    div[role="listbox"], ul[role="listbox"] {
+        background-color: #111827 !important;
+        border: 1px solid #F97316 !important;
     }
-    div[role="listbox"] * {
-        color: #000000 !important;
+    
+    /* Imiona na rozwijanej liście - wymuszenie koloru białego/pomarańczowego */
+    div[role="option"], li[role="option"], div[role="listbox"] * {
+        color: #F8FAFC !important;
+        background-color: #111827 !important;
         font-weight: bold !important;
-        background-color: #FFFFFF !important;
+        font-size: 1.1rem !important;
     }
-    /* Podświetlenie opcji na liście po najechaniu myszką - delikatny szary z czarnym tekstem */
-    div[role="option"]:hover, div[role="option"] *:hover {
-        background-color: #E2E8F0 !important;
-        color: #000000 !important;
+    
+    /* Podświetlenie elementu na liście po najechaniu myszką */
+    div[role="option"]:hover, li[role="option"]:hover {
+        background-color: #F97316 !important;
+        color: #0A1128 !important;
     }
-    /* ----------------------------------------------------------------------- */
+    /* -------------------------------------------------------- */
     
     /* Kontener loga i tytułu */
     .logo-title-container {
@@ -106,22 +111,6 @@ st.markdown("""
         background-color: #EA580C !important;
         transform: translateY(-1px);
         box-shadow: 0 4px 6px rgba(249, 115, 22, 0.4);
-    }
-    
-    /* Inputy numerów wewnątrz terminarza */
-    .match-container div[data-baseweb="input"] {
-        background-color: #172554 !important;
-        border: 1px solid #1E3A8A !important;
-    }
-    .match-container div[data-baseweb="input"] input {
-        color: #F97316 !important;
-    }
-
-    /* Powiadomienia (Toasty / Pop-upy) */
-    [data-testid="stToast"], div[data-testid="stNotification"] {
-        background-color: #1E3A8A !important;
-        color: white !important;
-        border-left: 5px solid #F97316 !important;
     }
     
     /* Karty meczów */
@@ -247,7 +236,7 @@ COUNTRY_FLAGS = {
     "Niemcy": "de", "Curaçao": "cw", "WKS": "ci", "Ekwador": "ec",
     "Holandia": "nl", "Japonia": "jp", "Szwecja": "se", "Tunezja": "tn",
     "Belgia": "be", "Egipt": "eg", "Iran": "ir", "Nowa Zelandia": "nz",
-    "Hiszpania": "es", "Wyspy Zielonego Przylądka": "cv", "Arabia Saudyjska": "sa", "Urugwaj": "uy",
+    "Hiszpania": "es", "Wyspy Zielonego Przylążka": "cv", "Arabia Saudyjska": "sa", "Urugwaj": "uy",
     "Francja": "fr", "Senegal": "sn", "Irak": "iq", "Norwegia": "no",
     "Argentyna": "ar", "Algieria": "dz", "Austria": "at", "Jordania": "jo",
     "Portugalia": "pt", "DR Konga": "cd", "Uzbekistan": "uz", "Kolumbia": "co",
@@ -279,7 +268,7 @@ GROUPS_DICT = {
     "Grupa E": ["Niemcy", "Curaçao", "WKS", "Ekwador"],
     "Grupa F": ["Holandia", "Japonia", "Szwecja", "Tunezja"],
     "Grupa G": ["Belgia", "Egipt", "Iran", "Nowa Zelandia"],
-    "Grupa H": ["Hiszpania", "Wyspy Zielonego Przylądka", "Arabia Saudyjska", "Urugwaj"],
+    "Grupa H": ["Hiszpania", "Wyspy Zielonego Przylążka", "Arabia Saudyjska", "Urugwaj"],
     "Grupa I": ["Francja", "Senegal", "Irak", "Norwegia"],
     "Grupa J": ["Argentyna", "Algieria", "Austria", "Jordania"],
     "Grupa K": ["Portugalia", "DR Konga", "Uzbekistan", "Kolumbia"],
@@ -459,7 +448,6 @@ if 'logged_in_user' not in st.session_state:
 now = datetime.now()
 
 if st.session_state.logged_in_user is None:
-    # PODZIAŁ OKNA LOGOWANIA: Formularz po lewej, klasyfikacja na żywo po prawej
     col_login, col_board = st.columns([2, 3], gap="large")
     
     with col_login:
