@@ -4,20 +4,21 @@ import numpy as np
 import os
 from datetime import datetime, timedelta
 
-# 1. Konfiguracja i Szata Graficzna
+# 1. Konfiguracja i Szata Graficzna zgodna z nowym brandingiem KriCon Group (Granat + Pomarańcz)
 st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", layout="wide")
 
+# CSS dla nowoczesnej stylizacji brandingowej KriCon (Granatowy + Pomarańczowy)
 st.markdown("""
     <style>
-    .reportview-container, .main .block-container { 
-        background: #FFFFFF; 
-        color: #1F2937; 
-    }
+    /* Tło główne i kontenerów - JAŚNIEJSZE */
+    .reportview-container, .main .block-container { background: #FFFFFF; color: #1F2937; }
     .main .block-container { padding-top: 1rem; }
+    
+    /* Kontener loga i tytułu */
     .logo-title-container {
         display: flex;
         align-items: center;
-        border-bottom: 4px solid #3B82F6;
+        border-bottom: 4px solid #F97316; /* Pomarańczowy akcent KriCon */
         padding-bottom: 15px;
         margin-bottom: 25px;
     }
@@ -28,62 +29,86 @@ st.markdown("""
         max-height: 80px;
         width: auto;
     }
+    
+    /* Nagłówek H1 - Granatowy KriCon wewnątrz kontenera flex */
     .logo-title-container h1 {
-        color: #1E3A8A !important;
+        color: #1E3A8A !important; /* Granatowy */
         font-family: 'Segoe UI', Arial, sans-serif;
         font-weight: 700;
         margin: 0 !important;
         border: none !important;
         padding: 0 !important;
     }
+    
+    /* Pozostałe nagłówki */
     h2, h3 { 
         color: #1E3A8A !important;
         font-family: 'Segoe UI', Arial, sans-serif;
     }
+    
+    /* Przyciski w kolorystyce KriCon (Granat przechodzący w pomarańcz na hover) */
     .stButton>button {
-        background-color: #3B82F6 !important;
+        background-color: #1E3A8A !important;
         color: white !important;
         border-radius: 6px !important;
-        border: none !important;
+        border: 1px solid #1E3A8A !important;
         font-weight: 600 !important;
         padding: 0.6rem 1.8rem !important;
         transition: all 0.2s ease;
     }
     .stButton>button:hover {
-        background-color: #2563EB !important;
+        background-color: #F97316 !important;
+        border-color: #F97316 !important;
+        color: white !important;
         transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(249, 115, 22, 0.2);
     }
+    
+    /* Komunikaty i notyfikacje - Nowy styl na bazie pomarańczu */
     div[data-testid="stNotification"] {
-        background-color: #EFF6FF !important;
+        background-color: #F3F4F6 !important;
         color: #1E3A8A !important;
-        border-left: 5px solid #3B82F6 !important;
+        border-left: 5px solid #F97316 !important;
         border-radius: 4px;
     }
+    
+    /* Toast pop-up - dostosowany kolor */
+    [data-testid="stToast"] {
+        background-color: #1E3A8A !important;
+        color: white !important;
+    }
+    
+    /* Oficjalny wynik - kolor Emergency z witryny KriCon (Pomarańczowy dla wyróżnienia) */
     .real-score { 
         font-size: 1.3rem; 
-        color: #EF4444; 
+        color: #F97316; /* KriCon Orange */
         font-weight: bold; 
-        background-color: #FEF2F2;
+        background-color: #FEFCE8;
         padding: 6px 12px;
         border-radius: 6px;
         display: inline-block;
         margin-top: 5px;
     }
+    
+    /* Zakładki (Tabs) dopasowane do stylu */
     .stTabs [data-baseweb="tab"] {
-        color: #4B5563 !important;
+        color: #1E3A8A !important;
         font-weight: 600;
         font-size: 1.1rem;
     }
     .stTabs [data-baseweb="tab"][aria-selected="true"] {
-        border-bottom-color: #3B82F6 !important;
-        color: #1E3A8A !important;
+        border-bottom-color: #F97316 !important;
+        color: #F97316 !important;
     }
+
+    /* Stylizacja tabel HTML - Granatowe nagłówki, białe tło */
     .kricon-table {
         width: 100%;
         border-collapse: collapse;
         margin: 15px 0;
         font-size: 1rem;
         min-width: 400px;
+        background-color: #FFFFFF;
     }
     .kricon-table th {
         background-color: #1E3A8A;
@@ -102,7 +127,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Flagi PNG
+# Mapowanie Państw na Kody ISO (dla stabilnych flag PNG z flagcdn.com)
 COUNTRY_FLAGS = {
     "Meksyk": "mx", "RPA": "za", "Korea Południowa": "kr", "Czechy": "cz",
     "Kanada": "ca", "Bośnia i Hercegowina": "ba", "Katar": "qa", "Szwajcaria": "ch",
@@ -123,6 +148,7 @@ COUNTRY_FLAGS = {
 MONTH_MAP = {"Czerwca": 6, "Lipca": 7}
 
 def get_flag_html(country_name):
+    """Generuje kod HTML dla flagi na podstawie nazwy państwa."""
     clean_name = country_name.replace("🏳️", "").strip()
     code = COUNTRY_FLAGS.get(clean_name, "unknown")
     if code == "unknown":
@@ -130,12 +156,16 @@ def get_flag_html(country_name):
     flag_url = f"https://flagcdn.com/w40/{code}.png"
     return f'<img src="{flag_url}" width="25" style="vertical-align: middle; margin-right: 10px; border: 1px solid #ddd; border-radius:2px;" alt="flaga"> {country_name}'
 
-# 2. Wyświetlanie Loga
+# 2. Wyświetlanie Loga (Ładowanie lokalne dla stabilności)
+# ⚠️ UWAGA: Umieść nowy plik loga w formacie PNG i nazwij go 'logo.png', zastępując stary plik w tym samym folderze co app.py
 LOCAL_LOGO_PATH = "./logo.png"
+
 if os.path.exists(LOCAL_LOGO_PATH):
     logo_html = f'<img src="{LOCAL_LOGO_PATH}" alt="Kricon Group Logo" class="logo-image">'
 else:
-    logo_html = '<span style="font-size:2em; margin-right:15px;">🌐</span>'
+    # Ostrzeżenie dla administratora
+    print(f"OSTRZEŻENIE: Nie znaleziono pliku loga pod ścieżką: {LOCAL_LOGO_PATH}")
+    logo_html = '<span style="font-size:2em; margin-right:15px;">🌐</span>' # Placeholder
 
 st.markdown(f"""
     <div class="logo-title-container">
@@ -146,20 +176,15 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# Baza użytkowników
+# 3. Baza użytkowników
 USER_CREDENTIALS = {
-    "Adam": "adam2026",
-    "Maciej": "maciej2026",
-    "Marcin": "marcin2026",
-    "Kamil": "kamil2026",
-    "Kuba M": "kubam2026",
-    "Tomek": "tomek2026",
-    "Kuba K": "kubak2026",
-    "Rafał": "rafal2026",
-    "admin": "kriconadmin"
+    "Adam": "adam2026", "Maciej": "maciej2026", "Marcin": "marcin2026",
+    "Kamil": "kamil2026", "Kuba M": "kubam2026", "Tomek": "tomek2026",
+    "Kuba K": "kubak2026", "Rafał": "rafal2026", "admin": "kriconadmin"
 }
 players = [k for k in USER_CREDENTIALS.keys() if k != "admin"]
 
+# Oficjalny podział na grupy Mistrzostw Świata 2026
 GROUPS_DICT = {
     "Grupa A": ["Meksyk", "RPA", "Korea Południowa", "Czechy"],
     "Grupa B": ["Kanada", "Bośnia i Hercegowina", "Katar", "Szwajcaria"],
@@ -175,14 +200,18 @@ GROUPS_DICT = {
     "Grupa L": ["Anglia", "Chorwacja", "Ghana", "Panama"]
 }
 
-# 3. Harmonogram
+# 4. Generator Harmonogramu 104 Meczów z Oficjalnymi Ramami Datowymi
 def generate_schedule():
     schedule = {}
     match_id = 1
+    
+    # Faza grupowa: 11 - 27 Czerwca
     dates_group = [f"{d} Czerwca" for d in range(11, 28)]
+    
     matchups = [(0,1), (2,3), (0,2), (1,3), (0,3), (1,2)]
     date_idx = 0
     
+    # Faza Grupowa (72 mecze przy 12 grupach)
     for m_round in range(6):
         for group_name, teams in GROUPS_DICT.items():
             t1_idx, t2_idx = matchups[m_round]
@@ -190,16 +219,13 @@ def generate_schedule():
                 "date": dates_group[date_idx % len(dates_group)],
                 "time": "18:00",
                 "stage": group_name,
-                "home": teams[t1_idx], 
-                "away": teams[t2_idx],
-                "score_h": None, 
-                "score_a": None, 
-                "status": "Oczekuje"
+                "home": teams[t1_idx], "away": teams[t2_idx],
+                "score_h": None, "score_a": None, "status": "Oczekuje"
             }
             match_id += 1
-            if match_id % 4 == 0: 
-                date_idx += 1
+            if match_id % 4 == 0: date_idx += 1
 
+    # Oficjalne ramy czasowe fazy pucharowej MŚ 2026
     ko_stages = [
         ("1/16 Finału", 16, ["28 Czerwca", "29 Czerwca", "30 Czerwca", "1 Lipca", "2 Lipca", "3 Lipca"]), 
         ("1/8 Finału", 8, ["4 Lipca", "5 Lipca", "6 Lipca", "7 Lipca"]), 
@@ -216,17 +242,15 @@ def generate_schedule():
                 "date": stage_dates[d_idx % len(stage_dates)],
                 "time": "21:00",
                 "stage": stage_name,
-                "home": "TBD", 
-                "away": "TBD",
-                "score_h": None, 
-                "score_a": None, 
-                "status": "Oczekuje"
+                "home": "TBD", "away": "TBD",
+                "score_h": None, "score_a": None, "status": "Oczekuje"
             }
             match_id += 1
             d_idx += 1
             
     return schedule
 
+# Inicjalizacja bezpieczna
 if 'results' not in st.session_state or "date" not in st.session_state.results.get(1, {}):
     st.session_state.results = generate_schedule()
 
@@ -247,7 +271,7 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
         return 1
     return 0
 
-# 4. System Logowania
+# 5. System Logowania
 if 'logged_in_user' not in st.session_state:
     st.session_state.logged_in_user = None
 
@@ -269,8 +293,9 @@ else:
         st.session_state.logged_in_user = None
         st.rerun()
 
-    # --- LOGIKA AUTOMATYCZNYCH PRZYPOMNIEŃ POP-UP ---
+    # --- LOGIKA AUTOMATYCZNYCH PRZYPOMNIEŃ POP-UP (WIDOCZNA DLA WSZYSTKICH PO ZALOGOWANIU) ---
     now = datetime.now()
+    # Sztuczne ustawienie roku turnieju na 2026 na potrzeby walidacji dat
     current_year = 2026 
     
     for match_id, match in st.session_state.results.items():
@@ -281,7 +306,6 @@ else:
                 month_str = date_parts[1]
                 month = MONTH_MAP.get(month_str, 6)
                 
-                # Zabezpieczenie .get() na wypadek starych danych w pamięci
                 time_parts = match.get("time", "18:00").split(":")
                 hour = int(time_parts[0])
                 minute = int(time_parts[1])
@@ -303,6 +327,7 @@ else:
 
     tab1, tab2, tab3, tab4 = st.tabs(["📊 Klasyfikacja", "📅 Terminarz i Typy", "📈 Tabele Grup", "⚙️ Admin"])
 
+    # ZAKŁADKA 1: KLASYFIKACJA
     with tab1:
         st.header("Tabela Wyników Typera")
         scores = {player: 0 for player in players}
@@ -318,13 +343,14 @@ else:
         df_scores = df_scores.sort_values(by="Punkty", ascending=False).reset_index(drop=True)
         df_scores.index += 1
         
+        # Renderowanie tabeli liderów w formacie HTML dla zachowania nowych kolorów akcentów pomarańczowych
         html_rows = ""
         for idx, row in df_scores.iterrows():
             bg_style = ""
             if idx == 1 and row['Punkty'] > 0:
-                bg_style = 'style="background-color: #DBEAFE; font-weight: bold; color: #1E3A8A;"'
+                bg_style = 'style="background-color: #FEFCE8; font-weight: bold; color: #1E3A8A;"' # Jasnopomarańczowe tło lidera
             elif idx == len(df_scores) and row['Punkty'] > 0:
-                bg_style = 'style="background-color: #FEE2E2; color: #991B1B;"'
+                bg_style = 'style="background-color: #FEE2E2; color: #991B1B;"' # Jasnoczerwone dla ostatniego
             
             html_rows += f"""
             <tr {bg_style}>
@@ -341,6 +367,7 @@ else:
             </table>
         """, unsafe_allow_html=True)
 
+    # ZAKŁADKA 2: TERMINARZ I TYPY
     with tab2:
         if current_user == "admin":
             st.warning("Zaloguj się jako gracz, aby typować.")
@@ -352,7 +379,6 @@ else:
             for match_id, match in st.session_state.results.items():
                 if match["date"] == selected_date:
                     st.markdown(f"### {get_flag_html(match['home'])} vs {get_flag_html(match['away'])}", unsafe_allow_html=True)
-                    # Zabezpieczenie przed brakiem klucza 'time' 
                     st.caption(f"Faza: {match['stage']} | Godzina: {match.get('time', '18:00')} | Mecz #{match_id}")
                     
                     if match['status'] == "Zakończony":
@@ -377,6 +403,7 @@ else:
                                 st.session_state.bets[match_id][current_user] = (bet_h, bet_a)
                                 st.success("Zapisano!")
                     
+                    # SYSTEM ANTY-ŚCIĄGANIA
                     if match['status'] == "Zakończony":
                         with st.expander("👁️ Zobacz typy innych graczy"):
                             other_bets = []
@@ -397,11 +424,14 @@ else:
                             
                     st.divider()
 
+    # ZAKŁADKA 3: TABELE GRUP
     with tab3:
         st.header("📈 Tabele Fazy Grupowej")
         st.write("Aktualizowane na żywo po wpisaniu oficjalnych wyników przez Admina.")
         
         group_sel = st.selectbox("Wybierz grupę:", list(GROUPS_DICT.keys()))
+        
+        # Obliczanie tabeli
         teams_stats = {t: {"Punkty": 0, "BZ": 0, "BS": 0, "RB": 0} for t in GROUPS_DICT[group_sel]}
         
         for match in st.session_state.results.values():
@@ -409,6 +439,7 @@ else:
                 h_team, a_team = match["home"], match["away"]
                 sh, sa = match["score_h"], match["score_a"]
                 
+                # Aktualizacja bramek
                 teams_stats[h_team]["BZ"] += sh
                 teams_stats[h_team]["BS"] += sa
                 teams_stats[h_team]["RB"] += (sh - sa)
@@ -417,6 +448,7 @@ else:
                 teams_stats[a_team]["BS"] += sh
                 teams_stats[a_team]["RB"] += (sa - sh)
                 
+                # Aktualizacja punktów
                 if sh > sa:
                     teams_stats[h_team]["Punkty"] += 3
                 elif sa > sh:
@@ -427,9 +459,11 @@ else:
                     
         df_group = pd.DataFrame.from_dict(teams_stats, orient='index').reset_index()
         df_group.rename(columns={'index': 'Reprezentacja'}, inplace=True)
+        # Sortowanie (Punkty -> Różnica Bramek -> Bramki Zdobyte)
         df_group = df_group.sort_values(by=["Punkty", "RB", "BZ"], ascending=[False, False, False]).reset_index(drop=True)
         df_group.index += 1
         
+        # Generowanie tabeli jako HTML dla poprawnego renderowania nowych granatowych nagłówków
         group_rows = ""
         for idx, row in df_group.iterrows():
             group_rows += f"""
@@ -452,6 +486,7 @@ else:
             </table>
         """, unsafe_allow_html=True)
 
+    # ZAKŁADKA 4: ADMIN
     with tab4:
         if current_user != "admin":
             st.error("Zaloguj się jako 'admin', aby wpisywać wyniki.")
@@ -462,6 +497,7 @@ else:
             
             for match_id, match in st.session_state.results.items():
                 if match["date"] == admin_date:
+                    
                     if "TBD" in match["home"] or "Finał" in match["stage"] or "1/" in match["stage"]:
                         new_home = st.text_input(f"Drużyna 1 (Mecz #{match_id})", value=match["home"], key=f"edit_h_{match_id}")
                         new_away = st.text_input(f"Drużyna 2 (Mecz #{match_id})", value=match["away"], key=f"edit_a_{match_id}")
