@@ -72,25 +72,40 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4) !important;
     }
     
-    /* Pulsujący jaskrawy banner ostrzegawczy */
-    .pulse-warning-banner {
-        background-color: #FF4500 !important;
-        color: white !important;
+    /* --- ELEMENTY STATUSU TYPOWANIA (NOWOŚĆ) --- */
+    /* Czerwony mrygający banner - Brak Typu */
+    .missing-bet-banner {
+        background-color: #DC2626 !important; /* Strażacka czerwień */
+        color: #FFFFFF !important;
         font-weight: bold !important;
         text-align: center !important;
-        padding: 3px !important;
+        padding: 4px !important;
         border-radius: 4px !important;
         font-size: 0.75rem !important;
         margin-top: 2px !important;
-        animation: simple-blink 1.2s infinite ease-in-out;
+        animation: critical-blink 1.2s infinite ease-in-out;
     }
-    @keyframes simple-blink {
+    @keyframes critical-blink {
         0% { opacity: 0.5; }
-        50% { opacity: 1; }
+        50% { opacity: 1; box-shadow: 0 0 10px #DC2626; }
         100% { opacity: 0.5; }
     }
     
-    /* --- ULTRA KOMPAKTOWY TERMINARZ INLINE --- */
+    /* Zielony stabilny pasek - Typ Zapisany z ptaszkiem */
+    .success-bet-banner {
+        background-color: #16A34A !important; /* Głęboka zieleń */
+        color: #FFFFFF !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        padding: 4px !important;
+        border-radius: 4px !important;
+        font-size: 0.75rem !important;
+        margin-top: 2px !important;
+        border: 1px solid #22C55E;
+    }
+    /* ------------------------------------------- */
+    
+    /* Ultra kompaktowy terminarz inline */
     .match-container { 
         background: #172554 !important; 
         border: 1px solid #1E3A8A !important; 
@@ -140,7 +155,6 @@ st.markdown("""
         margin: 0;
     }
     
-    /* Sekcja typu gracza pod spodem */
     .bet-sub-row {
         display: flex;
         align-items: center;
@@ -417,6 +431,13 @@ if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = N
 now = datetime.now()
 fetch_official_results_from_api(now)
 
+# LOGIKA LIVE DLA TRANZYCJI IKON
+for m_id, m in st.session_state.results.items():
+    if m['status'] != "Zakończony":
+        time_diff = now - m['timestamp']
+        if timedelta(minutes=0) <= time_diff <= timedelta(minutes=120):
+            st.session_state.results[m_id]['status'] = "LIVE"
+
 if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
     with c1:
@@ -460,12 +481,11 @@ else:
             if (mode == "Oczekujące" and m['status'] == "Zakończony") or (mode == "Zakończone" and m['status'] == "Oczekuje"): continue
             status_html = '<span class="status-badge status-live">🔴 LIVE</span>' if m['status'] == "LIVE" else ('<span class="status-badge status-ended">⚫ Zakończony</span>' if m['status'] == "Zakończony" else '<span class="status-badge status-waiting">🟡 Oczekuje</span>')
             
-            # Pobieranie wyników oficjalnych
             sh_real = "" if m.get('score_h') is None else str(m.get('score_h'))
             sa_real = "" if m.get('score_a') is None else str(m.get('score_a'))
             oficjalny_wynik_tekst = f"{sh_real} : {sa_real}" if (sh_real != "") else "vs"
             
-            # --- MODEL 1 LINII: NUMER, PIŁKA, TEAMY, OFICJALNY WYNIK ---
+            # LINIA 1: NUMER, PIŁKA, DRUŻYNY, OFICJALNY WYNIK
             st.markdown(f"""
             <div class='match-container'>
                 <div class='match-inline-main-row'>
@@ -487,7 +507,7 @@ else:
             has_existing_bet = st.session_state.bets[m_id].get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
             
-            # --- LINIA 2: CHIPY TYPOWANIA ORAZ PRZYCISK ZAPISU POD SPODEM ---
+            # LINIA 2: EDYCJA / WPISYWANIE WŁASNEGO TYPU GRACZA
             c_label, c_input_h, c_input_a, c_btn = st.columns([1.5, 1, 1, 3.5])
             
             with c_label:
@@ -500,6 +520,12 @@ else:
                 if locked:
                     st.button("Zablokowane", disabled=True, key=f"lock_btn_{m_id}")
                 else:
+                    # --- DYNAMICZNY PODZIAŁ STATUSÓW: CZERWONY BRAK / ZIELONY PTASZEK Z MOŻLIWOŚCIĄ EDYCJI ---
+                    if has_existing_bet:
+                        st.markdown("<div class='success-bet-banner'>✔ TYP ZAPISANY (Możesz edytować)</div>", unsafe_allow_html=True)
+                    else:
+                        st.markdown("<div class='missing-bet-banner'>🔴 ⚠️ NIEODDANY TYP</div>", unsafe_allow_html=True)
+                    
                     button_container_class = "" if has_existing_bet else "pulsing-save-btn"
                     st.markdown(f"<div class='{button_container_class}'>", unsafe_allow_html=True)
                     if st.button("Zapisz", key=f"btn_{m_id}"): 
@@ -508,8 +534,6 @@ else:
                         st.success("Zapisano!")
                         st.rerun()
                     st.markdown("</div>", unsafe_allow_html=True)
-                    if not has_existing_bet:
-                        st.markdown("<div class='pulse-warning-banner'>⚠️ NIEODDANY TYP</div>", unsafe_allow_html=True)
                         
             if locked or m['status'] == "Zakończony":
                 with st.expander("👁️ Zobacz typy innych graczy"):
