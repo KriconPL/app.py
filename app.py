@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 # 1. Konfiguracja aplikacji i Szata Graficzna Dark Navy & Orange
 st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", layout="wide")
 
-# GLOBALNE PROFILE I CONFIG (Przeniesione na samą górę)
+# GLOBALNE PROFILE I CONFIG
 USER_CREDENTIALS = {
     "Adam": "adam2026", "Maciej": "maciej2026", "Marcin": "marcin2026",
     "Kamil": "kamil2026", "Kuba M": "kubam2026", "Tomek": "tomek2026",
@@ -20,18 +20,18 @@ USER_CREDENTIALS = {
 players = [k for k in USER_CREDENTIALS.keys() if k != "admin"]
 
 GROUPS_DICT = {
-    "Grupa A": ["🇲🇽 Meksyk", "🇿🇦 RPA", "🇰🇷 Korea Południowa", "🇨🇿 Czechy"], 
-    "Grupa B": ["🇨🇦 Kanada", "🇧🇦 Bośnia i Hercegowina", "🇶🇦 Katar", "🇨🇭 Szwajcaria"],
-    "Grupa C": ["🇧🇷 Brazylia", "🇲🇦 Maroko", "🇭🇹 Haiti", "🏴󠁧󠁢󠁳󠁣󠁴󠁿 Szkocja"], 
-    "Grupa D": ["🇺🇸 USA", "🇵🇾 Paragwaj", "🇦🇺 Australia", "🇹🇷 Turcja"],
-    "Grupa E": ["🇩🇪 Niemcy", "🇨🇼 Curaçao", "🇨🇮 WKS", "🇪🇨 Ekwador"], 
-    "Grupa F": ["🇳🇱 Holandia", "🇯🇵 Japonia", "🇸🇪 Szwecja", "🇹🇳 Tunezja"],
-    "Grupa G": ["🇧🇪 Belgia", "🇪🇬 Egipt", "🇮🇷 Iran", "🇳🇿 Nowa Zelandia"], 
-    "Grupa H": ["🇪🇸 Hiszpania", "🇨🇻 Wyspy Zielonego Przylądka", "🇸🇦 Arabia Saudyjska", "🇺🇾 Urugwaj"],
-    "Grupa I": ["🇫🇷 Francja", "🇸🇳 Senegal", "🇮🇶 Irak", "🇳🇴 Norwegia"], 
-    "Grupa J": ["🇦🇷 Argentyna", "🇩🇿 Algieria", "🇦🇹 Austria", "🇯🇴 Jordania"],
-    "Grupa K": ["🇵🇹 Portugalia", "🇨🇩 DR Konga", "🇺🇿 Uzbekistan", "🇨🇴 Kolumbia"], 
-    "Grupa L": ["🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglia", "🇭🇷 Chorwacja", "🇬🇭 Ghana", "🇵🇦 Panama"]
+    "Grupa A": ["Meksyk", "RPA", "Korea Południowa", "Czechy"], 
+    "Grupa B": ["Kanada", "Bośnia i Hercegowina", "Katar", "Szwajcaria"],
+    "Grupa C": ["Brazylia", "Maroko", "Haiti", "Szkocja"], 
+    "Grupa D": ["USA", "Paragwaj", "Australia", "Turcja"],
+    "Grupa E": ["Niemcy", "Curaçao", "WKS", "Ekwador"], 
+    "Grupa F": ["Holandia", "Japonia", "Szwecja", "Tunezja"],
+    "Grupa G": ["Belgia", "Egipt", "Iran", "Nowa Zelandia"], 
+    "Grupa H": ["Hiszpania", "Wyspy Zielonego Przylądka", "Arabia Saudyjska", "Urugwaj"],
+    "Grupa I": ["Francja", "Senegal", "Irak", "Norwegia"], 
+    "Grupa J": ["Argentyna", "Algieria", "Austria", "Jordania"],
+    "Grupa K": ["Portugalia", "DR Konga", "Uzbekistan", "Kolumbia"], 
+    "Grupa L": ["Anglia", "Chorwacja", "Ghana", "Panama"]
 }
 
 VENUES_LIST = [
@@ -41,7 +41,6 @@ VENUES_LIST = [
     "Gillette, Boston", "BMO Field, Toronto", "BBVA, Monterrey", "Akron, Guadalajara"
 ]
 
-# ANTY-COPY GUARD: BLOKADA MYSZKI I KLAWIATURY
 st.markdown("""
     <script>
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
@@ -107,6 +106,24 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# --- SYSTEM EMOTIKON FLAG ---
+def get_flag_emoji(team_name):
+    flags = {
+        "Meksyk": "🇲🇽", "RPA": "🇿🇦", "Korea Południowa": "🇰🇷", "Czechy": "🇨🇿",
+        "Kanada": "🇨🇦", "Bośnia i Hercegowina": "🇧🇦", "Katar": "🇶🇦", "Szwajcaria": "🇨🇭",
+        "Brazylia": "🇧🇷", "Maroko": "🇲🇦", "Haiti": "🇭🇹", "Szkocja": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+        "USA": "🇺🇸", "Paragwaj": "🇵🇾", "Australia": "🇦🇺", "Turcja": "🇹🇷",
+        "Niemcy": "🇩🇪", "Curaçao": "🇨🇼", "WKS": "🇨🇮", "Ekwador": "🇪🇨",
+        "Holandia": "🇳🇱", "Japonia": "🇯🇵", "Szwecja": "🇸🇪", "Tunezja": "🇹🇳",
+        "Belgia": "🇧🇪", "Egipt": "🇪🇬", "Iran": "🇮🇷", "Nowa Zelandia": "🇳🇿",
+        "Hiszpania": "🇪🇸", "Wyspy Zielonego Przylądka": "🇨🇻", "Arabia Saudyjska": "🇸🇦", "Urugwaj": "🇺🇾",
+        "Francja": "🇫🇷", "Senegal": "🇸🇳", "Irak": "🇮🇶", "Norwegia": "🇳🇴",
+        "Argentyna": "🇦🇷", "Algieria": "🇩🇿", "Austria": "🇦🇹", "Jordania": "🇯🇴",
+        "Portugalia": "🇵🇹", "DR Konga": "🇨🇩", "Uzbekistan": "🇺🇿", "Kolumbia": "🇨🇴",
+        "Anglia": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Chorwacja": "🇭🇷", "Ghana": "🇬🇭", "Panama": "🇵🇦"
+    }
+    return flags.get(team_name, "")
+
 def security_clean_text(val):
     if not isinstance(val, str): return val
     return re.sub(r'<[^>]*?>', '', val).strip()
@@ -157,11 +174,13 @@ def render_bracket_match_html_clean(match_id):
     sh, sa = (str(m.get("score_h", "?")), str(m.get("score_a", "?"))) if m.get("status") == "Zakończony" else ("?", "?")
     win_h = m.get("score_h") is not None and m.get("score_a") is not None and m.get("score_h") > m.get("score_a") and m.get("status") == "Zakończony"
     win_a = m.get("score_h") is not None and m.get("score_a") is not None and m.get("score_a") > m.get("score_h") and m.get("status") == "Zakończony"
-    st.markdown(f"""<div class="bracket-match-card"><div class="bracket-match-title">Mecz #{match_id}</div><div class='bracket-row {"bracket-team-winner" if win_h else ""}'><span>{m.get('home', 'TBD')}</span><span class="bracket-score-cell">{sh}</span></div><div class='bracket-row {"bracket-team-winner" if win_a else ""}'><span>{m.get('away', 'TBD')}</span><span class="bracket-score-cell">{sa}</span></div></div>""", unsafe_allow_html=True)
+    flag_h = get_flag_emoji(m.get('home'))
+    flag_a = get_flag_emoji(m.get('away'))
+    st.markdown(f"""<div class="bracket-match-card"><div class="bracket-match-title">Mecz #{match_id}</div><div class='bracket-row {"bracket-team-winner" if win_h else ""}'><span>{flag_h} {m.get('home', 'TBD')}</span><span class="bracket-score-cell">{sh}</span></div><div class='bracket-row {"bracket-team-winner" if win_a else ""}'><span>{flag_a} {m.get('away', 'TBD')}</span><span class="bracket-score-cell">{sa}</span></div></div>""", unsafe_allow_html=True)
 
 def get_mini_group_html_string(g_code):
     teams = GROUPS_DICT.get(f"Grupa {g_code}", [])
-    lines = "".join([f"<div style='text-align:left; padding:3px 0; font-size:0.9rem;'>{t}</div>" for t in teams])
+    lines = "".join([f"<div style='text-align:left; padding:3px 0; font-size:0.9rem;'>{get_flag_emoji(t)} {t}</div>" for t in teams])
     return f"""<div class="bracket-group-box"><div style="font-weight:bold; color:#F97316; margin-bottom:4px; font-size:0.85rem;">GRUPA {g_code}</div>{lines}</div>"""
 
 def save_backup_local_and_github():
@@ -197,26 +216,26 @@ def generate_schedule():
     schedule = {}
     months_pl = {6: "Czerwca", 7: "Lipca"}
     raw_fixtures = [
-        (2026, 6, 11, 21, 0, "Grupa A", "🇲🇽 Meksyk", "🇿🇦 RPA"), (2026, 6, 12, 4, 0, "Grupa A", "🇰🇷 Korea Południowa", "🇨🇿 Czechy"),
-        (2026, 6, 12, 21, 0, "Grupa B", "🇨🇦 Kanada", "🇧🇦 Bośnia i Hercegowina"), (2026, 6, 13, 3, 0, "Grupa D", "🇺🇸 USA", "🇵🇾 Paragwaj"),
-        (2026, 6, 13, 21, 0, "Grupa B", "🇶🇦 Katar", "🇨🇭 Szwajcaria"), (2026, 6, 14, 0, 0, "Grupa C", "🇧🇷 Brazylia", "🇲🇦 Maroko"),
-        (2026, 6, 14, 3, 0, "Grupa C", "🏴󠁧󠁢󠁳󠁣󠁴󠁿 Szkocja", "🇭🇹 Haiti"), (2026, 6, 14, 6, 0, "Grupa D", "🇦🇺 Australia", "🇹🇷 Turcja"),
-        (2026, 6, 14, 19, 0, "Grupa E", "🇩🇪 Niemcy", "🇨🇼 Curaçao"), (2026, 6, 14, 22, 0, "Grupa F", "🇳🇱 Holandia", "🇯🇵 Japonia"),
-        (2026, 6, 15, 1, 0, "Grupa E", "🇨🇮 WKS", "🇪🇨 Ekwador"), (2026, 6, 15, 4, 0, "Grupa F", "🇸🇪 Szwecja", "🇹🇳 Tunezja"),
-        (2026, 6, 15, 18, 0, "Grupa H", "🇪🇸 Hiszpania", "🇨🇻 Wyspy Zielonego Przylądka"), (2026, 6, 15, 21, 0, "Grupa G", "🇧🇪 Belgia", "🇪🇬 Egipt"),
-        (2026, 6, 16, 0, 0, "Grupa H", "🇸🇦 Arabia Saudyjska", "🇺🇾 Urugwaj"), (2026, 6, 16, 3, 0, "Grupa G", "🇮🇷 Iran", "🇳🇿 Nowa Zelandia"),
-        (2026, 6, 16, 21, 0, "Grupa I", "🇫🇷 Francja", "🇸🇳 Senegal"), (2026, 6, 16, 21, 0, "Grupa I", "🇮🇶 Irak", "🇳🇴 Norwegia"),
-        (2026, 6, 17, 3, 0, "Grupa J", "🇦🇷 Argentyna", "🇩🇿 Algieria"), (2026, 6, 17, 6, 0, "Grupa J", "🇦🇹 Austria", "🇯🇴 Jordania"),
-        (2026, 6, 17, 19, 0, "Grupa K", "🇵🇹 Portugalia", "🇨🇩 DR Konga"), (2026, 6, 17, 22, 0, "Grupa L", "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anglia", "🇭🇷 Chorwacja"),
-        (2026, 6, 18, 1, 0, "Grupa L", "🇬🇭 Ghana", "🇵🇦 Panama"), (2026, 6, 18, 4, 0, "Grupa K", "🇺🇿 Uzbekistan", "🇨🇴 Kolumbia"),
-        (2026, 6, 18, 18, 0, "Grupa A", "🇨🇿 Czechy", "🇿🇦 RPA"), (2026, 6, 18, 21, 0, "Grupa B", "🇨🇭 Szwajcaria", "🇧🇦 Bośnia i Hercegowina"),
-        (2026, 6, 19, 0, 0, "Grupa B", "🇨🇦 Kanada", "🇶🇦 Katar"), (2026, 6, 19, 3, 0, "Grupa A", "🇲🇽 Meksyk", "🇰🇷 Korea Południowa"),
-        (2026, 6, 19, 21, 0, "Grupa D", "🇺🇸 USA", "🇦🇺 Australia"), (2026, 6, 20, 0, 0, "Grupa C", "🏴󠁧󠁢󠁳󠁣󠁴󠁿 Szkocja", "🇲🇦 Maroko"),
-        (2026, 6, 20, 3, 0, "Grupa C", "🇧🇷 Brazylia", "🇭🇹 Haiti"), (2026, 6, 20, 5, 0, "Grupa D", "🇹🇷 Turcja", "🇵🇾 Paragwaj"),
-        (2026, 6, 20, 19, 0, "Grupa F", "🇳🇱 Holandia", "🇸🇪 Szwecja"), (2026, 6, 20, 22, 0, "Grupa E", "🇩🇪 Niemcy", "🇨🇮 WKS"),
-        (2026, 6, 21, 2, 0, "Grupa E", "🇪🇨 Ekwador", "🇨🇼 Curaçao"), (2026, 6, 21, 6, 0, "Grupa F", "🇹🇳 Tunezja", "🇯🇵 Japonia"),
-        (2026, 6, 21, 18, 0, "Grupa H", "🇪🇸 Hiszpania", "🇸🇦 Arabia Saudyjska"), (2026, 6, 21, 21, 0, "Grupa G", "🇧🇪 Belgia", "🇮🇷 Iran"),
-        (2026, 6, 22, 0, 0, "Grupa H", "🇺🇾 Urugwaj", "🇨🇻 Wyspy Zielonego Przylądka"), (2026, 6, 22, 3, 0, "Grupa G", "🇳🇿 Nowa Zelandia", "🇪🇬 Egipt")
+        (2026, 6, 11, 21, 0, "Grupa A", "Meksyk", "RPA"), (2026, 6, 12, 4, 0, "Grupa A", "Korea Południowa", "Czechy"),
+        (2026, 6, 12, 21, 0, "Grupa B", "Kanada", "Bośnia i Hercegowina"), (2026, 6, 13, 3, 0, "Grupa D", "USA", "Paragwaj"),
+        (2026, 6, 13, 21, 0, "Grupa B", "Katar", "Szwajcaria"), (2026, 6, 14, 0, 0, "Grupa C", "Brazylia", "Maroko"),
+        (2026, 6, 14, 3, 0, "Grupa C", "Szkocja", "Haiti"), (2026, 6, 14, 6, 0, "Grupa D", "Australia", "Turcja"),
+        (2026, 6, 14, 19, 0, "Grupa E", "Niemcy", "Curaçao"), (2026, 6, 14, 22, 0, "Grupa F", "Holandia", "Japonia"),
+        (2026, 6, 15, 1, 0, "Grupa E", "WKS", "Ekwador"), (2026, 6, 15, 4, 0, "Grupa F", "Szwecja", "Tunezja"),
+        (2026, 6, 15, 18, 0, "Grupa H", "Hiszpania", "Wyspy Zielonego Przylądka"), (2026, 6, 15, 21, 0, "Grupa G", "Belgia", "Egipt"),
+        (2026, 6, 16, 0, 0, "Grupa H", "Arabia Saudyjska", "Urugwaj"), (2026, 6, 16, 3, 0, "Grupa G", "Iran", "Nowa Zelandia"),
+        (2026, 6, 16, 21, 0, "Grupa I", "Francja", "Senegal"), (2026, 6, 16, 21, 0, "Grupa I", "Irak", "Norwegia"),
+        (2026, 6, 17, 3, 0, "Grupa J", "Argentyna", "Algieria"), (2026, 6, 17, 6, 0, "Grupa J", "Austria", "Jordania"),
+        (2026, 6, 17, 19, 0, "Grupa K", "Portugalia", "DR Konga"), (2026, 6, 17, 22, 0, "Grupa L", "Anglia", "Chorwacja"),
+        (2026, 6, 18, 1, 0, "Grupa L", "Ghana", "Panama"), (2026, 6, 18, 4, 0, "Grupa K", "Uzbekistan", "Kolumbia"),
+        (2026, 6, 18, 18, 0, "Grupa A", "Czechy", "RPA"), (2026, 6, 18, 21, 0, "Grupa B", "Szwajcaria", "Bośnia i Hercegowina"),
+        (2026, 6, 19, 0, 0, "Grupa B", "Kanada", "Katar"), (2026, 6, 19, 3, 0, "Grupa A", "Meksyk", "Korea Południowa"),
+        (2026, 6, 19, 21, 0, "Grupa D", "USA", "Australia"), (2026, 6, 20, 0, 0, "Grupa C", "Szkocja", "Maroko"),
+        (2026, 6, 20, 3, 0, "Grupa C", "Brazylia", "Haiti"), (2026, 6, 20, 5, 0, "Grupa D", "Turcja", "Paragwaj"),
+        (2026, 6, 20, 19, 0, "Grupa F", "Holandia", "Szwecja"), (2026, 6, 20, 22, 0, "Grupa E", "Niemcy", "WKS"),
+        (2026, 6, 21, 2, 0, "Grupa E", "Ekwador", "Curaçao"), (2026, 6, 21, 6, 0, "Grupa F", "Tunezja", "Japonia"),
+        (2026, 6, 21, 18, 0, "Grupa H", "Hiszpania", "Arabia Saudyjska"), (2026, 6, 21, 21, 0, "Grupa G", "Belgia", "Iran"),
+        (2026, 6, 22, 0, 0, "Grupa H", "Urugwaj", "Wyspy Zielonego Przylądka"), (2026, 6, 22, 3, 0, "Grupa G", "Nowa Zelandia", "Egipt")
     ]
     match_id = 1
     for yr, mo, dy, hr, mn, stage, home, away in raw_fixtures:
@@ -243,7 +262,7 @@ def generate_schedule():
             match_dt = datetime(2026, m_num, d, hour, 0, 0)
             schedule[match_id] = {
                 "timestamp": match_dt, "date": f"{d} {months_pl[m_num]} o {match_dt.strftime('%H:%M')}",
-                "stage": security_clean_text(stage_name), "home": "🏳️ TBD", "away": "🏳️ TBD", "score_h": None, "score_a": None, "status": "Oczekuje",
+                "stage": security_clean_text(stage_name), "home": "TBD", "away": "TBD", "score_h": None, "score_a": None, "status": "Oczekuje",
                 "venue": "MetLife, Nowy Jork" if stage_name == "Finał" else VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]
             }
             match_id += 1
@@ -258,10 +277,10 @@ def fetch_official_results_from_api(now_time):
             m['score_a'] = int(np.random.choice([0, 1, 2]))
             m['status'] = "Zakończony"
             if m_id >= 73:
-                if m['home'] == "🏳️ TBD": m['home'] = "🇲🇽 Meksyk"
-                if m['away'] == "🏳️ TBD": m['away'] = "🇿🇦 RPA"
+                if m['home'] == "TBD": m['home'] = "Meksyk"
+                if m['away'] == "TBD": m['away'] = "RPA"
 
-# --- INIT ---
+# --- SYSTEM INIT ---
 now = datetime.now()
 if 'results' not in st.session_state or len(st.session_state.results) != 104: st.session_state.results = generate_schedule()
 if 'bets' not in st.session_state or len(st.session_state.bets) != 104: st.session_state.bets = {m_id: {} for m_id in st.session_state.results.keys()}
@@ -278,6 +297,7 @@ for m_id, m in st.session_state.results.items():
 
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 
+# --- WIDOKI ---
 if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
     with c1:
@@ -315,11 +335,17 @@ else:
             locked = (m['timestamp'] - now).total_seconds() <= 0
             has_existing_bet = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user, (0,0))
+            
+            flag_h_emoji = get_flag_emoji(m['home'])
+            flag_a_emoji = get_flag_emoji(m['away'])
+            
             st.markdown(f"<div class='match-container'><div class='match-top-meta-row'><span class='match-id-text'>⚽ Mecz #{m_id}</span>{status_html}<span class='match-date-badge'>📅 {m['date']}</span><span class='match-venue-badge'>📍 {m.get('venue', 'Stadion')}</span><span style='color:#64748B;'>({m['stage']})</span></div>", unsafe_allow_html=True)
             c_home, c_score, c_away, c_in_h, c_in_a, c_btn, c_banner = st.columns([2.2, 1.2, 1.2, 1.3, 1.3, 1.6, 2.5])
-            with c_home: st.markdown(f"<span class='team-text-align-right'>{m['home']}</span>", unsafe_allow_html=True)
+            
+            with c_home: st.markdown(f"<span class='team-text-align-right'>{flag_h_emoji} {m['home']}</span>", unsafe_allow_html=True)
             with c_score: st.markdown(f"<span class='official-score-badge'>{oficjalny_wynik_tekst}</span>", unsafe_allow_html=True)
-            with c_away: st.markdown(f"<span class='team-text-align-left'>{m['away']}</span>", unsafe_allow_html=True)
+            with c_away: st.markdown(f"<span class='team-text-align-left'>{flag_a_emoji} {m['away']}</span>", unsafe_allow_html=True)
+            
             with c_in_h: b_h = st.number_input(f"H_{m_id}", 0, 20, int(cur_h), 1, key=f"input_h_{m_id}", disabled=locked, label_visibility="collapsed")
             with c_in_a: b_a = st.number_input(f"A_{m_id}", 0, 20, int(cur_a), 1, key=f"input_a_{m_id}", disabled=locked, label_visibility="collapsed")
             with c_btn:
@@ -358,13 +384,21 @@ else:
             df_g = pd.DataFrame.from_dict(stats, orient='index').reset_index().rename(columns={'index': 'Reprezentacja'}).sort_values(by=["Pkt", "RB", "BZ"], ascending=False).reset_index(drop=True)
             df_g.index+=1
             if len(df_g) >= 3: third_places_list.append(df_g.iloc[2].to_dict())
-            g_rows = "".join([f"<tr {'style=\"background-color:#16A34A;\"' if idx in [1, 2] else ('style=\"background-color:#EA580C;\"' if idx == 3 else '')}><td><b>{idx}</b></td><td>{r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>" for idx, r in df_g.iterrows()])
+            
+            g_rows = ""
+            for idx, r in df_g.iterrows():
+                f_emoji = get_flag_emoji(r['Reprezentacja'])
+                row_style = 'style="background-color:#16A34A;"' if idx in [1, 2] else ('style=\"background-color:#EA580C;\"' if idx == 3 else '')
+                g_rows += f"<tr {row_style}><td><b>{idx}</b></td><td>{f_emoji} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
             st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table>", unsafe_allow_html=True)
+            
         st.divider(); st.header("🏆 Ranking Drużyn z 3. Miejsc")
         if third_places_list:
             df_third = pd.DataFrame(third_places_list).sort_values(by=["Pkt", "RB", "BZ", "Zwyciestwa"], ascending=False).reset_index(drop=True)
             df_third.index += 1; third_rows = ""
-            for idx, r in df_third.iterrows(): third_rows += f"<tr {'style=\"background-color:#16A34A;\"' if idx <= 8 else ''}><td><b>{idx}</b></td><td><b>{r['Grupa']}</b></td><td>{r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
+            for idx, r in df_third.iterrows(): 
+                f_emoji = get_flag_emoji(r['Reprezentacja'])
+                third_rows += f"<tr {'style=\"background-color:#16A34A;\"' if idx <= 8 else ''}><td><b>{idx}</b></td><td><b>{r['Grupa']}</b></td><td>{f_emoji} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
             st.markdown(f"<table class='kricon-table'><tr><th>Msc.</th><th>Grupa</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{third_rows}</table>", unsafe_allow_html=True)
     with tab4:
         st.header("🏆 Drabinka Fazy Pucharowej"); st.divider()
@@ -381,7 +415,9 @@ else:
         with c_mid:
             st.markdown("<div style='padding-top:120px;'><div class='center-final-card'><h2>🏆 WIELKI FINAŁ</h2>", unsafe_allow_html=True)
             m_104 = st.session_state.results.get(104, {})
-            st.markdown(f"<b>{m_104.get('home','TBD')} vs {m_104.get('away','TBD')}</b><br><span class='official-score-badge' style='display:inline-block; width:auto;'>{m_104.get('score_h','?')} : {m_104.get('score_a','?')}</span>", unsafe_allow_html=True)
+            f_h_fin = get_flag_emoji(m_104.get('home',''))
+            f_a_fin = get_flag_emoji(m_104.get('away',''))
+            st.markdown(f"<b>{f_h_fin} {m_104.get('home','TBD')} vs {f_a_fin} {m_104.get('away','TBD')}</b><br><span class='official-score-badge' style='display:inline-block; width:auto;'>{m_104.get('score_h','?')} : {m_104.get('score_a','?')}</span>", unsafe_allow_html=True)
             st.markdown("</div></div>", unsafe_allow_html=True)
         with c_8r:
             render_bracket_match_html_clean(102); st.write("---")
