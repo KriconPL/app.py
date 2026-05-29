@@ -29,7 +29,7 @@ st.markdown("""
         color: #F8FAFC !important;
     }
 
-    /* Formularz logowania i selektory */
+    /* --- FIX: POPRAWKA WIDOCZNOŚCI LISTY ROZWIJANEJ (LOGOWANIE) --- */
     div[data-testid="stSelectbox"] label p, div[data-testid="stTextInput"] label p {
         color: #F97316 !important;
         font-weight: bold !important;
@@ -40,11 +40,26 @@ st.markdown("""
         border: 2px solid #F97316 !important;
         border-radius: 6px !important;
     }
-    div[data-baseweb="select"] div, div[data-baseweb="input"] input {
-        color: #F97316 !important; 
+    /* Tekst wewnątrz zamkniętego selectboxa */
+    div[data-baseweb="select"] div {
+        color: #F97316 !important;
+        font-weight: bold !important;
+    }
+    /* Okno rozwijane z listą graczy - wymuszenie ciemnego tła i pomarańczowych napisów */
+    div[role="listbox"], ul[role="listbox"], div[data-baseweb="popover"] {
+        background-color: #060B19 !important;
+        background: #060B19 !important;
+        border: 2px solid #F97316 !important;
+    }
+    div[role="option"], li[role="option"] {
+        color: #F97316 !important;
+        background-color: #060B19 !important;
         font-weight: bold !important;
         font-size: 1.1rem !important;
-        -webkit-text-fill-color: #F97316 !important;
+    }
+    div[role="option"]:hover, li[role="option"]:hover {
+        background-color: #F97316 !important;
+        color: #0A1128 !important;
     }
     
     /* --- STYLIZACJA KLASYCZNYCH PRZYCISKÓW ZAPISU --- */
@@ -58,8 +73,6 @@ st.markdown("""
         padding: 0.6rem 1.8rem !important;
         transition: all 0.2s ease !important;
         display: inline-block !important;
-        opacity: 1 !important;
-        visibility: visible !important;
     }
     .stButton>button:hover {
         background-color: #EA580C !important;
@@ -68,13 +81,13 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4) !important;
     }
     
-    /* --- NOWOŚĆ: WYMUSZONE I AGRESYWNE MRYGANIE/PULSOWANIE PRZYCISKU --- */
-    div.pulsing-save-btn .stButton > button {
-        background-color: #FF4500 !important; /* Jaskrawy, alarmowy pomarańcz */
+    /* --- FIX: SKUTECZNE, AGRESYWNE MRYGANIE PRZYCISKU ZAPISZ --- */
+    div.pulsing-save-btn button, div.pulsing-save-btn .stButton > button {
+        background-color: #FF4500 !important;
         color: #FFFFFF !important;
-        font-weight: 800 !important;
+        font-weight: 900 !important;
         border: 2px solid #FFFFFF !important;
-        animation: neon-pulsing-blink 1.2s infinite ease-in-out !important;
+        animation: neon-pulsing-blink 1s infinite ease-in-out !important;
     }
     
     @keyframes neon-pulsing-blink {
@@ -84,9 +97,9 @@ st.markdown("""
             background-color: #FF4500 !important;
         }
         50% {
-            transform: scale(1.04);
-            box-shadow: 0 0 15px #FF7F50, 0 0 30px #FF4500;
-            background-color: #FF7F50 !important; /* Rozjaśnienie w środku mrygnięcia */
+            transform: scale(1.05);
+            box-shadow: 0 0 20px #FF7F50, 0 0 40px #FF4500;
+            background-color: #FF7F50 !important;
         }
         100% {
             transform: scale(1);
@@ -94,9 +107,8 @@ st.markdown("""
             background-color: #FF4500 !important;
         }
     }
-    /* ------------------------------------------------------------------- */
     
-    /* Naprawa przycisków wewnątrz pól st.number_input (+ i -) */
+    /* Przyciski wewnątrz pól st.number_input (+ i -) */
     div[data-testid="stNumberInput"] button {
         background-color: #1E3A8A !important;
         color: #F8FAFC !important;
@@ -112,7 +124,7 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* --- SYSTEM POŁĄCZEŃ LINIAMI W DRABINCE (PAJĘCZYNA) --- */
+    /* --- SYSTEM POŁĄCZEŃ LINIAMI W DRABINCE --- */
     .bracket-column-wrapper {
         display: flex;
         flex-direction: column;
@@ -235,6 +247,8 @@ COUNTRY_FLAGS = {
 }
 
 def get_flag_html(country_name):
+    if not country_name or country_name == "TBD":
+        return f'<span style="font-size:1.1em; margin-right:4px;">🏳️</span>'
     clean_name = country_name.replace("🏳️", "").strip()
     code = COUNTRY_FLAGS.get(clean_name, "unknown")
     if code == "unknown": return f'<span style="font-size:1.1em; margin-right:4px;">🏳️</span>'
@@ -389,15 +403,19 @@ def get_bracket_match_html_string(match_id):
     sa = "" if m["score_a"] is None else str(m["score_a"])
     win_h = m["score_h"] is not None and m["score_a"] is not None and m["score_h"] > m["score_a"]
     win_a = m["score_h"] is not None and m["score_a"] is not None and m["score_a"] > m["score_h"]
+    
+    home_name = m['home'] if m['home'] else "TBD"
+    away_name = m['away'] if m['away'] else "TBD"
+    
     return f"""
     <div class="bracket-connector-cell">
         <div class="bracket-match-box">
             <div class="bracket-match-id">Mecz #{match_id}</div>
             <div class="bracket-team-line {"bracket-winner" if win_h else ""}">
-                <span>{get_flag_html(m['home'])} {m['home']}</span><span class="bracket-score">{sh}</span>
+                <span>{get_flag_html(home_name)} {home_name}</span><span class="bracket-score">{sh}</span>
             </div>
             <div class="bracket-team-line {"bracket-winner" if win_a else ""}">
-                <span>{get_flag_html(m['away'])} {m['away']}</span><span class="bracket-score">{sa}</span>
+                <span>{get_flag_html(away_name)} {away_name}</span><span class="bracket-score">{sa}</span>
             </div>
         </div>
     </div>
@@ -455,7 +473,8 @@ else:
         
     if st.sidebar.button("Wyloguj się"): st.session_state.logged_in_user = None; st.rerun()
     
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 Ranking", "📅 Terminarz", "📈 Tabele", "🕸️ Drabinka Pajęczyna"])
+    # --- USUNIĘTE SŁOWO PAJĘCZYNA - ZMIANA NA "DRABINKA" ---
+    tab1, tab2, tab3, tab4 = st.tabs(["📊 Ranking", "📅 Terminarz", "📈 Tabele", "🏆 Drabinka Turniejowa"])
     
     with tab1: 
         st.header("Klasyfikacja")
@@ -487,7 +506,7 @@ else:
                 if locked:
                     st.button("Zablokowane", disabled=True, key=f"lock_btn_{m_id}")
                 else:
-                    # WYMUSZENIE WTRZYKNIĘCIA NEONOWEJ KLASY PULSOWANIA TYLKO GDY GRACZ NIE KLIKNĄŁ ZAPISU
+                    # MRYGANIE PRZYCISKU (TYLKO DLA NIEOBSTAWIONYCH MECZÓW)
                     button_container_class = "" if has_existing_bet else "pulsing-save-btn"
                     st.markdown(f"<div class='{button_container_class}'>", unsafe_allow_html=True)
                     if st.button("Zapisz Typ", key=f"btn_{m_id}"): 
@@ -546,8 +565,9 @@ else:
                 third_rows += f"<tr {row_bg}><td style='text-align:center;'><b>{idx}</b></td><td><b>{r['Grupa']}</b></td><td>{get_flag_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td><td>{r['Zwyciestwa']}</td></tr>"
             st.markdown(f"<table class='kricon-table'><tr><th style='text-align:center;'>Msc.</th><th>Źródło</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th><th>Zwycięstwa</th></tr>{third_rows}</table>", unsafe_allow_html=True)
 
+    # --- ZAKŁADKA DRABINKI (ZAKTUALIZOWANA NAZWA I BEZPIECZNE STRUNY) ---
     with tab4:
-        st.header("🕸️ Oficjalna Drabinka Skrzydłowa z Połączeniami")
+        st.header("🏆 Oficjalna Drabinka Skrzydłowa z Połączeniami")
         st.divider()
         col_l_group, col_l_16, col_l_8, col_center, col_r_8, col_r_16, col_r_group = st.columns([1.2, 1.3, 1.3, 1.8, 1.3, 1.3, 1.2])
         
@@ -573,14 +593,21 @@ else:
             st.markdown("<div style='text-align: center; padding-top: 180px;'>", unsafe_allow_html=True)
             st.markdown("<div class='center-final-box'>", unsafe_allow_html=True)
             st.markdown("<h2 style='color:#FFF; font-size:1.8rem; margin-bottom:10px;'>🏆 WIELKI FINAŁ</h2>", unsafe_allow_html=True)
+            
+            # Zabezpieczenie przed błędem TypeError dla meczów pucharowych TBD
             m_104 = st.session_state.results.get(104)
+            home_final = m_104['home'] if (m_104 and m_104['home']) else "TBD"
+            away_final = m_104['away'] if (m_104 and m_104['away']) else "TBD"
+            sh_104 = "" if m_104['score_h'] is None else m_104['score_h']
+            sa_104 = "" if m_104['score_a'] is None else m_104['score_a']
+            
             st.markdown(f"""
                 <div style='font-size:1.4rem; font-weight:bold; margin:15px 0;'>
-                    {get_flag_html(m_104['home'])} {m_104['home']} 
+                    {get_flag_html(home_final)} {home_final} 
                     <span style='color:#FF6B00; background:#060B19; padding:6px 14px; border-radius:4px; border:1px solid #F97316;'>
-                        {"" if m_104['score_h'] is None else m_104['score_h']} : {"" if m_104['score_a'] is None else m_104['score_a']}
+                        {sh_104} : {sa_104}
                     </span> 
-                    {get_flag_html(m_104['away'])} {m_104['away']}
+                    {get_flag_html(away_final)} {away_final}
                 </div>
             """, unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
@@ -588,7 +615,9 @@ else:
             st.markdown("<div class='bracket-match-box' style='border-color: #38BDF8; margin-top: 100px;'>", unsafe_allow_html=True)
             st.markdown("<h4 style='color:#38BDF8; margin:0 0 6px 0;'>🥉 MECZ O 3. MIEJSCE</h4>", unsafe_allow_html=True)
             m_103 = st.session_state.results.get(103)
-            st.markdown(f"<b>{m_103['home']} vs {m_103['away']}</b>", unsafe_allow_html=True)
+            home_3rd = m_103['home'] if (m_103 and m_103['home']) else "TBD"
+            away_3rd = m_103['away'] if (m_103 and m_103['away']) else "TBD"
+            st.markdown(f"<b>{home_3rd} vs {away_3rd}</b>", unsafe_allow_html=True)
             st.markdown("</div></div>", unsafe_allow_html=True)
             
         with col_r_8:
