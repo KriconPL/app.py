@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import os
+from datetime import datetime, timedelta
 
 # 1. Konfiguracja i Szata Graficzna
 st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", layout="wide")
@@ -118,6 +119,9 @@ COUNTRY_FLAGS = {
     "TBD": "unknown"
 }
 
+# Mapa miesięcy tekstowych na liczby do walidacji czasu
+MONTH_MAP = {"Czerwca": 6, "Lipca": 7}
+
 def get_flag_html(country_name):
     clean_name = country_name.replace("🏳️", "").strip()
     code = COUNTRY_FLAGS.get(clean_name, "unknown")
@@ -184,6 +188,7 @@ def generate_schedule():
             t1_idx, t2_idx = matchups[m_round]
             schedule[match_id] = {
                 "date": dates_group[date_idx % len(dates_group)],
+                "time": "18:00", # Dodano domyślną godzinę rozpoczęcia meczu do walidacji czasu
                 "stage": group_name,
                 "home": teams[t1_idx], 
                 "away": teams[t2_idx],
@@ -209,6 +214,7 @@ def generate_schedule():
         for _ in range(count):
             schedule[match_id] = {
                 "date": stage_dates[d_idx % len(stage_dates)],
+                "time": "21:00", # Faza pucharowa domyślnie o 21:00
                 "stage": stage_name,
                 "home": "TBD", 
                 "away": "TBD",
@@ -263,6 +269,44 @@ else:
         st.session_state.logged_in_user = None
         st.rerun()
 
+    # --- LOGIKA AUTOMATYCZNYCH PRZYPOMNIEŃ POP-UP (WIDOCZNA DLA WSZYSTKICH PO ZALOGOWANIU) ---
+    now = datetime.now()
+    # Sztuczne ustawienie roku turnieju na 2026 na potrzeby walidacji dat
+    current_year = 2026 
+    
+    for match_id, match in st.session_state.results.items():
+        if match["status"] == "Oczekuje":
+            try:
+                # Rozbicie tekstu "11 Czerwca" -> dzień: 11, miesiąc: Czerwca
+                date_parts = match["date"].split()
+                day = int(date_parts[0])
+                month_str = date_parts[1]
+                month = MONTH_MAP.get(month_str, 6)
+                
+                # Rozbicie godziny "18:00" -> godzina: 18, minuta: 00
+                time_parts = match["time"].split(":")
+                hour = int(time_parts[0])
+                minute = int(time_parts[1])
+                
+                match_datetime = datetime(current_year, month, day, hour, minute)
+                time_to_match = match_datetime - now
+                
+                # Sprawdzamy czy do meczu została MNIEJ niż godzina, ale mecz jeszcze się NIE zaczął
+                if timedelta(hours=0) < time_to_match <= timedelta(hours=1):
+                    for player in players:
+                        # Jeśli gracz nie ma zapisanego typu (brak klucza lub puste wartości)
+                        if player not in st.session_state.bets[match_id] or st.session_state.bets[match_id][player] == (None, None):
+                            match_name = f"{match['home']} - {match['away']}"
+                            alert_msg = f"ej typie {player}, zapomniałeś obstawić mecz {match_name}, który zaraz się zaczyna!"
+                            
+                            # 1. Wyświetlenie fizycznego dymka/pop-upu na ekranie (znika po paru sekundach)
+                            st.toast(alert_msg, icon="⚠️")
+                            
+                            # 2. Stałe przypomnienie na górze strony pod nagłówkiem, dopóki gracz nie kliknie "zapisz"
+                            st.warning(alert_msg)
+            except Exception as e:
+                pass # zabezpieczenie przed błędami parsowania dat
+
     tab1, tab2, tab3, tab4 = st.tabs(["📊 Klasyfikacja", "📅 Terminarz i Typy", "📈 Tabele Grup", "⚙️ Admin"])
 
     with tab1:
@@ -314,7 +358,7 @@ else:
             for match_id, match in st.session_state.results.items():
                 if match["date"] == selected_date:
                     st.markdown(f"### {get_flag_html(match['home'])} vs {get_flag_html(match['away'])}", unsafe_allow_html=True)
-                    st.caption(f"Faza: {match['stage']} | Mecz #{match_id}")
+                    st.caption(f"Faza: {match['stage']} | Godzina: {match['time']} | Mecz #{match_id}")
                     
                     if match['status'] == "Zakończony":
                         st.markdown(f"<p class='real-score'>Oficjalny wynik: {match['score_h']} - {match['score_a']}</p>", unsafe_allow_html=True)
