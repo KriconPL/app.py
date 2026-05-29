@@ -354,15 +354,11 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
     
     return legend_html + f"<table class='kricon-table'><tr><th>Msc.</th><th>Trend</th><th>Gracz</th><th>Punkty</th><th>Najbliższy mecz</th></tr>{rows}</table>"
 
-# --- FIX: ZABEZPIECZONA I CZYSTA FUNKCJA BLOKU DRABINKI PUCHAROWEJ ---
 def render_bracket_match_html_clean(match_id):
     m = st.session_state.results.get(match_id)
     if not m: return ""
-    
-    # Bezpieczne czytanie kluczy za pomocą metody .get() - eliminuje błąd TypeError
     sh = "" if m.get("score_h") is None else str(m.get("score_h"))
     sa = "" if m.get("score_a") is None else str(m.get("score_a"))
-    
     win_h = m.get("score_h") is not None and m.get("score_a") is not None and m.get("score_h") > m.get("score_a")
     win_a = m.get("score_h") is not None and m.get("score_a") is not None and m.get("score_a") > m.get("score_h")
     
@@ -417,6 +413,7 @@ if st.session_state.logged_in_user is None:
         st.subheader("📊 Ranking")
         st.markdown(render_leaderboard_html(now), unsafe_allow_html=True)
 else:
+    # --- PANEL BOCZNY (SIDEBAR) Z WARUNKIEM DOSTĘPU DLA ADMINA ---
     st.sidebar.write(f"👤 Zalogowany jako: **{st.session_state.logged_in_user}**")
     st.sidebar.markdown("---")
     
@@ -453,22 +450,23 @@ else:
             has_existing_bet = st.session_state.bets[m_id].get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
             
+            # --- FIX: WYPROSTOWANIE UNIKALNYCH STRIGOWYCH KLUCZY DLA INPUTÓW ---
             c1, c2, c3 = st.columns([1,1,2])
-            with c1: b_h = st.number_input(f"Wynik {m['home']}", 0, 20, cur_h, 1, key=f"h_{m_id}", disabled=locked)
-            with c2: b_a = st.number_input(f"Wynik {m['away']}", 0, 20, cur_a, 1, key=f"a_{m_id}", disabled=locked)
+            with c1: b_h = st.number_input(f"Wynik {m['home']}", 0, 20, int(cur_h), 1, key=f"input_h_{m_id}", disabled=locked)
+            with c2: b_a = st.number_input(f"Wynik {m['away']}", 0, 20, int(cur_a), 1, key=f"input_a_{m_id}", disabled=locked)
             with c3: 
                 st.write(""); st.write("")
                 if locked:
                     st.button("Zablokowane", disabled=True, key=f"lock_btn_{m_id}")
                 else:
-                    # WYMUSZENIE PULSOWANIA BANNERA OSTRZEGAWCZEGO NAD STATYCZNYM PRZYCISKIEM
-                    if not has_existing_bet:
-                        st.markdown("<div class='pulse-warning-banner'>⚠️ NIEODDANY TYP</div>", unsafe_allow_html=True)
+                    button_container_class = "" if has_existing_bet else "pulsing-save-btn"
+                    st.markdown(f"<div class='{button_container_class}'>", unsafe_allow_html=True)
                     if st.button("Zapisz Typ", key=f"btn_{m_id}"): 
                         st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a)
                         save_backup_local_and_github() 
                         st.success("Zapisano!")
                         st.rerun()
+                    st.markdown("</div>", unsafe_allow_html=True)
                     
             if locked or m['status'] == "Zakończony":
                 with st.expander("👁️ Zobacz typy innych graczy"):
@@ -505,12 +503,21 @@ else:
             g_rows = "".join([f"<tr {'style=\"background-color: #16A34A; font-weight: bold; color: #FFFFFF;\"' if idx in [1, 2] else ('style=\"background-color: #EA580C; font-weight: bold; color: #FFFFFF;\"' if idx == 3 else '')}><td><b>{idx}</b></td><td>{get_flag_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>" for idx, r in df_g.iterrows()])
             st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table>", unsafe_allow_html=True)
 
-    # --- FIX: CAŁKOWICIE NOWA, KRYSTALICZNIE CZYSTA DRABINKA TABELARYCZNA ---
+        st.divider()
+        st.header("🏆 Ranking Drużyn z 3. Miejsc (Awansuje 8 najlepszych)")
+        df_third = pd.DataFrame(third_places_list)
+        if not df_third.empty:
+            df_third = df_third.sort_values(by=["Pkt", "RB", "BZ", "Zwyciestwa"], ascending=[False, False, False, False]).reset_index(drop=True)
+            df_third.index += 1
+            third_rows = ""
+            for idx, r in df_third.iterrows():
+                row_bg = 'style="background-color: #16A34A; font-weight: bold; color: #FFFFFF;"' if idx <= 8 else ''
+                third_rows += f"<tr {row_bg}><td style='text-align:center;'><b>{idx}</b></td><td><b>{r['Grupa']}</b></td><td>{get_flag_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td><td>{r['Zwyciestwa']}</td></tr>"
+            st.markdown(f"<table class='kricon-table'><tr><th style='text-align:center;'>Msc.</th><th>Źródło</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th><th>Zwycięstwa</th></tr>{third_rows}</table>", unsafe_allow_html=True)
+
     with tab4:
         st.header("🏆 Drabinka Fazy Pucharowej")
-        st.write("Wyrównany, symetryczny układ sportowy ze schodzącymi się skrzydłami.")
         st.divider()
-        
         c_g1, c_16l, c_8l, c_mid, c_8r, c_r16, c_g2 = st.columns([1.1, 1.3, 1.3, 1.8, 1.3, 1.3, 1.1])
         
         with c_g1:
