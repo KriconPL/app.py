@@ -10,9 +10,10 @@ st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", lay
 
 st.markdown("""
     <style>
-    /* Wymuszenie ciemnego tła dla całej aplikacji Streamlit */
-    [data-testid="stAppViewContainer"], .stApp {
+    /* Globalne wymuszenie wyświetlania głównego suwaka przeglądarki */
+    html, body, [data-testid="stAppViewContainer"], .stApp {
         background-color: #0A1128 !important; 
+        overflow-y: auto !important;
     }
     [data-testid="stSidebar"] {
         background-color: #060B19 !important; 
@@ -58,36 +59,22 @@ st.markdown("""
         color: #0A1128 !important;
     }
     
-    /* --- CAŁKOWICIE NOWY, NEONOWY, BARDZO WIDOCZNY SUWAK BOCZNY --- */
-    .main-scroll-wrapper {
-        max-height: 720px;
-        overflow-y: scroll !important;
-        padding-right: 20px;
-        margin-top: 10px;
-        scrollbar-width: thick !important;
-        scrollbar-color: #FF6B00 #060B19 !important; /* Dla Firefox */
-    }
-    
-    /* Webkit (Chrome, Safari, Edge, Opera) */
-    .main-scroll-wrapper::-webkit-scrollbar {
-        width: 18px !important; /* Jeszcze grubszy pasek */
+    /* GŁÓWNY, DUŻY, NEONOWO-POMARAŃCZOWY SUWAK CAŁEJ STRONY INTERNETOWEJ */
+    ::-webkit-scrollbar {
+        width: 16px !important;
         display: block !important;
     }
-    .main-scroll-wrapper::-webkit-scrollbar-track {
-        background: #060B19 !important; /* Bardzo ciemne tło toru, by jaskrawy suwak się wyróżniał */
-        border-left: 2px solid #1E3A8A !important;
-        border-radius: 10px !important;
+    ::-webkit-scrollbar-track {
+        background: #060B19 !important;
     }
-    .main-scroll-wrapper::-webkit-scrollbar-thumb {
-        background-color: #FF6B00 !important; /* Jaskrawy, neonowy pomarańczowy */
-        border-radius: 10px !important;
-        border: 3px solid #060B19 !important; /* Kontrastowe odcięcie od toru */
-        box-shadow: 0 0 8px rgba(255, 107, 0, 0.6) !important; /* Efekt delikatnego świecenia */
+    ::-webkit-scrollbar-thumb {
+        background-color: #FF6B00 !important;
+        border-radius: 8px !important;
+        border: 2px solid #060B19 !important;
     }
-    .main-scroll-wrapper::-webkit-scrollbar-thumb:hover {
-        background-color: #FF8833 !important; /* Rozjaśnienie po najechaniu */
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #FF8833 !important;
     }
-    /* ------------------------------------------------------------- */
     
     /* Kontener loga i tytułu */
     .logo-title-container {
@@ -138,17 +125,54 @@ st.markdown("""
         border: 1px solid #1E3A8A !important;
         border-radius: 10px;
         padding: 20px;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
-    .match-header {
-        color: #F97316 !important;
-        margin-bottom: 10px;
-        font-size: 1.4rem;
-        font-weight: 700;
+    .match-header-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         border-bottom: 1px solid #1E3A8A;
         padding-bottom: 10px;
+        margin-bottom: 15px;
     }
+    .match-header-title {
+        color: #F97316 !important;
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    
+    /* DYNAMICZNE STATUSY WIELO-KOLOROWE */
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+    }
+    .status-live {
+        background-color: #DC2626 !important;
+        color: white !important;
+        animation: pulse-glow 1.5s infinite;
+    }
+    .status-ended {
+        background-color: #111827 !important;
+        color: #94A3B8 !important;
+        border: 1px solid #374151;
+    }
+    .status-waiting {
+        background-color: #D97706 !important;
+        color: white !important;
+    }
+    
+    @keyframes pulse-glow {
+        0% { opacity: 1; box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+        50% { opacity: 0.8; box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+        100% { opacity: 1; box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+    }
+    
     .teams-display {
         font-size: 1.6rem !important;
         font-weight: bold !important;
@@ -177,10 +201,11 @@ st.markdown("""
         color: #F97316 !important;
     }
 
+    /* Tabele klasyczne i grupowe */
     .kricon-table {
         width: 100%;
         border-collapse: collapse;
-        margin: 15px 0;
+        margin: 15px 0 35px 0;
         font-size: 0.95rem;
         background-color: #172554 !important;
         border-radius: 8px;
@@ -194,10 +219,24 @@ st.markdown("""
         font-weight: 800;
     }
     .kricon-table td {
-        padding: 10px 12px;
+        padding: 11px 12px;
         border-bottom: 1px solid #1E3A8A !important;
         color: #F8FAFC !important;
         vertical-align: middle;
+    }
+    
+    /* Legenda Punktacji */
+    .points-legend {
+        background-color: #060B19;
+        border: 1px solid #1E3A8A;
+        border-left: 5px solid #F97316;
+        border-radius: 6px;
+        padding: 12px 16px;
+        margin-bottom: 15px;
+    }
+    .legend-item {
+        margin: 4px 0;
+        font-size: 0.95rem;
     }
     
     .badge-trend {
@@ -283,7 +322,7 @@ GROUPS_DICT = {
     "Grupa E": ["Niemcy", "Curaçao", "WKS", "Ekwador"],
     "Grupa F": ["Holandia", "Japonia", "Szwecja", "Tunezja"],
     "Grupa G": ["Belgia", "Egipt", "Iran", "Nowa Zelandia"],
-    "Grupa H": ["Hiszpania", "Wyspy Zielonego Przyl फडणला", "Arabia Saudyjska", "Urugwaj"],
+    "Grupa H": ["Hiszpania", "Wyspy Zielonego Przylądka", "Arabia Saudyjska", "Urugwaj"],
     "Grupa I": ["Francja", "Senegal", "Irak", "Norwegia"],
     "Grupa J": ["Argentyna", "Algieria", "Austria", "Jordania"],
     "Grupa K": ["Portugalia", "DR Konga", "Uzbekistan", "Kolumbia"],
@@ -389,11 +428,12 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     return 0
 
 def get_time_to_next_unbet_match(player_name, now_time):
-    upcoming = sorted([m for m in st.session_state.results.values() if m["status"] == "Oczekuje" and m["timestamp"] > now_time], key=lambda x: x["timestamp"])
+    upcoming = sorted([m for m in st.session_state.results.values() if m["timestamp"] > now_time], key=lambda x: x["timestamp"])
     for match in upcoming:
         m_id = [k for k, v in st.session_state.results.items() if v == match][0]
         if st.session_state.bets[m_id].get(player_name, (None, None)) == (None, None):
             diff = match["timestamp"] - now_time
+            if diff.total_seconds() <= 0: continue
             h, m = int(diff.total_seconds() // 3600), int((diff.total_seconds() % 3600) // 60)
             return f'<span class="{"time-warning" if diff <= timedelta(hours=1) else "time-normal"}">Za {h}h {m}m</span>'
     return '<span class="time-ok">✔ Wszystko obstawione</span>'
@@ -406,6 +446,16 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
                 if p in st.session_state.bets[m_id]:
                     scores[p] += calculate_points(st.session_state.bets[m_id][p][0], st.session_state.bets[m_id][p][1], res['score_h'], res['score_a'])
     df = pd.DataFrame(list(scores.items()), columns=["Gracz", "Punkty"]).sort_values(by="Punkty", ascending=False).reset_index(drop=True)
+    
+    # DODANA LEGENDA ZASAD PUNKTACJI
+    legend_html = """
+    <div class="points-legend">
+        <div style="font-weight: bold; color: #F97316; margin-bottom: 6px; font-size: 1.05rem;">ℹ️ System przyznawania punktów:</div>
+        <div class="legend-item">🎯 <b style="color: #4ADE80;">3 Punkty</b> — dokładne wytypowanie wyniku spotkania (np. wynik 2:1, typ 2:1)</div>
+        <div class="legend-item">⚖️ <b style="color: #38BDF8;">1 Punkt</b> — poprawne wskazanie zwycięzcy lub remisu (np. wynik 3:1, typ 1:0)</div>
+    </div>
+    """
+    
     rows = ""
     for idx, row in df.iterrows():
         pos, p_name = idx + 1, row['Gracz']
@@ -414,10 +464,21 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
         trend = '<div class="badge-trend trend-box-up">▲</div>' if old_pos > pos else ('<div class="badge-trend trend-box-down">▼</div>' if old_pos < pos else '<div class="badge-trend trend-box-stable">•</div>')
         bg = 'style="background-color: #16A34A; font-weight: bold; color: #FFFFFF;"' if pos == 1 and row['Punkty'] > 0 else ('style="background-color: #DC2626; font-weight: bold; color: #FFFFFF;"' if pos == len(df) and row['Punkty'] > 0 else '')
         rows += f"<tr {bg}><td style='text-align:center;'><b>{pos}</b></td><td style='text-align:center;'>{trend}</td><td>{p_name}</td><td><b>{row['Punkty']} pkt</b></td><td>{get_time_to_next_unbet_match(p_name, now_time)}</td></tr>"
-    return f"<table class='kricon-table'><tr><th>Msc.</th><th>Trend</th><th>Gracz</th><th>Punkty</th><th>Najbliższy mecz</th></tr>{rows}</table>"
+    
+    table_html = f"<table class='kricon-table'><tr><th>Msc.</th><th>Trend</th><th>Gracz</th><th>Punkty</th><th>Najbliższy mecz</th></tr>{rows}</table>"
+    return legend_html + table_html
 
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 now = datetime.now()
+
+# LOGIKA DYNAMICZNEGO WYKRYWANIA MECZÓW LIVE
+for m_id, m in st.session_state.results.items():
+    if m['status'] != "Zakończony":
+        time_diff = now - m['timestamp']
+        if timedelta(minutes=0) <= time_diff <= timedelta(minutes=120):
+            st.session_state.results[m_id]['status'] = "LIVE"
+        elif time_diff > timedelta(minutes=120) and m['status'] == "LIVE":
+            st.session_state.results[m_id]['status'] = "Oczekuje"
 
 if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
@@ -446,34 +507,57 @@ else:
         mode = st.radio("Widok:", ["Oczekujące", "Wszystkie", "Zakończone"], horizontal=True)
         st.divider()
         
-        st.markdown("<div class='main-scroll-wrapper'>", unsafe_allow_html=True)
         sorted_m = sorted(st.session_state.results.items(), key=lambda x: (x[1]['timestamp'], x[0]))
         for m_id, m in sorted_m:
             if (mode == "Oczekujące" and m['status'] == "Zakończony") or (mode == "Zakończone" and m['status'] == "Oczekuje"): continue
             
-            # NAPRAWIONE: Wyczyszczenie kodu HTML z tagów markdownowych typu ###
-            st.write(f"⚽ Mecz #{m_id}")
-            st.markdown(f"<div class='teams-display'>{get_flag_html(m['home'])} {m['home']} vs {get_flag_html(m['away'])} {m['away']}</div>", unsafe_allow_html=True)
-            st.write(f"Faza: {m['stage']} | {m['date']}, {m['time']}")
+            if m['status'] == "LIVE":
+                status_html = '<span class="status-badge status-live">🔴 LIVE</span>'
+            elif m['status'] == "Zakończony":
+                status_html = '<span class="status-badge status-ended">⚫ Zakończony</span>'
+            else:
+                status_html = '<span class="status-badge status-waiting">🟡 Oczekuje</span>'
+                
+            st.markdown(f"""
+            <div class='match-container'>
+                <div class='match-header-wrapper'>
+                    <h4 class='match-header-title'>⚽ Mecz #{m_id}</h4>
+                    {status_html}
+                </div>
+                <div class='teams-display'>{get_flag_html(m['home'])} {m['home']} vs {get_flag_html(m['away'])} {m['away']}</div>
+                <p style='color: #94A3B8; font-size: 1.05rem;'>Faza: {m['stage']} | {m['date']}, {m['time']}</p>
+            """, unsafe_allow_html=True)
             
-            if m['status'] == "Zakończony": st.markdown(f"<p class='real-score'>Wynik: {m['score_h']} - {m['score_a']}</p>", unsafe_allow_html=True)
+            if m['status'] == "Zakończony": 
+                st.markdown(f"<p class='real-score'>Wynik końcowy: {m['score_h']} - {m['score_a']}</p>", unsafe_allow_html=True)
+            
             locked = (m['timestamp'] - now).total_seconds() <= 0
             cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
+            
             c1, c2, c3 = st.columns([1,1,2])
-            with c1: b_h = st.number_input(f"H", 0, 20, cur_h, 1, key=f"h_{m_id}", disabled=locked)
-            with c2: b_a = st.number_input(f"A", 0, 20, cur_a, 1, key=f"a_{m_id}", disabled=locked)
+            with c1: b_h = st.number_input(f"Wynik {m['home']}", 0, 20, cur_h, 1, key=f"h_{m_id}", disabled=locked)
+            with c2: b_a = st.number_input(f"Wynik {m['away']}", 0, 20, cur_a, 1, key=f"a_{m_id}", disabled=locked)
             with c3: 
                 st.write(""); st.write("")
-                if not locked and st.button("Zapisz", key=f"btn_{m_id}"): st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a); st.success("OK")
+                if not locked and st.button("Zapisz Typ", key=f"btn_{m_id}"): 
+                    st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a)
+                    st.success("Zapisano!")
+            
             if locked or m['status'] == "Zakończony":
-                with st.expander("Typy innych"):
-                    st.dataframe(pd.DataFrame([{"Gracz": p, "Typ": f"{st.session_state.bets[m_id].get(p, (None,None))[0]} - {st.session_state.bets[m_id].get(p, (None,None))[1]}"} for p in players if p != st.session_state.logged_in_user]), use_container_width=True)
-            st.markdown("<hr style='border: 1px solid #1E3A8A; margin-top: 20px; margin-bottom: 20px;'>", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+                with st.expander("👁️ Zobacz typy innych graczy"):
+                    other_bets = []
+                    for p in players:
+                        if p != st.session_state.logged_in_user:
+                            p_bet = st.session_state.bets[m_id].get(p)
+                            other_bets.append({
+                                "Gracz": p, 
+                                "Typowany wynik": f"{p_bet[0]} - {p_bet[1]}" if p_bet else "Brak typu"
+                            })
+                    st.dataframe(pd.DataFrame(other_bets), use_container_width=True)
+            st.markdown("</div>", unsafe_allow_html=True)
         
     with tab3:
-        st.header("Tabele Grup")
-        st.markdown("<div class='main-scroll-wrapper'>", unsafe_allow_html=True)
+        st.header("Tabele Grup Turniejowych")
         for g_name in list(GROUPS_DICT.keys()):
             st.markdown(f"### {g_name}")
             stats = {t: {"Pkt": 0, "BZ": 0, "BS": 0, "RB": 0} for t in GROUPS_DICT[g_name]}
@@ -488,13 +572,30 @@ else:
                         else: stats[h]["Pkt"]+=1; stats[a]["Pkt"]+=1
             df_g = pd.DataFrame.from_dict(stats, orient='index').reset_index().rename(columns={'index': 'Reprezentacja'}).sort_values(by=["Pkt", "RB", "BZ"], ascending=False).reset_index(drop=True)
             df_g.index+=1
-            g_rows = "".join([f"<tr><td><b>{idx}</b></td><td>{get_flag_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>" for idx, r in df_g.iterrows()])
+            
+            g_rows = ""
+            for idx, r in df_g.iterrows():
+                row_bg = ""
+                if idx in [1, 2]:
+                    row_bg = 'style="background-color: #16A34A; font-weight: bold; color: #FFFFFF;"'
+                elif idx == 3:
+                    row_bg = 'style="background-color: #EA580C; font-weight: bold; color: #FFFFFF;"'
+                
+                g_rows += f"""
+                <tr {row_bg}>
+                    <td><b>{idx}</b></td>
+                    <td>{get_flag_html(r['Reprezentacja'])} {r['Reprezentacja']}</td>
+                    <td><b>{r['Pkt']}</b></td>
+                    <td>{r['BZ']}</td>
+                    <td>{r['BS']}</td>
+                    <td>{r['RB']}</td>
+                </tr>
+                """
             st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table>", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
         
     with tab4:
         if st.session_state.logged_in_user == "admin":
-            st.markdown("<div class='main-scroll-wrapper'>", unsafe_allow_html=True)
+            st.header("⚙️ Wprowadzanie oficjalnych wyników")
             for m_id, m in sorted(st.session_state.results.items(), key=lambda x: (x[1]['timestamp'], x[0])):
                 st.markdown(f"<div class='match-container'>Mecz #{m_id} | {m['home']} vs {m['away']}", unsafe_allow_html=True)
                 if "TBD" in m["home"] or "/" in m["stage"]:
@@ -502,14 +603,18 @@ else:
                     with c_h: m["home"] = st.text_input("D1", m["home"], key=f"ad_h_{m_id}")
                     with c_a: m["away"] = st.text_input("D2", m["away"], key=f"ad_a_{m_id}")
                 c1, c2, c3 = st.columns([1,1,2])
-                with c1: rh = st.number_input("H", 0, 20, m['score_h'] if m['score_h'] else 0, 1, key=f"rh_{m_id}")
-                with c2: ra = st.number_input("A", 0, 20, m['score_a'] if m['score_a'] else 0, 1, key=f"ra_{m_id}")
+                with c1: rh = st.number_input("H", 0, 20, m['score_h'] if m['score_h'] is not None else 0, 1, key=f"rh_{m_id}")
+                with c2: ra = st.number_input("A", 0, 20, m['score_a'] if m['score_a'] is not None else 0, 1, key=f"ra_{m_id}")
                 with c3:
                     st.write(""); st.write("")
-                    if st.button("Zatwierdź", key=f"rb_{m_id}"):
-                        m['score_h'], m['score_a'], m['status'] = rh, ra, "Zakończony"
+                    if st.button("Zatwierdź Wynik", key=f"rb_{m_id}"):
+                        st.session_state.results[m_id]['score_h'] = rh
+                        st.session_state.results[m_id]['score_a'] = ra
+                        st.session_state.results[m_id]['status'] = "Zakończony"
+                        
                         temp_p = {}
                         render_leaderboard_html(now, temp_p)
-                        st.session_state.last_positions = temp_p; st.rerun()
+                        st.session_state.last_positions = temp_p
+                        st.success("Zatwierdzono wynik!")
+                        st.rerun()
                 st.markdown("</div>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
