@@ -47,7 +47,7 @@ st.markdown("""
         -webkit-text-fill-color: #F97316 !important;
     }
     
-    /* --- STYLIZACJA PRZYCISKÓW ZAPISU --- */
+    /* --- STYLIZACJA KLASYCZNYCH PRZYCISKÓW ZAPISU --- */
     .stButton>button {
         background-color: #F97316 !important;
         color: #FFFFFF !important;
@@ -68,18 +68,33 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4) !important;
     }
     
-    /* --- DYNAMICZNA ANIMACJA PULSOWANIA DLA MECZÓW NIEOBSTAWIONYCH --- */
-    div.pulsing-save-btn button {
-        background-color: #FF6B00 !important;
-        animation: button-pulse-glow 1.5s infinite !important;
-        border: 1px solid #FFF !important;
+    /* --- NOWOŚĆ: WYMUSZONE I AGRESYWNE MRYGANIE/PULSOWANIE PRZYCISKU --- */
+    div.pulsing-save-btn .stButton > button {
+        background-color: #FF4500 !important; /* Jaskrawy, alarmowy pomarańcz */
+        color: #FFFFFF !important;
+        font-weight: 800 !important;
+        border: 2px solid #FFFFFF !important;
+        animation: neon-pulsing-blink 1.2s infinite ease-in-out !important;
     }
     
-    @keyframes button-pulse-glow {
-        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.7); }
-        50% { transform: scale(1.02); box-shadow: 0 0 0 12px rgba(255, 107, 0, 0); }
-        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 0, 0); }
+    @keyframes neon-pulsing-blink {
+        0% {
+            transform: scale(1);
+            box-shadow: 0 0 4px #FF4500, 0 0 10px #FF4500;
+            background-color: #FF4500 !important;
+        }
+        50% {
+            transform: scale(1.04);
+            box-shadow: 0 0 15px #FF7F50, 0 0 30px #FF4500;
+            background-color: #FF7F50 !important; /* Rozjaśnienie w środku mrygnięcia */
+        }
+        100% {
+            transform: scale(1);
+            box-shadow: 0 0 4px #FF4500, 0 0 10px #FF4500;
+            background-color: #FF4500 !important;
+        }
     }
+    /* ------------------------------------------------------------------- */
     
     /* Naprawa przycisków wewnątrz pól st.number_input (+ i -) */
     div[data-testid="stNumberInput"] button {
@@ -460,7 +475,7 @@ else:
             
             locked = (m['timestamp'] - now).total_seconds() <= 0
             
-            # SPRAWDZENIE CZY ISTNIEJE JUŻ ZAPISANY TYP DLA TEGO MECZU W SESJI
+            # Sprawdzenie czy istnieje już zapisany typ dla tego meczu w sesji
             has_existing_bet = st.session_state.bets[m_id].get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
             
@@ -472,9 +487,9 @@ else:
                 if locked:
                     st.button("Zablokowane", disabled=True, key=f"lock_btn_{m_id}")
                 else:
-                    # WYMUSZENIE PULSOWANIA W HTML TYLKO GDY GRACZ NIE ZAPISAŁ JESZCZE TYPU
-                    button_class = "" if has_existing_bet else "pulsing-save-btn"
-                    st.markdown(f"<div class='{button_class}'>", unsafe_allow_html=True)
+                    # WYMUSZENIE WTRZYKNIĘCIA NEONOWEJ KLASY PULSOWANIA TYLKO GDY GRACZ NIE KLIKNĄŁ ZAPISU
+                    button_container_class = "" if has_existing_bet else "pulsing-save-btn"
+                    st.markdown(f"<div class='{button_container_class}'>", unsafe_allow_html=True)
                     if st.button("Zapisz Typ", key=f"btn_{m_id}"): 
                         st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a)
                         save_backup_local_and_github() 
