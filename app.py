@@ -21,21 +21,39 @@ st.markdown("""
         background-color: #0A1128 !important;
     }
     
-    /* Kolor tekstów globalnych i formularzy */
-    h1, h2, h3, h4, h5, h6, p, span, label, div, [data-testid="stWidgetLabel"] p {
+    /* Kolor tekstów globalnych */
+    h1, h2, h3, h4, h5, h6, p, span, label, div {
         color: #F8FAFC !important;
     }
 
-    /* Poprawka widoczności pól formularza logowania i ich etykiet na kolor pomarańczowy */
+    /* --- GWARANCJA WIDOCZNOŚCI POLA LOGOWANIA (NAZWA UŻYTKOWNIKA I HASŁO) --- */
+    /* Etykiety nad polami (Napisy: Wybierz użytkownika, Wpisz hasło) */
     div[data-testid="stSelectbox"] label p, div[data-testid="stTextInput"] label p {
         color: #F97316 !important;
         font-weight: bold !important;
-        font-size: 1.1rem !important;
+        font-size: 1.2rem !important;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
     }
-    div[data-baseweb="select"] *, div[data-baseweb="input"] * {
-        color: #F97316 !important; 
+    
+    /* Wymuszenie jasnego, czytelnego wnętrza dla pól wprowadzania, aby tekst nigdy się nie zlał */
+    div[data-baseweb="select"] {
+        background-color: #FFFFFF !important;
+        border: 2px solid #F97316 !important;
+        border-radius: 6px !important;
+    }
+    div[data-baseweb="input"] {
+        background-color: #FFFFFF !important;
+        border: 2px solid #F97316 !important;
+        border-radius: 6px !important;
+    }
+    
+    /* Kolor tekstu wpisywanego oraz opcji na liście rozwijanej */
+    div[data-baseweb="select"] *, div[data-baseweb="input"] input, div[role="listbox"] * {
+        color: #0A1128 !important; 
         font-weight: bold !important;
+        font-size: 1.05rem !important;
     }
+    /* ----------------------------------------------------------------------- */
     
     /* Kontener loga i tytułu */
     .logo-title-container {
@@ -81,10 +99,13 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(249, 115, 22, 0.4);
     }
     
-    /* Inputy numerów (Typy w terminarzu) */
-    div[data-baseweb="input"], div[data-baseweb="select"] {
+    /* Inputy numerów wewnątrz terminarza */
+    .match-container div[data-baseweb="input"] {
         background-color: #172554 !important;
         border: 1px solid #1E3A8A !important;
+    }
+    .match-container div[data-baseweb="input"] input {
+        color: #F97316 !important;
     }
 
     /* Powiadomienia (Toasty / Pop-upy) */
@@ -177,7 +198,7 @@ st.markdown("""
     
     /* Kolorystyka czasu do meczu */
     .time-ok { color: #4ADE80 !important; font-weight: bold; }
-    .time-warning { color: #F97316 !important; font-weight: bold; animation: blink 1.5s infinite; }
+    .time-warning { color: #F97316 !important; font-weight: bold; }
     .time-normal { color: #CBD5E1 !important; }
     </style>
 """, unsafe_allow_html=True)
@@ -217,7 +238,7 @@ COUNTRY_FLAGS = {
     "Niemcy": "de", "Curaçao": "cw", "WKS": "ci", "Ekwador": "ec",
     "Holandia": "nl", "Japonia": "jp", "Szwecja": "se", "Tunezja": "tn",
     "Belgia": "be", "Egipt": "eg", "Iran": "ir", "Nowa Zelandia": "nz",
-    "Hiszpania": "es", "Wyspy Zielonego Przylążka": "cv", "Arabia Saudyjska": "sa", "Urugwaj": "uy",
+    "Hiszpania": "es", "Wyspy Zielonego Przylądka": "cv", "Arabia Saudyjska": "sa", "Urugwaj": "uy",
     "Francja": "fr", "Senegal": "sn", "Irak": "iq", "Norwegia": "no",
     "Argentyna": "ar", "Algieria": "dz", "Austria": "at", "Jordania": "jo",
     "Portugalia": "pt", "DR Konga": "cd", "Uzbekistan": "uz", "Kolumbia": "co",
@@ -249,7 +270,7 @@ GROUPS_DICT = {
     "Grupa E": ["Niemcy", "Curaçao", "WKS", "Ekwador"],
     "Grupa F": ["Holandia", "Japonia", "Szwecja", "Tunezja"],
     "Grupa G": ["Belgia", "Egipt", "Iran", "Nowa Zelandia"],
-    "Grupa H": ["Hiszpania", "Wyspy Zielonego Przylążka", "Arabia Saudyjska", "Urugwaj"],
+    "Grupa H": ["Hiszpania", "Wyspy Zielonego Przylądka", "Arabia Saudyjska", "Urugwaj"],
     "Grupa I": ["Francja", "Senegal", "Irak", "Norwegia"],
     "Grupa J": ["Argentyna", "Algieria", "Austria", "Jordania"],
     "Grupa K": ["Portugalia", "DR Konga", "Uzbekistan", "Kolumbia"],
@@ -341,7 +362,6 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
 
 # Funkcja obliczająca czas do najbliższego nieobstawionego meczu gracza
 def get_time_to_next_unbet_match(player_name, now_time):
-    # Filtrujemy tylko mecze, które jeszcze się nie zaczęły
     upcoming_matches = sorted(
         [m for m in st.session_state.results.values() if m["status"] == "Oczekuje" and m["timestamp"] > now_time],
         key=lambda x: x["timestamp"]
@@ -351,13 +371,11 @@ def get_time_to_next_unbet_match(player_name, now_time):
         match_id = [k for k, v in st.session_state.results.items() if v == match][0]
         player_bet = st.session_state.bets[match_id].get(player_name, (None, None))
         
-        # Jeśli gracz nie ma typu dla tego nadchodzącego meczu
         if player_bet == (None, None):
             diff = match["timestamp"] - now_time
             hours = int(diff.total_seconds() // 3600)
             minutes = int((diff.total_seconds() % 3600) // 60)
             
-            # Stan alarmowy: Mniej niż godzina do meczu
             if diff <= timedelta(hours=1):
                 return f'<span class="time-warning">⏳ Za {hours}h {minutes}m!</span>'
             else:
@@ -365,7 +383,7 @@ def get_time_to_next_unbet_match(player_name, now_time):
                 
     return '<span class="time-ok">✔ Wszystko obstawione</span>'
 
-# Funkcja pomocnicza do generowania kodu tabeli klasyfikacji z czasem do meczu
+# Funkcja pomocnicza do generowania kodu tabeli klasyfikacji
 def render_leaderboard_html(now_time, new_positions_dict_dest=None):
     scores = {player: 0 for player in players}
     for match_id, result in st.session_state.results.items():
@@ -401,7 +419,6 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
         elif pos == len(df_scores) and row['Punkty'] > 0:
             bg_style = 'style="background-color: #DC2626; font-weight: bold; color: #FFFFFF;"' 
             
-        # Pobieramy czas odliczania dla danego zawodnika
         countdown_html = get_time_to_next_unbet_match(player_name, now_time)
         
         html_rows += f"""
@@ -433,7 +450,7 @@ if 'logged_in_user' not in st.session_state:
 now = datetime.now()
 
 if st.session_state.logged_in_user is None:
-    # PODZIAŁ OKNA LOGOWANIA: Formularz po lewej, klasyfikacja na żywo z odliczaniem po prawej
+    # PODZIAŁ OKNA LOGOWANIA: Formularz po lewej, klasyfikacja na żywo po prawej
     col_login, col_board = st.columns([2, 3], gap="large")
     
     with col_login:
