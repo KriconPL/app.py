@@ -58,31 +58,44 @@ st.markdown("""
         color: #0A1128 !important;
     }
     
-    /* Kontener z bocznym suwakiem dla listy meczów */
-    .scroll-container {
-        max-height: 700px;
+    /* Globalne kontenery z bocznym suwakiem */
+    .scroll-container, .table-scroll-container {
+        max-height: 650px;
         overflow-y: auto;
         padding-right: 15px;
         border: 1px solid #1E3A8A;
         border-radius: 12px;
         background-color: #0D1B3E;
         padding: 20px;
+        margin-bottom: 25px;
     }
     
-    /* Stylizacja bocznego suwaka (Scrollbara) */
-    .scroll-container::-webkit-scrollbar {
+    /* Dla tabel zmniejszamy wysokość kontenera by zmieścił się idealnie bez marnowania przestrzeni */
+    .table-scroll-container {
+        max-height: 280px;
+    }
+    
+    /* POMARAŃCZOWY SUWAK (Dla silników WebKit - Chrome, Safari, Edge, nowy Opera) */
+    .scroll-container::-webkit-scrollbar, .table-scroll-container::-webkit-scrollbar {
         width: 10px;
     }
-    .scroll-container::-webkit-scrollbar-track {
+    .scroll-container::-webkit-scrollbar-track, .table-scroll-container::-webkit-scrollbar-track {
         background: #0A1128;
         border-radius: 10px;
     }
-    .scroll-container::-webkit-scrollbar-thumb {
+    .scroll-container::-webkit-scrollbar-thumb, .table-scroll-container::-webkit-scrollbar-thumb {
         background: #F97316;
         border-radius: 10px;
+        border: 2px solid #0A1128;
     }
-    .scroll-container::-webkit-scrollbar-thumb:hover {
+    .scroll-container::-webkit-scrollbar-thumb:hover, .table-scroll-container::-webkit-scrollbar-thumb:hover {
         background: #EA580C;
+    }
+
+    /* Wsparcie dla Firefox (wersje nowoczesne) */
+    .scroll-container, .table-scroll-container {
+        scrollbar-width: thin;
+        scrollbar-color: #F97316 #0A1128;
     }
     
     /* Kontener loga i tytułu */
@@ -169,7 +182,7 @@ st.markdown("""
     .kricon-table {
         width: 100%;
         border-collapse: collapse;
-        margin: 10px 0 35px 0;
+        margin: 0;
         font-size: 0.95rem;
         background-color: #172554 !important;
         border-radius: 8px;
@@ -279,12 +292,10 @@ GROUPS_DICT = {
     "Grupa L": ["Anglia", "Chorwacja", "Ghana", "Panama"]
 }
 
-# OFICJALNY GENERATOR HARMONOGRAMU (CZAS POLSKI - CEST)
 def generate_schedule():
     schedule = {}
     months_pl = {6: "Czerwca", 7: "Lipca"}
     
-    # 1. Dokładny spis meczów kolejki 1 i 2 fazy grupowej wg strefy polskiej (CEST)
     raw_fixtures = [
         # Kolejka 1
         (2026, 6, 11, 21, 0, "Grupa A", "Meksyk", "RPA"),
@@ -302,7 +313,7 @@ def generate_schedule():
         (2026, 6, 15, 18, 0, "Grupa H", "Hiszpania", "Wyspy Zielonego Przylądka"),
         (2026, 6, 15, 21, 0, "Grupa G", "Belgia", "Egipt"),
         (2026, 6, 16, 0, 0, "Grupa H", "Arabia Saudyjska", "Urugwaj"),
-        (2026, 6, 16, 3, 0, "Grupa G", "Iran", "New Zealand"),
+        (2026, 6, 16, 3, 0, "Grupa G", "Iran", "Nowa Zelandia"),
         (2026, 6, 16, 21, 0, "Grupa I", "Francja", "Senegal"),
         (2026, 6, 17, 0, 0, "Grupa I", "Irak", "Norwegia"),
         (2026, 6, 17, 3, 0, "Grupa J", "Argentyna", "Algieria"),
@@ -332,7 +343,6 @@ def generate_schedule():
     ]
     
     match_id = 1
-    # Budowanie obiektów z parsowaniem
     for yr, mo, dy, hr, mn, stage, home, away in raw_fixtures:
         dt = datetime(yr, mo, dy, hr, mn)
         schedule[match_id] = {
@@ -345,14 +355,11 @@ def generate_schedule():
         }
         match_id += 1
 
-    # Dopełnienie brakujących meczów grupowych do pełnej puli 72 (Kolejka 3 + pozostałe)
-    # Rozkład godzinowy dopasowany symulacyjnie do bloków transmisyjnych CEST MŚ
     all_groups = list(GROUPS_DICT.keys())
     sim_day = datetime(2026, 6, 22, 18, 0)
     while match_id <= 72:
         g_name = all_groups[(match_id % 12)]
         teams = GROUPS_DICT[g_name]
-        # Wybór par tak, by nie dublować identycznych zestawów w prosty sposób
         if match_id % 2 == 0:
             h, a = teams[0], teams[3]
         else:
@@ -370,7 +377,6 @@ def generate_schedule():
         if match_id % 4 == 0:
             sim_day += timedelta(days=1)
 
-    # 3. Faza Pucharowa (32 mecze) - Poprawne ramy czasowe w strefie CEST
     ko_stages = [
         ("1/16 Finału", 16, [(29,6), (30,6), (1,7), (2,7)]), 
         ("1/8 Finału", 8, [(4,7), (5,7), (6,7), (7,7)]),     
@@ -385,7 +391,6 @@ def generate_schedule():
         matches_per_date = max(1, count // len(stage_dates))
         for i in range(count):
             d, m_num = stage_dates[date_idx % len(stage_dates)]
-            # Najczęstsze oficjalne ramy wieczorne w Polsce dla meczów pucharowych z USA
             hour = 18 if i % 2 == 0 else 22
             match_dt = datetime(2026, m_num, d, hour, 0, 0)
             
@@ -610,6 +615,10 @@ else:
         st.header("📈 Tabele Fazy Grupowej")
         for group_name in list(GROUPS_DICT.keys()):
             st.markdown(f"### {group_name}")
+            
+            # NOWOŚĆ: Każda tabela zamknięta w małym, dedykowanym kontenerze z pomarańczowym suwakiem
+            st.markdown("<div class='table-scroll-container'>", unsafe_allow_html=True)
+            
             teams_stats = {t: {"Punkty": 0, "BZ": 0, "BS": 0, "RB": 0} for t in GROUPS_DICT[group_name]}
             for match in st.session_state.results.values():
                 if match["stage"] == group_name and match["status"] == "Zakończony":
@@ -636,6 +645,8 @@ else:
             for idx, row in df_group.iterrows():
                 group_rows += f"<tr><td><b>{idx}</b></td><td>{get_flag_html(row['Reprezentacja'])}</td><td><b>{row['Punkty']}</b></td><td>{row['BZ']}</td><td>{row['BS']}</td><td>{row['RB']}</td></tr>"
             st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Reprezentacja</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{group_rows}</table>", unsafe_allow_html=True)
+            
+            st.markdown("</div>", unsafe_allow_html=True) # Zamknięcie kontenera tabeli grupowej
 
     with tab4:
         if current_user != "admin":
