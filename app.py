@@ -10,7 +10,6 @@ st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", lay
 
 st.markdown("""
     <style>
-    /* Wymuszenie ciemnego tła dla całej aplikacji Streamlit */
     [data-testid="stAppViewContainer"], .stApp {
         background-color: #0A1128 !important; 
     }
@@ -20,13 +19,9 @@ st.markdown("""
     [data-testid="stHeader"] {
         background-color: #0A1128 !important;
     }
-    
-    /* Kolor tekstów globalnych */
     h1, h2, h3, h4, h5, h6, p, span, label, div {
         color: #F8FAFC !important;
     }
-
-    /* Kontener loga i tytułu */
     .logo-title-container {
         display: flex;
         align-items: center;
@@ -46,15 +41,12 @@ st.markdown("""
         width: auto;
         object-fit: contain;
     }
-    
     .logo-title-container h1 {
         margin: 0 !important;
         border: none !important;
         padding: 0 0 0 15px !important;
         font-size: 2.5rem;
     }
-    
-    /* Przyciski w kolorystyce KriCon Orange */
     .stButton>button {
         background-color: #F97316 !important;
         color: white !important;
@@ -69,8 +61,6 @@ st.markdown("""
         transform: translateY(-1px);
         box-shadow: 0 4px 6px rgba(249, 115, 22, 0.4);
     }
-    
-    /* Inputy numerów (Typy) */
     div[data-baseweb="input"], div[data-baseweb="select"] {
         background-color: #172554 !important;
         border: 1px solid #1E3A8A !important;
@@ -79,15 +69,11 @@ st.markdown("""
         color: #F97316 !important;
         font-weight: bold;
     }
-
-    /* Powiadomienia (Toasty / Pop-upy) */
     [data-testid="stToast"], div[data-testid="stNotification"] {
         background-color: #1E3A8A !important;
         color: white !important;
         border-left: 5px solid #F97316 !important;
     }
-    
-    /* Karty meczów */
     .match-container {
         background: #172554 !important; 
         border: 1px solid #1E3A8A !important;
@@ -114,8 +100,6 @@ st.markdown("""
         display: inline-block;
         margin-top: 10px;
     }
-    
-    /* Zakładki (Tabs) */
     .stTabs [data-baseweb="tab"] {
         color: #94A3B8 !important;
         font-weight: 600;
@@ -125,8 +109,6 @@ st.markdown("""
         border-bottom-color: #F97316 !important;
         color: #F97316 !important;
     }
-
-    /* Tabele HTML */
     .kricon-table {
         width: 100%;
         border-collapse: collapse;
@@ -151,8 +133,6 @@ st.markdown("""
     .kricon-table tr:hover {
         background-color: #1E3A8A !important;
     }
-    
-    /* Style strzałek ligowych */
     .trend-up { color: #4ADE80 !important; font-weight: bold; }
     .trend-down { color: #F87171 !important; font-weight: bold; }
     .trend-stable { color: #94A3B8 !important; font-weight: bold; }
@@ -220,4 +200,54 @@ players = [k for k in USER_CREDENTIALS.keys() if k != "admin"]
 
 GROUPS_DICT = {
     "Grupa A": ["Meksyk", "RPA", "Korea Południowa", "Czechy"],
-    "Grupa B":
+    "Grupa B": ["Kanada", "Bośnia i Hercegowina", "Katar", "Szwajcaria"],
+    "Grupa C": ["Brazylia", "Maroko", "Haiti", "Szkocja"],
+    "Grupa D": ["USA", "Paragwaj", "Australia", "Turcja"],
+    "Grupa E": ["Niemcy", "Curaçao", "WKS", "Ekwador"],
+    "Grupa F": ["Holandia", "Japonia", "Szwecja", "Tunezja"],
+    "Grupa G": ["Belgia", "Egipt", "Iran", "Nowa Zelandia"],
+    "Grupa H": ["Hiszpania", "Wyspy Zielonego Przylądka", "Arabia Saudyjska", "Urugwaj"],
+    "Grupa I": ["Francja", "Senegal", "Irak", "Norwegia"],
+    "Grupa J": ["Argentyna", "Algieria", "Austria", "Jordania"],
+    "Grupa K": ["Portugalia", "DR Konga", "Uzbekistan", "Kolumbia"],
+    "Grupa L": ["Anglia", "Chorwacja", "Ghana", "Panama"]
+}
+
+# Generator Harmonogramu 104 Meczów
+def generate_schedule():
+    schedule = {}
+    match_id = 1
+    months_pl = {6: "Czerwca", 7: "Lipca"}
+    
+    matchups = [(0,1), (2,3), (0,2), (1,3), (0,3), (1,2)]
+    group_matches = []
+    for round_idx in range(6):
+        for group_name, teams in GROUPS_DICT.items():
+            t1, t2 = matchups[round_idx]
+            group_matches.append({"stage": group_name, "home": teams[t1], "away": teams[t2]})
+            
+    start_date = datetime(2026, 6, 11)
+    times = [15, 18, 21, 23] 
+    for i, match in enumerate(group_matches):
+        day_offset = i // 4
+        time_idx = i % 4
+        match_dt = start_date + timedelta(days=day_offset)
+        match_dt = match_dt.replace(hour=times[time_idx], minute=0, second=0)
+        
+        schedule[match_id] = {
+            "timestamp": match_dt,
+            "date": f"{match_dt.day} {months_pl[match_dt.month]}",
+            "time": match_dt.strftime("%H:%00"),
+            "stage": match["stage"],
+            "home": match["home"], "away": match["away"],
+            "score_h": None, "score_a": None, "status": "Oczekuje"
+        }
+        match_id += 1
+
+    ko_stages = [
+        ("1/16 Finału", 16, [(29,6), (30,6), (1,7), (2,7)]), 
+        ("1/8 Finału", 8, [(4,7), (5,7), (6,7), (7,7)]),     
+        ("Ćwierćfinały", 4, [(9,7), (10,7)]),                
+        ("Półfinały", 2, [(14,7), (15,7)]),                  
+        ("Mecz o 3. miejsce", 1, [(18,7)]),                  
+        ("Finał", 1, [(19,7)])
