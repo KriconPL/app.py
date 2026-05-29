@@ -26,49 +26,64 @@ st.markdown("""
         color: #F8FAFC !important;
     }
 
-    /* --- BEZWZGLĘDNA POPRAWKA WIDOCZNOŚCI FORMULARZA LOGOWANIA --- */
-    /* Etykiety nad polami (Wybierz użytkownika / Wpisz hasło) */
+    /* Formularz logowania - poprawki widoczności */
     div[data-testid="stSelectbox"] label p, div[data-testid="stTextInput"] label p {
         color: #F97316 !important;
         font-weight: bold !important;
         font-size: 1.2rem !important;
     }
-    
-    /* Główne okienka wyboru przed kliknięciem - CIEMNIEJSZY GRANAT */
     div[data-baseweb="select"], div[data-baseweb="input"] {
         background-color: #060B19 !important;
         border: 2px solid #F97316 !important;
         border-radius: 6px !important;
     }
-    
-    /* Tekst wewnątrz zamkniętego okienka oraz wpisywane hasło - POMARAŃCZOWY */
     div[data-baseweb="select"] div, div[data-baseweb="input"] input {
         color: #F97316 !important; 
         font-weight: bold !important;
         font-size: 1.1rem !important;
-        -webkit-text-fill-color: #F97316 !important; /* Poprawka dla Safari/Chrome */
+        -webkit-text-fill-color: #F97316 !important;
     }
-
-    /* Wymuszenie ciemnego tła dla rozwijanego menu (dropdown) */
     div[role="listbox"], ul[role="listbox"] {
         background-color: #060B19 !important;
         border: 1px solid #F97316 !important;
     }
-    
-    /* Opcje (imiona) na rozwijanej liście - POMARAŃCZOWE */
     div[role="option"], li[role="option"], div[role="listbox"] * {
         color: #F97316 !important;
         background-color: #060B19 !important;
         font-weight: bold !important;
         font-size: 1.1rem !important;
     }
-    
-    /* Podświetlenie elementu na liście po najechaniu myszką - POMARAŃCZOWE TŁO, CZARNY TEKST */
     div[role="option"]:hover, li[role="option"]:hover {
         background-color: #F97316 !important;
         color: #0A1128 !important;
     }
-    /* -------------------------------------------------------- */
+    
+    /* NOWOŚĆ: Kontener z bocznym suwakiem dla listy meczów */
+    .scroll-container {
+        max-height: 700px;
+        overflow-y: auto;
+        padding-right: 15px;
+        border: 1px solid #1E3A8A;
+        border-radius: 12px;
+        background-color: #0D1B3E;
+        padding: 20px;
+    }
+    
+    /* Stylizacja bocznego suwaka (Scrollbara) */
+    .scroll-container::-webkit-scrollbar {
+        width: 10px;
+    }
+    .scroll-container::-webkit-scrollbar-track {
+        background: #0A1128;
+        border-radius: 10px;
+    }
+    .scroll-container::-webkit-scrollbar-thumb {
+        background: #F97316;
+        border-radius: 10px;
+    }
+    .scroll-container::-webkit-scrollbar-thumb:hover {
+        background: #EA580C;
+    }
     
     /* Kontener loga i tytułu */
     .logo-title-container {
@@ -90,7 +105,6 @@ st.markdown("""
         width: auto;
         object-fit: contain;
     }
-    
     .logo-title-container h1 {
         margin: 0 !important;
         border: none !important;
@@ -98,7 +112,7 @@ st.markdown("""
         font-size: 2.5rem;
     }
     
-    /* Przyciski w kolorystyce KriCon Orange */
+    /* Przyciski KriCon */
     .stButton>button {
         background-color: #F97316 !important;
         color: white !important;
@@ -142,7 +156,6 @@ st.markdown("""
         margin-top: 10px;
     }
     
-    /* Zakładki (Tabs) */
     .stTabs [data-baseweb="tab"] {
         color: #94A3B8 !important;
         font-weight: 600;
@@ -153,7 +166,6 @@ st.markdown("""
         color: #F97316 !important;
     }
 
-    /* Tabele HTML */
     .kricon-table {
         width: 100%;
         border-collapse: collapse;
@@ -176,11 +188,7 @@ st.markdown("""
         color: #F8FAFC !important;
         vertical-align: middle;
     }
-    .kricon-table tr:hover {
-        background-color: #1E3A8A !important;
-    }
     
-    /* Style strzałek ligowych */
     .badge-trend {
         display: inline-flex;
         align-items: center;
@@ -194,15 +202,12 @@ st.markdown("""
     .trend-box-up { background-color: #16A34A; color: white; }
     .trend-box-down { background-color: #DC2626; color: white; }
     .trend-box-stable { background-color: #374151; color: #94A3B8; }
-    
-    /* Kolorystyka czasu do meczu */
     .time-ok { color: #4ADE80 !important; font-weight: bold; }
     .time-warning { color: #F97316 !important; font-weight: bold; }
     .time-normal { color: #CBD5E1 !important; }
     </style>
 """, unsafe_allow_html=True)
 
-# Funkcja odczytująca zdjęcie jako Base64
 def get_base64_of_bin_file(bin_file):
     try:
         with open(bin_file, 'rb') as f:
@@ -228,7 +233,6 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# Flagi PNG
 COUNTRY_FLAGS = {
     "Meksyk": "mx", "RPA": "za", "Korea Południowa": "kr", "Czechy": "cz",
     "Kanada": "ca", "Bośnia i Hercegowina": "ba", "Katar": "qa", "Szwajcaria": "ch",
@@ -237,7 +241,7 @@ COUNTRY_FLAGS = {
     "Niemcy": "de", "Curaçao": "cw", "WKS": "ci", "Ekwador": "ec",
     "Holandia": "nl", "Japonia": "jp", "Szwecja": "se", "Tunezja": "tn",
     "Belgia": "be", "Egipt": "eg", "Iran": "ir", "Nowa Zelandia": "nz",
-    "Hiszpania": "es", "Wyspy Zielonego Przylążka": "cv", "Arabia Saudyjska": "sa", "Urugwaj": "uy",
+    "Hiszpania": "es", "Wyspy Zielonego Przylądka": "cv", "Arabia Saudyjska": "sa", "Urugwaj": "uy",
     "Francja": "fr", "Senegal": "sn", "Irak": "iq", "Norwegia": "no",
     "Argentyna": "ar", "Algieria": "dz", "Austria": "at", "Jordania": "jo",
     "Portugalia": "pt", "DR Konga": "cd", "Uzbekistan": "uz", "Kolumbia": "co",
@@ -253,7 +257,6 @@ def get_flag_html(country_name):
     flag_url = f"https://flagcdn.com/w40/{code}.png"
     return f'<img src="{flag_url}" width="22" style="vertical-align: middle; margin-right: 8px; border: 1px solid #1E3A8A; border-radius:2px;" alt="flaga"> {country_name}'
 
-# Baza użytkowników
 USER_CREDENTIALS = {
     "Adam": "adam2026", "Maciej": "maciej2026", "Marcin": "marcin2026",
     "Kamil": "kamil2026", "Kuba M": "kubam2026", "Tomek": "tomek2026",
@@ -269,14 +272,14 @@ GROUPS_DICT = {
     "Grupa E": ["Niemcy", "Curaçao", "WKS", "Ekwador"],
     "Grupa F": ["Holandia", "Japonia", "Szwecja", "Tunezja"],
     "Grupa G": ["Belgia", "Egipt", "Iran", "Nowa Zelandia"],
-    "Grupa H": ["Hiszpania", "Wyspy Zielonego Przylążka", "Arabia Saudyjska", "Urugwaj"],
+    "Grupa H": ["Hiszpania", "Wyspy Zielonego Przylądka", "Arabia Saudyjska", "Urugwaj"],
     "Grupa I": ["Francja", "Senegal", "Irak", "Norwegia"],
     "Grupa J": ["Argentyna", "Algieria", "Austria", "Jordania"],
     "Grupa K": ["Portugalia", "DR Konga", "Uzbekistan", "Kolumbia"],
     "Grupa L": ["Anglia", "Chorwacja", "Ghana", "Panama"]
 }
 
-# Generator Harmonogramu 104 Meczów
+# Generator Harmonogramu z poprawnym rozkładem dat i bezpieczną godziną
 def generate_schedule():
     schedule = {}
     match_id = 1
@@ -293,6 +296,7 @@ def generate_schedule():
     start_date = datetime(2026, 6, 11)
     times = [15, 18, 21, 23] 
     
+    # 72 mecze grupowe: od 11 do 28 czerwca
     for i, match in enumerate(group_matches):
         day_offset = i // 4
         time_idx = i % 4
@@ -302,13 +306,14 @@ def generate_schedule():
         schedule[match_id] = {
             "timestamp": match_dt,
             "date": f"{match_dt.day} {months_pl[match_dt.month]}",
-            "time": match_dt.strftime("%H:%00"),
+            "time": match_dt.strftime("%H:00"), # Naprawiono błąd z % zamiast 00
             "stage": match["stage"],
             "home": match["home"], "away": match["away"],
             "score_h": None, "score_a": None, "status": "Oczekuje"
         }
         match_id += 1
 
+    # 32 mecze pucharowe: od 29 czerwca do 19 lipca
     ko_stages = [
         ("1/16 Finału", 16, [(29,6), (30,6), (1,7), (2,7)]), 
         ("1/8 Finału", 8, [(4,7), (5,7), (6,7), (7,7)]),     
@@ -320,8 +325,7 @@ def generate_schedule():
     
     for stage_name, count, stage_dates in ko_stages:
         date_idx = 0
-        matches_per_date = count // len(stage_dates) if len(stage_dates) > 0 else 1
-        matches_per_date = max(1, matches_per_date)
+        matches_per_date = max(1, count // len(stage_dates))
         for i in range(count):
             d, m_num = stage_dates[date_idx % len(stage_dates)]
             hour = 18 if i % 2 == 0 else 21
@@ -330,7 +334,7 @@ def generate_schedule():
             schedule[match_id] = {
                 "timestamp": match_dt,
                 "date": f"{d} {months_pl[m_num]}",
-                "time": match_dt.strftime("%H:%00"),
+                "time": match_dt.strftime("%H:00"), # Naprawiono błąd z % zamiast 00
                 "stage": stage_name,
                 "home": "TBD", "away": "TBD",
                 "score_h": None, "score_a": None, "status": "Oczekuje"
@@ -359,30 +363,24 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
         return 1
     return 0
 
-# Funkcja obliczająca czas do najbliższego nieobstawionego meczu gracza
 def get_time_to_next_unbet_match(player_name, now_time):
     upcoming_matches = sorted(
         [m for m in st.session_state.results.values() if m["status"] == "Oczekuje" and m["timestamp"] > now_time],
         key=lambda x: x["timestamp"]
     )
-    
     for match in upcoming_matches:
         match_id = [k for k, v in st.session_state.results.items() if v == match][0]
         player_bet = st.session_state.bets[match_id].get(player_name, (None, None))
-        
         if player_bet == (None, None):
             diff = match["timestamp"] - now_time
             hours = int(diff.total_seconds() // 3600)
             minutes = int((diff.total_seconds() % 3600) // 60)
-            
             if diff <= timedelta(hours=1):
                 return f'<span class="time-warning">⏳ Za {hours}h {minutes}m!</span>'
             else:
                 return f'<span class="time-normal">Za {hours}h {minutes}m</span>'
-                
     return '<span class="time-ok">✔ Wszystko obstawione</span>'
 
-# Funkcja pomocnicza do generowania kodu tabeli klasyfikacji
 def render_leaderboard_html(now_time, new_positions_dict_dest=None):
     scores = {player: 0 for player in players}
     for match_id, result in st.session_state.results.items():
@@ -402,7 +400,6 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
         player_name = row['Gracz']
         if new_positions_dict_dest is not None:
             new_positions_dict_dest[player_name] = pos
-        
         old_pos = st.session_state.last_positions.get(player_name, pos)
         
         if old_pos > pos:
@@ -419,7 +416,6 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
             bg_style = 'style="background-color: #DC2626; font-weight: bold; color: #FFFFFF;"' 
             
         countdown_html = get_time_to_next_unbet_match(player_name, now_time)
-        
         html_rows += f"""
         <tr {bg_style}>
             <td style="text-align:center;"><b>{pos}</b></td>
@@ -442,28 +438,23 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
         </table>
     """
 
-# System Logowania
 if 'logged_in_user' not in st.session_state:
     st.session_state.logged_in_user = None
 
 now = datetime.now()
 
 if st.session_state.logged_in_user is None:
-    # PODZIAŁ OKNA LOGOWANIA: Formularz po lewej, klasyfikacja na żywo po prawej
     col_login, col_board = st.columns([2, 3], gap="large")
-    
     with col_login:
         st.subheader("🔒 Logowanie do systemu Kricon Typer")
         username = st.selectbox("Wybierz użytkownika:", [""] + list(USER_CREDENTIALS.keys()))
         password = st.text_input("Wpisz hasło:", type="password")
-        
         if st.button("Zaloguj się"):
             if USER_CREDENTIALS.get(username) == password:
                 st.session_state.logged_in_user = username
                 st.rerun()
             else:
                 st.error("Błędne hasło. Spróbuj ponownie.")
-                
     with col_board:
         st.subheader("📊 Aktualna Klasyfikacja i Stan Obstawień")
         st.markdown(render_leaderboard_html(now), unsafe_allow_html=True)
@@ -474,7 +465,6 @@ else:
         st.session_state.logged_in_user = None
         st.rerun()
 
-    # --- LOGIKA AUTOMATYCZNYCH PRZYPOMNIEŃ POP-UP ---
     for match_id, match in st.session_state.results.items():
         if match["status"] == "Oczekuje":
             try:
@@ -483,38 +473,32 @@ else:
                     for player in players:
                         if player not in st.session_state.bets[match_id] or st.session_state.bets[match_id][player] == (None, None):
                             match_name = f"{match['home']} - {match['away']}"
-                            alert_msg = f"Hej {player}, zapomniałeś obstawić mecz {match_name}, który zaraz się zaczyna!"
-                            st.toast(alert_msg, icon="⚠️")
-                            st.warning(alert_msg)
+                            st.toast(f"Hej {player}, zapomniałeś obstawić mecz {match_name}!", icon="⚠️")
+                            st.warning(f"Hej {player}, zapomniałeś obstawić mecz {match_name}!")
             except Exception:
                 pass 
 
     tab1, tab2, tab3, tab4 = st.tabs(["📊 Klasyfikacja", "📅 Lista Meczów (Terminarz)", "📈 Tabele Grup", "⚙️ Admin"])
 
-    # ZAKŁADKA 1: KLASYFIKACJA (PO ZALOGOWANIU)
     with tab1:
         st.header("Tabela Wyników Typera")
         new_positions = {}
         st.markdown(render_leaderboard_html(now, new_positions), unsafe_allow_html=True)
 
-    # ZAKŁADKA 2: TERMINARZ
     with tab2:
         if current_user == "admin":
             st.warning("Zaloguj się jako gracz, aby typować.")
         else:
             st.header("Terminarz Mistrzostw Świata 2026")
-            
-            view_mode = st.radio(
-                "Pokaż mecze:", 
-                ["Oczekujące (Od najbliższych)", "Wszystkie 104 mecze", "Tylko Zakończone"], 
-                horizontal=True,
-                key="user_view_mode"
-            )
+            view_mode = st.radio("Pokaż mecze:", ["Oczekujące (Od najbliższych)", "Wszystkie 104 mecze", "Tylko Zakończone"], horizontal=True, key="user_view_mode")
             st.divider()
             
-            sorted_matches = sorted(st.session_state.results.items(), key=lambda x: (x[1]['timestamp'], x[0]))
+            # Otwarcie kontenera ze skrollem z boku
+            st.markdown("<div class='scroll-container'>", unsafe_allow_html=True)
             
+            sorted_matches = sorted(st.session_state.results.items(), key=lambda x: (x[1]['timestamp'], x[0]))
             matches_shown = 0
+            
             for match_id, match in sorted_matches:
                 if view_mode == "Oczekujące (Od najbliższych)" and match['status'] == "Zakończony":
                     continue
@@ -532,9 +516,7 @@ else:
                 if match['status'] == "Zakończony":
                     st.markdown(f"<p class='real-score'>Oficjalny wynik: {match['score_h']} - {match['score_a']}</p>", unsafe_allow_html=True)
                 elif is_lock_time:
-                    st.markdown("<p style='color: #F87171; font-weight: bold;'>⚠️ Obstawianie tego meczu zostało zablokowane (mecz w toku lub oczekuje na wynik).</p>", unsafe_allow_html=True)
-                else:
-                    st.markdown("<p style='color: #4ADE80;'>• Rejestracja typów otwarta</p>", unsafe_allow_html=True)
+                    st.markdown("<p style='color: #F87171; font-weight: bold;'>⚠️ Obstawianie tego meczu zostało zablokowane.</p>", unsafe_allow_html=True)
                 
                 curr_h, curr_a = st.session_state.bets[match_id].get(current_user, (None, None))
                 
@@ -551,7 +533,7 @@ else:
                     else:
                         if st.button("Zapisz typ", key=f"btn_{match_id}"):
                             st.session_state.bets[match_id][current_user] = (bet_h, bet_a)
-                            st.success("Zapisano pomyślnie!")
+                            st.success("Zapisano!")
                 
                 if is_lock_time or match['status'] == "Zakończony":
                     with st.expander("👁️ Zobacz typy innych graczy"):
@@ -559,53 +541,34 @@ else:
                         for p in players:
                             if p != current_user:
                                 p_bet = st.session_state.bets[match_id].get(p)
-                                if p_bet is not None:
-                                    other_bets.append({"Gracz": p, "Typ": f"{p_bet[0]} - {p_bet[1]}"})
-                                else:
-                                    other_bets.append({"Gracz": p, "Typ": "Brak typu"})
-                        if other_bets:
-                            st.dataframe(pd.DataFrame(other_bets), use_container_width=True)
-                        else:
-                            st.write("Nikt z graczy nie obstawił tego meczu.")
-                else:
-                    st.info("🔒 Typy innych graczy zostaną odsłonięte po rozpoczęciu spotkania.")
-                
+                                other_bets.append({"Gracz": p, "Typ": f"{p_bet[0]} - {p_bet[1]}" if p_bet else "Brak typu"})
+                        st.dataframe(pd.DataFrame(other_bets), use_container_width=True)
                 st.markdown("</div>", unsafe_allow_html=True)
                 
+            st.markdown("</div>", unsafe_allow_html=True) # Zamknięcie scroll-containera
             if matches_shown == 0:
-                st.info("Brak meczów w wybranej kategorii.")
+                st.info("Brak meczów.")
 
-    # ZAKŁADKA 3: TABELE GRUP
     with tab3:
-        st.header("📈 Tabele Fazy Grupowej (Zestawienie Listowe)")
-        st.write("Wszystkie grupy zaprezentowane jedna pod drugą w kolejności A-L.")
-        st.divider()
-        
+        st.header("📈 Tabele Fazy Grupowej")
         for group_name in list(GROUPS_DICT.keys()):
             st.markdown(f"### {group_name}")
             teams_stats = {t: {"Punkty": 0, "BZ": 0, "BS": 0, "RB": 0} for t in GROUPS_DICT[group_name]}
-            
             for match in st.session_state.results.values():
                 if match["stage"] == group_name and match["status"] == "Zakończony":
                     h_team, a_team = match["home"], match["away"]
                     sh, sa = match["score_h"], match["score_a"]
-                    
                     teams_stats[h_team]["BZ"] += sh
                     teams_stats[h_team]["BS"] += sa
                     teams_stats[h_team]["RB"] += (sh - sa)
-                    
                     teams_stats[a_team]["BZ"] += sa
                     teams_stats[a_team]["BS"] += sh
                     teams_stats[a_team]["RB"] += (sa - sh)
-                    
-                    if sh > sa:
-                        teams_stats[h_team]["Punkty"] += 3
-                    elif sa > sh:
-                        teams_stats[a_team]["Punkty"] += 3
+                    if sh > sa: teams_stats[h_team]["Punkty"] += 3
+                    elif sa > sh: teams_stats[a_team]["Punkty"] += 3
                     else:
                         teams_stats[h_team]["Punkty"] += 1
                         teams_stats[a_team]["Punkty"] += 1
-                        
             df_group = pd.DataFrame.from_dict(teams_stats, orient='index').reset_index()
             df_group.rename(columns={'index': 'Reprezentacja'}, inplace=True)
             df_group = df_group.sort_values(by=["Punkty", "RB", "BZ"], ascending=[False, False, False]).reset_index(drop=True)
@@ -613,72 +576,40 @@ else:
             
             group_rows = ""
             for idx, row in df_group.iterrows():
-                group_rows += f"""
-                <tr>
-                    <td><b>{idx}</b></td>
-                    <td>{get_flag_html(row['Reprezentacja'])}</td>
-                    <td><b>{row['Punkty']}</b></td>
-                    <td>{row['BZ']}</td>
-                    <td>{row['BS']}</td>
-                    <td>{row['RB']}</td>
-                </tr>
-                """
-                
-            st.markdown(f"""
-                <table class="kricon-table">
-                    <tr>
-                        <th>Poz.</th><th>Reprezentacja</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th>
-                    </tr>
-                    {group_rows}
-                </table>
-            """, unsafe_allow_html=True)
+                group_rows += f"<tr><td><b>{idx}</b></td><td>{get_flag_html(row['Reprezentacja'])}</td><td><b>{row['Punkty']}</b></td><td>{row['BZ']}</td><td>{row['BS']}</td><td>{row['RB']}</td></tr>"
+            st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Reprezentacja</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{group_rows}</table>", unsafe_allow_html=True)
 
-    # ZAKŁADKA 4: ADMIN
     with tab4:
         if current_user != "admin":
-            st.error("Zaloguj się jako 'admin', aby wpisywać wyniki.")
+            st.error("Wymagane uprawnienia administratora.")
         else:
-            st.header("⚙️ Wprowadzanie Wyników (Lista Chronologiczna)")
-            search_query = st.text_input("Wyszukaj mecz po fazie, państwie lub dacie:").lower()
-            st.divider()
+            st.header("⚙️ Panel Wyników (Admin)")
+            search_query = st.text_input("Wyszukaj mecz:").lower()
             
+            st.markdown("<div class='scroll-container'>", unsafe_allow_html=True)
             sorted_admin_matches = sorted(st.session_state.results.items(), key=lambda x: (x[1]['timestamp'], x[0]))
-            
             for match_id, match in sorted_admin_matches:
-                match_text = f"mecz #{match_id} {match['stage']} {match['home']} {match['away']} {match['date']}".lower()
-                
-                if search_query and search_query not in match_text:
+                if search_query and search_query not in f"mecz #{match_id} {match['stage']} {match['home']} {match['away']}".lower():
                     continue
-                
                 st.markdown(f"<div class='match-container' style='padding: 15px;'>", unsafe_allow_html=True)
-                st.markdown(f"<span style='color: #F97316; font-weight: bold; font-size: 1.2rem;'>Mecz #{match_id}</span> | **{get_flag_html(match['home'])} vs {get_flag_html(match['away'])}** <br><span style='color:#94A3B8; font-size:0.9rem;'>({match['stage']} - {match['date']} {match['time']})</span>", unsafe_allow_html=True)
+                st.markdown(f"<span style='color: #F97316; font-weight: bold;'>Mecz #{match_id}</span> | **{get_flag_html(match['home'])} vs {get_flag_html(match['away'])}** ({match['stage']})", unsafe_allow_html=True)
                 
                 if "TBD" in match["home"] or "Finał" in match["stage"] or "1/" in match["stage"]:
-                    col_h, col_a = st.columns(2)
-                    with col_h:
-                        new_home = st.text_input(f"Zmień: Drużyna 1 (Mecz #{match_id})", value=match["home"], key=f"edit_h_{match_id}")
-                    with col_a:
-                        new_away = st.text_input(f"Zmień: Drużyna 2 (Mecz #{match_id})", value=match["away"], key=f"edit_a_{match_id}")
-                    st.session_state.results[match_id]["home"] = new_home
-                    st.session_state.results[match_id]["away"] = new_away
+                    c_h, c_a = st.columns(2)
+                    with c_h: match["home"] = st.text_input("Drużyna 1", value=match["home"], key=f"edit_h_{match_id}")
+                    with c_a: match["away"] = st.text_input("Drużyna 2", value=match["away"], key=f"edit_a_{match_id}")
 
                 c1, c2, c3 = st.columns([1, 1, 2])
-                with c1:
-                    res_h = st.number_input(f"Wynik {match['home']}", min_value=0, step=1, key=f"res_h_{match_id}", value=match['score_h'] if match['score_h'] is not None else 0)
-                with c2:
-                    res_a = st.number_input(f"Wynik {match['away']}", min_value=0, step=1, key=f"res_a_{match_id}", value=match['score_a'] if match['score_a'] is not None else 0)
+                with c1: res_h = st.number_input("Wynik H", min_value=0, step=1, key=f"res_h_{match_id}", value=match['score_h'] if match['score_h'] is not None else 0)
+                with c2: res_a = st.number_input("Wynik A", min_value=0, step=1, key=f"res_a_{match_id}", value=match['score_a'] if match['score_a'] is not None else 0)
                 with c3:
-                    st.write("")
-                    st.write("")
-                    if st.button("Zatwierdź Wynik", key=f"res_btn_{match_id}"):
-                        st.session_state.results[match_id]['score_h'] = res_h
-                        st.session_state.results[match_id]['score_a'] = res_a
-                        st.session_state.results[match_id]['status'] = "Zakończony"
-                        
+                    st.write(""); st.write("")
+                    if st.button("Zatwierdź", key=f"res_btn_{match_id}"):
+                        match['score_h'], match['score_a'], match['status'] = res_h, res_a, "Zakończony"
                         temp_positions = {}
                         render_leaderboard_html(now, temp_positions)
                         st.session_state.last_positions = temp_positions
-                        
-                        st.success("Tabela i punkty przeliczone!")
+                        st.success("Przeliczono!")
                         st.rerun()
                 st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
