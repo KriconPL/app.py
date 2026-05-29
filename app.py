@@ -10,7 +10,6 @@ st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", lay
 
 st.markdown("""
     <style>
-    /* Globalne wymuszenie wyświetlania głównego suwaka przeglądarki */
     html, body, [data-testid="stAppViewContainer"], .stApp {
         background-color: #0A1128 !important; 
         overflow-y: auto !important;
@@ -22,12 +21,10 @@ st.markdown("""
         background-color: #0A1128 !important;
     }
     
-    /* Kolor tekstów globalnych */
     h1, h2, h3, h4, h5, h6, p, span, label, div {
         color: #F8FAFC !important;
     }
 
-    /* Formularz logowania - poprawki widoczności */
     div[data-testid="stSelectbox"] label p, div[data-testid="stTextInput"] label p {
         color: #F97316 !important;
         font-weight: bold !important;
@@ -59,7 +56,6 @@ st.markdown("""
         color: #0A1128 !important;
     }
     
-    /* GŁÓWNY, DUŻY, NEONOWO-POMARAŃCZOWY SUWAK CAŁEJ STRONY INTERNETOWEJ */
     ::-webkit-scrollbar {
         width: 16px !important;
         display: block !important;
@@ -76,7 +72,6 @@ st.markdown("""
         background-color: #FF8833 !important;
     }
     
-    /* Kontener loga i tytułu */
     .logo-title-container {
         display: flex;
         align-items: center;
@@ -103,7 +98,6 @@ st.markdown("""
         font-size: 2.5rem;
     }
     
-    /* Przyciski KriCon */
     .stButton>button {
         background-color: #F97316 !important;
         color: white !important;
@@ -119,7 +113,6 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(249, 115, 22, 0.4);
     }
     
-    /* Karty meczów */
     .match-container {
         background: #172554 !important; 
         border: 1px solid #1E3A8A !important;
@@ -143,7 +136,6 @@ st.markdown("""
         margin: 0;
     }
     
-    /* DYNAMICZNE STATUSY WIELO-KOLOROWE */
     .status-badge {
         padding: 4px 12px;
         border-radius: 20px;
@@ -201,7 +193,6 @@ st.markdown("""
         color: #F97316 !important;
     }
 
-    /* Tabele klasyczne i grupowe */
     .kricon-table {
         width: 100%;
         border-collapse: collapse;
@@ -225,7 +216,6 @@ st.markdown("""
         vertical-align: middle;
     }
     
-    /* Legenda Punktacji */
     .points-legend {
         background-color: #060B19;
         border: 1px solid #1E3A8A;
@@ -447,7 +437,6 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
                     scores[p] += calculate_points(st.session_state.bets[m_id][p][0], st.session_state.bets[m_id][p][1], res['score_h'], res['score_a'])
     df = pd.DataFrame(list(scores.items()), columns=["Gracz", "Punkty"]).sort_values(by="Punkty", ascending=False).reset_index(drop=True)
     
-    # DODANA LEGENDA ZASAD PUNKTACJI
     legend_html = """
     <div class="points-legend">
         <div style="font-weight: bold; color: #F97316; margin-bottom: 6px; font-size: 1.05rem;">ℹ️ System przyznawania punktów:</div>
