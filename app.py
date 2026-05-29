@@ -4,7 +4,7 @@ import numpy as np
 import os
 import base64
 import json 
-import requests # Służy do automatycznej synchronizacji z GitHub API
+import requests 
 from datetime import datetime, timedelta
 
 # 1. Konfiguracja aplikacji i Szata Graficzna Dark Navy & Orange
@@ -12,6 +12,7 @@ st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", lay
 
 st.markdown("""
     <style>
+    /* Globalne wymuszenie wyświetlania głównego suwaka przeglądarki */
     html, body, [data-testid="stAppViewContainer"], .stApp {
         background-color: #0A1128 !important; 
         overflow-y: auto !important;
@@ -23,10 +24,12 @@ st.markdown("""
         background-color: #0A1128 !important;
     }
     
+    /* Kolor tekstów globalnych */
     h1, h2, h3, h4, h5, h6, p, span, label, div {
         color: #F8FAFC !important;
     }
 
+    /* Formularz logowania i selektory */
     div[data-testid="stSelectbox"] label p, div[data-testid="stTextInput"] label p {
         color: #F97316 !important;
         font-weight: bold !important;
@@ -44,6 +47,44 @@ st.markdown("""
         -webkit-text-fill-color: #F97316 !important;
     }
     
+    /* --- NAPRAWIONE: WYMUSZENIE WIDOCZNOŚCI PRZYCISKÓW (KRICON ORANGE) --- */
+    .stButton>button {
+        background-color: #F97316 !important;
+        color: #FFFFFF !important;
+        border-radius: 6px !important;
+        border: none !important;
+        font-weight: 700 !important;
+        font-size: 1rem !important;
+        padding: 0.6rem 1.8rem !important;
+        transition: all 0.2s ease !important;
+        display: inline-block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    .stButton>button:hover {
+        background-color: #EA580C !important;
+        color: #FFFFFF !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4) !important;
+    }
+    
+    /* Naprawa przycisków wewnątrz pól st.number_input (+ i -) */
+    div[data-testid="stNumberInput"] button {
+        background-color: #1E3A8A !important;
+        color: #F8FAFC !important;
+        border: 1px solid #F97316 !important;
+    }
+    div[data-testid="stNumberInput"] button:hover {
+        background-color: #F97316 !important;
+        color: #0A1128 !important;
+    }
+    div[data-testid="stNumberInput"] input {
+        color: #F8FAFC !important;
+        background-color: #0A1128 !important;
+        font-weight: bold !important;
+    }
+    
+    /* --- SYSTEM POŁĄCZEŃ LINIAMI W DRABINCE (PAJĘCZYNA) --- */
     .bracket-column-wrapper {
         display: flex;
         flex-direction: column;
@@ -97,32 +138,33 @@ st.markdown("""
     .time-ok { color: #4ADE80 !important; font-weight: bold; }
     .time-warning { color: #FF6B00 !important; font-weight: bold; }
     .time-normal { color: #CBD5E1 !important; }
+    
+    /* Suwak boczny */
+    ::-webkit-scrollbar { width: 16px !important; display: block !important; }
+    ::-webkit-scrollbar-track { background: #060B19 !important; }
+    ::-webkit-scrollbar-thumb { background-color: #FF6B00 !important; border-radius: 8px !important; border: 2px solid #060B19 !important; }
+    ::-webkit-scrollbar-thumb:hover { background-color: #FF8833 !important; }
     </style>
 """, unsafe_allow_html=True)
 
 BACKUP_FILE = "typer_backup.json"
 
 def save_backup_local_and_github():
-    """Zapisuje typy lokalnie w Streamlit i automatycznie synchronizuje plik na GitHubie przez API"""
     try:
         serializable_bets = {str(m_id): bets for m_id in st.session_state.bets.keys() for bets in [st.session_state.bets[m_id]]}
         json_string = json.dumps(serializable_bets, ensure_ascii=False, indent=4)
         
-        # 1. Zapis lokalny na serwerze Streamlit
         with open(BACKUP_FILE, "w", encoding="utf-8") as f:
             f.write(json_string)
             
-        # 2. Bezobsługowy zapis na GitHub (tylko jeśli zdefiniowano Secrets)
         if "github" in st.secrets:
             cfg = st.secrets["github"]
             url = f"https://api.github.com/repos/{cfg['repo']}/contents/{BACKUP_FILE}"
             headers = {"Authorization": f"token {cfg['token']}", "Accept": "application/vnd.github.v3+json"}
             
-            # Pobranie aktualnego sha pliku (wymagane przez GitHub API do nadpisania elementu)
             res_get = requests.get(url, headers=headers)
-            sha = res_get.json().get("sha", None) if res_get.status_with == 200 else None
+            sha = res_get.json().get("sha", None) if res_get.status_code == 200 else None
             
-            # Wypchnięcie nowej bazy typów
             content_b64 = base64.b64encode(json_string.encode("utf-8")).decode("utf-8")
             payload = {
                 "message": f"🤖 Automatyczna kopia zapasowa typów: {datetime.now().strftime('%Y-%m-%d %H:%M')}",
@@ -343,6 +385,7 @@ def get_mini_group_html_string(g_code):
     </div>
     """
 
+if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 now = datetime.now()
 fetch_official_results_from_api(now)
 
@@ -357,8 +400,8 @@ if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
     with c1:
         st.subheader("🔒 Logowanie")
-        user = st.selectbox("Użytkownik:", [""] + list(USER_CREDENTIALS.keys()))
-        pw = st.text_input("Hasło:", type="password")
+        user = st.selectbox("Wybierz użytkownika:", [""] + list(USER_CREDENTIALS.keys()))
+        pw = st.text_input("Wpisz hasło:", type="password")
         if st.button("Zaloguj się"):
             if USER_CREDENTIALS.get(user) == pw: st.session_state.logged_in_user = user; st.rerun()
             else: st.error("Błąd logowania.")
@@ -366,21 +409,24 @@ if st.session_state.logged_in_user is None:
         st.subheader("📊 Ranking")
         st.markdown(render_leaderboard_html(now), unsafe_allow_html=True)
 else:
-    st.sidebar.write(f"👤: **{st.session_state.logged_in_user}**")
+    # --- PANEL BOCZNY (SIDEBAR) Z WARUNKIEM DOSTĘPU DLA ADMINA ---
+    st.sidebar.write(f"👤 Zalogowany jako: **{st.session_state.logged_in_user}**")
     st.sidebar.markdown("---")
-    st.sidebar.subheader("💾 System Bezpieczeństwa")
-    if os.path.exists(BACKUP_FILE):
-        st.sidebar.success("Streamlit: Kopia OK")
-    if "github" in st.secrets:
-        st.sidebar.success("GitHub Cloud Sync: AKTYWNY")
-    else:
-        st.sidebar.info("Zdefiniuj Secrets, aby włączyć GitHub Cloud Sync")
+    
+    # Przywracanie danych dostępne wyłącznie dla zalogowanego konta 'admin'
+    if st.session_state.logged_in_user == "admin":
+        st.sidebar.subheader("💾 System Bezpieczeństwa")
+        if os.path.exists(BACKUP_FILE):
+            st.sidebar.success("Kopia lokalna: OK")
+        if "github" in st.secrets:
+            st.sidebar.success("GitHub Cloud Sync: OK")
+            
+        if st.sidebar.button("Wymuś przywrócenie danych (Backup)"):
+            if load_backup_local(): st.sidebar.success("Pomyślnie odtworzono typy!")
+            else: st.sidebar.error("Błąd pliku kopii.")
+        st.sidebar.markdown("---")
         
-    if st.sidebar.button("Wymuś Przywrócenie danych"):
-        if load_backup_local(): st.sidebar.success("Przywrócono!")
-        else: st.sidebar.error("Błąd odczytu.")
-        
-    if st.sidebar.button("Wyloguj"): st.session_state.logged_in_user = None; st.rerun()
+    if st.sidebar.button("Wyloguj się"): st.session_state.logged_in_user = None; st.rerun()
     
     tab1, tab2, tab3, tab4 = st.tabs(["📊 Ranking", "📅 Terminarz", "📈 Tabele", "🕸️ Drabinka Pajęczyna"])
     
@@ -410,7 +456,7 @@ else:
                 st.write(""); st.write("")
                 if not locked and st.button("Zapisz Typ", key=f"btn_{m_id}"): 
                     st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a)
-                    save_backup_local_and_github() # DYNAMICZNA SYNCHRONIZACJA STREAMLIT + GITHUB W TLE
+                    save_backup_local_and_github() 
                     st.success("Zapisano!")
             if locked or m['status'] == "Zakończony":
                 with st.expander("👁️ Zobacz typy innych graczy"):
