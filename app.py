@@ -114,18 +114,4 @@ st.markdown(f"""
 # 2. Baza użytkowników
 USER_CREDENTIALS = {
     "Adam": "adam2026", "Maciej": "maciej2026", "Marcin": "marcin2026",
-    "Kamil": "kamil2026", "Kuba M": "kubam2026", "Tomek": "tomek2026",
-    "Kuba K": "kubak2026", "Rafał": "rafal2026", "admin": "kriconadmin"
-}
-players = [k for k in USER_CREDENTIALS.keys() if k != "admin"]
-
-# Oficjalny podział na grupy Mistrzostw Świata 2026 z DODANYMI FLAGAMI
-GROUPS_DICT = {
-    "Grupa A": ["🇲🇽 Meksyk", "🇿🇦 RPA", "🇰🇷 Korea Południowa", "🇨🇿 Czechy"],
-    "Grupa B": ["🇨🇦 Kanada", "🇧🇦 Bośnia i Hercegowina", "🇶🇦 Katar", "🇨🇭 Szwajcaria"],
-    "Grupa C": ["🇧🇷 Brazylia", "🇲🇦 Maroko", "🇭🇹 Haiti", "🏴󠁧󠁢󠁳󠁣󠁴󠁿 Szkocja"],
-    "Grupa D": ["🇺🇸 USA", "🇵🇾 Paragwaj", "🇦🇺 Australia", "🇹🇷 Turcja"],
-    "Grupa E": ["🇩🇪 Niemcy", "🇨🇼 Curaçao", "🇨🇮 WKS", "🇪🇨 Ekwador"],
-    "Grupa F": ["🇳🇱 Holandia", "🇯🇵 Japonia", "🇸🇪 Szwecja", "🇹🇳 Tunezja"],
-    "Grupa G": ["🇧🇪 Belgia", "🇪🇬 Egipt", "🇮🇷 Iran", "🇳🇿 Nowa Zelandia"],
-    "Grupa H": ["🇪🇸 Hiszpania", "🇨🇻 Wyspy Zielonego Przylądka
+    "Kamil": "kamil2026", "Kuba M": "kubam2026", "
