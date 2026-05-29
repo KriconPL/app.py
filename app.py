@@ -106,8 +106,10 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- SYSTEM EMOTIKON FLAG ---
-def get_flag_emoji(team_name):
+# --- SŁOWNIK EMOTIKON FLAG ---
+def get_flag_emoji(raw_name):
+    if not raw_name: return "🌐"
+    clean_name = re.sub(r'[^\w\s]', '', str(raw_name)).strip()
     flags = {
         "Meksyk": "🇲🇽", "RPA": "🇿🇦", "Korea Południowa": "🇰🇷", "Czechy": "🇨🇿",
         "Kanada": "🇨🇦", "Bośnia i Hercegowina": "🇧🇦", "Katar": "🇶🇦", "Szwajcaria": "🇨🇭",
@@ -120,12 +122,14 @@ def get_flag_emoji(team_name):
         "Francja": "🇫🇷", "Senegal": "🇸🇳", "Irak": "🇮🇶", "Norwegia": "🇳🇴",
         "Argentyna": "🇦🇷", "Algieria": "🇩🇿", "Austria": "🇦🇹", "Jordania": "🇯🇴",
         "Portugalia": "🇵🇹", "DR Konga": "🇨🇩", "Uzbekistan": "🇺🇿", "Kolumbia": "🇨🇴",
-        "Anglia": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Chorwacja": "🇭🇷", "Ghana": "🇬🇭", "Panama": "🇵🇦"
+        "Anglia": "🏴\u200d󠁥󠁮󠁧󠁿", "Chorwacja": "🇭🇷", "Ghana": "🇬🇭", "Panama": "🇵🇦"
     }
-    return flags.get(team_name, "")
+    return flags.get(clean_name, "🌐")
 
+# --- NAPRAWIONA FUNKCJA ZABEZPIECZAJĄCA (PRZEPUSZCZA EMOTIKONY FLAG) ---
 def security_clean_text(val):
     if not isinstance(val, str): return val
+    # Usuwa tylko tagi HTML, kompletnie ignorując i zostawiając symbole narodowe Unicode
     return re.sub(r'<[^>]*?>', '', val).strip()
 
 def calculate_points(pred_h, pred_a, real_h, real_a):
@@ -336,6 +340,7 @@ else:
             has_existing_bet = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user, (0,0))
             
+            # Wywołanie flag
             flag_h_emoji = get_flag_emoji(m['home'])
             flag_a_emoji = get_flag_emoji(m['away'])
             
@@ -388,10 +393,9 @@ else:
             g_rows = ""
             for idx, r in df_g.iterrows():
                 f_emoji = get_flag_emoji(r['Reprezentacja'])
-                row_style = 'style="background-color:#16A34A;"' if idx in [1, 2] else ('style=\"background-color:#EA580C;\"' if idx == 3 else '')
+                row_style = 'style="background-color:#16A34A;"' if idx in [1, 2] else ('style="background-color:#EA580C;"' if idx == 3 else '')
                 g_rows += f"<tr {row_style}><td><b>{idx}</b></td><td>{f_emoji} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
             st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table>", unsafe_allow_html=True)
-            
         st.divider(); st.header("🏆 Ranking Drużyn z 3. Miejsc")
         if third_places_list:
             df_third = pd.DataFrame(third_places_list).sort_values(by=["Pkt", "RB", "BZ", "Zwyciestwa"], ascending=False).reset_index(drop=True)
