@@ -41,6 +41,7 @@ VENUES_LIST = [
     "Gillette, Boston", "BMO Field, Toronto", "BBVA, Monterrey", "Akron, Guadalajara"
 ]
 
+# ANTY-COPY GUARD I DEFINICJE ANIMACJI CSS
 st.markdown("""
     <script>
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
@@ -75,15 +76,15 @@ st.markdown("""
     .stButton>button { background-color: #F97316 !important; color: #FFFFFF !important; border-radius: 4px !important; border: none !important; font-weight: 700 !important; height: 32px !important; line-height: 32px !important; padding: 0 12px !important; width: 100% !important; font-size: 0.85rem !important; }
     .stButton>button:hover { background-color: #EA580C !important; box-shadow: 0 3px 8px rgba(249, 115, 22, 0.4) !important; }
     
-    /* ANIMACJA NEONOWEGO PULSOWANIA W STYLU KRICON */
-    @keyframes pulse-red-alert {
-        0% { background-color: #DC2626; box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
-        50% { background-color: #EF4444; box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.2); }
-        100% { background-color: #DC2626; box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+    /* PRAWDZIWE, NIEZALEŻNE PULSOWANIE BANERU (WYMUSZONE CSS) */
+    @keyframes alert-pulse-red {
+        0% { background-color: #DC2626 !important; box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+        50% { background-color: #EF4444 !important; box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
+        100% { background-color: #DC2626 !important; box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
     }
     
     .missing-bet-banner {
-        animation: pulse-red-alert 1.2s infinite ease-in-out !important;
+        animation: alert-pulse-red 1.4s infinite ease-in-out !important;
         color: #FFFFFF !important;
         font-weight: bold !important;
         text-align: center !important;
@@ -93,7 +94,7 @@ st.markdown("""
         font-size: 0.85rem !important;
         display: block !important;
         width: 100% !important;
-        white-space: nowrap;
+        white-space: nowrap !important;
     }
     
     .success-bet-banner {
@@ -142,7 +143,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Słownik natywnych emoji systemowych do bezbłędnego przypisywania flag
+# --- SŁOWNIK MAPPINGU FLAG (NATYWNE EMOTIKONY) ---
 FLAGS_MAP = {
     "Meksyk": "🇲🇽", "RPA": "🇿🇦", "Korea Południowa": "🇰🇷", "Czechy": "🇨🇿",
     "Kanada": "🇨🇦", "Bośnia i Hercegowina": "🇧🇦", "Katar": "🇶🇦", "Szwajcaria": "🇨🇭",
@@ -160,10 +161,9 @@ FLAGS_MAP = {
 
 def clean_and_sanitize_team_string(raw_name):
     if not raw_name or raw_name == "TBD": return "TBD"
-    # Usuwa przedrostki regionalne bazy, jeśli Streamlit wstrzyknął je do pamięci podręcznej
     s = str(raw_name).strip()
+    # Bezwzględne obcinanie starych śmieci tekstowych i kodów regionalnych (jak MX, ZA, cz)
     s = re.sub(r'^(MX|ZA|KR|cz|cv|CA|BA|QA|CH|BR|MA|HT|US|PY|AU|TR|DE|WKS|EC|NL|JP|SE|TN|BEL|EGI|IRA|NZ|ESP|SA|URU|FRA|SEN|IRQ|NOR|ARG|ALG|AUT|JOR|POR|DRK|UZB|COL|ANG|CRO|GHA|PAN)\s+', '', s, flags=re.IGNORECASE)
-    # Usuwa ewentualne stare znaki emoji, jeśli były podwójnie zapisane
     s = re.sub(r'[^\w\s\-ąęćłńóśźżĄĘĆŁŃÓŚŹŻ]', '', s)
     return s.strip()
 
@@ -332,12 +332,20 @@ def fetch_official_results_from_api(now_time):
                 if m['home'] == "TBD": m['home'] = "Meksyk"
                 if m['away'] == "TBD": m['away'] = "RPA"
 
-# --- 🚀 AUTOMATYCZNY RESET SKAŻONEJ PAMIĘCI RAM SERWERA 🚀 ---
-# Kod sam wykrywa wadliwe dane w session_state i czyści je przy każdym przeładowaniu
-if 'results' not in st.session_state or len(st.session_state.results) != 104:
+# --- 🚀 BEZWZGLĘDNA, WYMUSZONA TRANSMUTACJA PAMIĘCI RAM SERWERA 🚀 ---
+# Sprawdzamy czy w pamięci chmury siedzą stare zepsute stringi (jak "MX Meksyk")
+force_reset_needed = False
+if 'results' in st.session_state:
+    for m in st.session_state.results.values():
+        if "MX " in str(m.get('home')) or "ZA " in str(m.get('away')) or "KR " in str(m.get('home')):
+            force_reset_needed = True
+            break
+
+# Jeśli system wykryje stare dane, wymazuje RAM i generuje bazę od zera bez potrzeby restartu z poziomu chmury
+if force_reset_needed or 'results' not in st.session_state or len(st.session_state.results) != 104:
     st.session_state.results = generate_schedule()
 else:
-    # Wymuszona pętla czyszcząca pamięć podręczną stanów chmury u samego źródła
+    # Trwałe nadpisanie session_state czystymi nazwami obiektów
     for m_id in list(st.session_state.results.keys()):
         st.session_state.results[m_id]['home'] = clean_and_sanitize_team_string(st.session_state.results[m_id]['home'])
         st.session_state.results[m_id]['away'] = clean_and_sanitize_team_string(st.session_state.results[m_id]['away'])
@@ -402,7 +410,7 @@ else:
             has_existing_bet = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user, (0,0))
             
-            # Wymuszone oczyszczanie przed jakimkolwiek renderowaniem w widoku
+            # Wymuszona izolacja i czyszczenie przed renderowaniem widoku front-end
             h_display = clean_and_sanitize_team_string(m['home'])
             a_display = clean_and_sanitize_team_string(m['away'])
             
