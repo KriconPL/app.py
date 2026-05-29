@@ -53,64 +53,14 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* Wyrównanie wysokości i stylów dla przycisków i bannerów w jednej linii */
-    .stButton>button {
-        background-color: #F97316 !important;
-        color: #FFFFFF !important;
-        border-radius: 4px !important;
-        border: none !important;
-        font-weight: 700 !important;
-        height: 32px !important;
-        line-height: 32px !important;
-        padding: 0 15px !important;
-        width: 100% !important;
-    }
-    .stButton>button:hover {
-        background-color: #EA580C !important;
-        box-shadow: 0 3px 8px rgba(249, 115, 22, 0.4) !important;
-    }
-    
-    /* --- BANNERY SFORMATOWANE DO TEJ SAMEJ WYSOKOŚCI CO PRZYCISK (32px) --- */
-    .missing-bet-banner {
-        background-color: #DC2626 !important;
-        color: #FFFFFF !important;
-        font-weight: bold !important;
-        text-align: center !important;
-        height: 32px !important;
-        line-height: 32px !important;
-        border-radius: 4px !important;
-        font-size: 0.85rem !important;
-        display: block !important;
-        width: 100% !important;
-        animation: simple-blink 1.2s infinite ease-in-out;
-    }
-    .success-bet-banner {
-        background-color: #16A34A !important;
-        color: #FFFFFF !important;
-        font-weight: bold !important;
-        text-align: center !important;
-        height: 32px !important;
-        line-height: 32px !important;
-        border-radius: 4px !important;
-        font-size: 0.85rem !important;
-        display: block !important;
-        width: 100% !important;
-        border: 1px solid #22C55E;
-    }
-    @keyframes simple-blink {
-        0% { opacity: 0.6; }
-        50% { opacity: 1; }
-        100% { opacity: 0.6; }
-    }
-    
-    /* Ciasny układ elementów listy meczów */
+    /* --- ULTRA CIASNY UKŁAD PIONOWY LISTY MECZÓW --- */
     .match-container { 
         background: #172554 !important; 
         border: 1px solid #1E3A8A !important; 
         border-radius: 4px; 
-        padding: 6px 12px !important; 
-        margin-bottom: 2px !important; 
-        box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        padding: 4px 10px !important; 
+        margin-bottom: 1px !important; /* Maksymalne zmniejszenie odległości między meczami */
+        box-shadow: 0 1px 2px rgba(0,0,0,0.15);
     }
     .match-inline-main-row {
         display: flex;
@@ -152,17 +102,91 @@ st.markdown("""
         margin: 0;
     }
     
-    /* Wysokość pól tekstowych dopasowana do rzędu */
-    .bet-label-text {
+    /* --- IDEALNY UKŁAD INLINE FLEX DLA TYPOWANIA (ROWNA LINIA I ROZMIAR) --- */
+    .flex-bet-inline-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        margin-top: 4px;
+    }
+    
+    .flex-bet-label {
         font-size: 0.85rem !important;
         color: #38BDF8 !important;
         font-weight: bold;
-        height: 32px !important;
-        line-height: 32px !important;
-        margin: 0 !important;
+        white-space: nowrap;
+        height: 32px;
+        display: flex;
+        align-items: center;
     }
     
-    div[data-testid="stNumberInput"] { height: 32px !important; }
+    .flex-input-box {
+        width: 70px !important;
+        height: 32px !important;
+    }
+    
+    .flex-btn-box {
+        width: 100px !important;
+        height: 32px !important;
+    }
+    
+    .flex-banner-box {
+        flex-grow: 1;
+        height: 32px;
+    }
+
+    /* Wymuszenie identycznej wysokości dla przycisków i banerów */
+    .stButton>button {
+        background-color: #F97316 !important;
+        color: #FFFFFF !important;
+        border-radius: 4px !important;
+        border: none !important;
+        font-weight: 700 !important;
+        height: 32px !important;
+        line-height: 32px !important;
+        padding: 0 12px !important;
+        width: 100% !important;
+    }
+    .stButton>button:hover {
+        background-color: #EA580C !important;
+        box-shadow: 0 3px 8px rgba(249, 115, 22, 0.4) !important;
+    }
+    
+    .missing-bet-banner {
+        background-color: #DC2626 !important;
+        color: #FFFFFF !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        height: 32px !important;
+        line-height: 32px !important;
+        border-radius: 4px !important;
+        font-size: 0.85rem !important;
+        display: block !important;
+        width: 100% !important;
+        animation: simple-blink 1.2s infinite ease-in-out;
+    }
+    .success-bet-banner {
+        background-color: #16A34A !important;
+        color: #FFFFFF !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        height: 32px !important;
+        line-height: 32px !important;
+        border-radius: 4px !important;
+        font-size: 0.85rem !important;
+        display: block !important;
+        width: 100% !important;
+        border: 1px solid #22C55E;
+    }
+    @keyframes simple-blink {
+        0% { opacity: 0.6; }
+        50% { opacity: 1; }
+        100% { opacity: 0.6; }
+    }
+    
+    /* Ukrywanie etykiet inputów w strukturze flex */
+    div[data-testid="stNumberInput"] { height: 32px !important; margin: 0 !important; padding: 0 !important; }
     div[data-testid="stNumberInput"] button { background-color: #1E3A8A !important; color: #F8FAFC !important; height: 32px !important; }
     div[data-testid="stNumberInput"] input { color: #F8FAFC !important; background-color: #0A1128 !important; font-size: 0.85rem !important; height: 32px !important; }
     
@@ -389,8 +413,6 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
 def render_bracket_match_html_clean(match_id):
     m = st.session_state.results.get(match_id)
     if not m: return ""
-    
-    # --- AUTOMATYCZNY ZNAK ZAPYTANIA DLA NIEZAKOŃCZONEJ DRABINKI ---
     if m.get("status") == "Zakończony":
         sh = str(m.get("score_h", "?"))
         sa = str(m.get("score_a", "?"))
@@ -430,13 +452,6 @@ def get_mini_group_html_string(g_code):
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 now = datetime.now()
 fetch_official_results_from_api(now)
-
-# LOGIKA LIVE DLA TRANZYCJI IKON
-for m_id, m in st.session_state.results.items():
-    if m['status'] != "Zakończony":
-        time_diff = now - m['timestamp']
-        if timedelta(minutes=0) <= time_diff <= timedelta(minutes=120):
-            st.session_state.results[m_id]['status'] = "LIVE"
 
 if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
@@ -481,7 +496,6 @@ else:
             if (mode == "Oczekujące" and m['status'] == "Zakończony") or (mode == "Zakończone" and m['status'] == "Oczekuje"): continue
             status_html = '<span class="status-badge status-live">🔴 LIVE</span>' if m['status'] == "LIVE" else ('<span class="status-badge status-ended">⚫ Zakończony</span>' if m['status'] == "Zakończony" else '<span class="status-badge status-waiting">🟡 Oczekuje</span>')
             
-            # --- AUTOMATYCZNY ZNAK ZAPYTANIA DLA SCHEDULERA TURNIEJOWEGO ---
             if m.get('status') == "Zakończony":
                 sh_real = str(m.get('score_h', '?'))
                 sa_real = str(m.get('score_a', '?'))
@@ -489,6 +503,7 @@ else:
             else:
                 oficjalny_wynik_tekst = "? : ?"
             
+            # GŁÓWNY WIERSZ MECZU
             st.markdown(f"""
             <div class='match-container'>
                 <div class='match-inline-main-row'>
@@ -510,11 +525,13 @@ else:
             has_existing_bet = st.session_state.bets[m_id].get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
             
-            # --- ZFORMTOWANIE KOLUMN W JEDNOLITĄ WYSOKOŚĆ (LABELS, INPUTS, BTN, BANNER) ---
-            c_label, c_input_h, c_input_a, c_btn, c_banner = st.columns([1.5, 0.8, 0.8, 1.5, 3.4])
+            # --- CAŁKOWITY RE-DESIGN INLINE: BANERY, POLA I PRZYCISKI W JEDNEJ LINII FLEX ---
+            st.markdown("<div class='flex-bet-inline-row'>", unsafe_allow_html=True)
+            
+            c_label, c_input_h, c_input_a, c_btn, c_banner = st.columns([1.5, 1.0, 1.0, 1.5, 4.0])
             
             with c_label:
-                st.markdown("<p class='bet-label-text'>➔ Twój Typ:</p>", unsafe_allow_html=True)
+                st.markdown("<div class='flex-bet-label'>➔ Twój Typ:</div>", unsafe_allow_html=True)
             with c_input_h:
                 b_h = st.number_input(f"H_{m_id}", 0, 20, int(cur_h), 1, key=f"input_h_{m_id}", disabled=locked, label_visibility="collapsed")
             with c_input_a:
@@ -537,6 +554,8 @@ else:
                         st.markdown("<div class='success-bet-banner'>✔ TYP ZAPISANY</div>", unsafe_allow_html=True)
                     else:
                         st.markdown("<div class='missing-bet-banner'>⚠️ NIEODDANY TYP</div>", unsafe_allow_html=True)
+            
+            st.markdown("</div>", unsafe_allow_html=True) # Zamknięcie wiersza flex
                         
             if locked or m['status'] == "Zakończony":
                 with st.expander("👁️ Zobacz typy innych graczy"):
@@ -621,13 +640,8 @@ else:
             m_104 = st.session_state.results.get(104, {})
             h_f = m_104.get('home', 'TBD')
             a_f = m_104.get('away', 'TBD')
-            
-            # --- ZNAK ZAPYTANIA DLA MECZU FINAŁOWEGO W DRABINCE ---
-            if m_104.get("status") == "Zakończony":
-                sh_f = str(m_104.get('score_h', '?'))
-                sa_f = str(m_104.get('score_a', '?'))
-            else:
-                sh_f, sa_f = "?", "?"
+            sh_f = "" if m_104.get('score_h') is None else str(m_104.get('score_h'))
+            sa_f = "" if m_104.get('score_a') is None else str(m_104.get('score_a'))
             
             st.markdown(f"""
                 <div style='font-size:1.25rem; font-weight:bold; margin:15px 0;'>
