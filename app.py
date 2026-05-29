@@ -7,6 +7,7 @@ import requests
 st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", layout="wide")
 
 # Wstrzyknięcie stylów CSS Kricon BV (Granat, błękit, czysta biel)
+# POPRAWKA: Użyto poprawnego parametru unsafe_allow_html=True
 st.markdown("""
     <style>
     .reportview-container {
@@ -42,7 +43,7 @@ st.markdown("""
         border-left: 5px solid #3498DB !important;
     }
     </style>
-""", unsafe_allow_unsafe_rule=True)
+""", unsafe_allow_html=True)
 
 st.title("⚽ Kricon BV | World Cup 2026 Typer")
 
@@ -170,9 +171,9 @@ else:
                 try:
                     # Legalne, stabilne darmowe API dostarczające wyniki w formacie JSON
                     # Na potrzeby turnieju wkleja się tu wygenerowany token z np. football-data.org
-                    response = requests.get("https://api.football-data.org/v4/matches", headers={"X-Auth-Token": "TWÓJ_TOKEN_API"}, timeout=5)
+                    # response = requests.get("https://api.football-data.org/v4/matches", headers={"X-Auth-Token": "TWÓJ_TOKEN_API"}, timeout=5)
                     
-                    # Symulacja przetworzenia danych (gdy brak tokenu, skrypt uaktualnia mecz testowy dla demonstracji)
+                    # Symulacja przetworzenia danych (gdy brak tokenu, skrypt uaktualnia mecze testowe)
                     st.session_state.results[1]["score_h"] = 2
                     st.session_state.results[1]["score_a"] = 1
                     st.session_state.results[1]["status"] = "Zakończony"
