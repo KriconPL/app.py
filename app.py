@@ -57,120 +57,118 @@ st.markdown("""
         color: #0A1128 !important;
     }
     
-    /* Stylizacja klasycznych przycisków zapisu */
+    /* Stylizacja przycisków zapisu */
     .stButton>button {
         background-color: #F97316 !important;
         color: #FFFFFF !important;
-        border-radius: 6px !important;
+        border-radius: 4px !important;
         border: none !important;
         font-weight: 700 !important;
-        padding: 0.3rem 1rem !important;
+        padding: 0.25rem 0.8rem !important;
         width: 100% !important;
     }
     .stButton>button:hover {
         background-color: #EA580C !important;
-        box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4) !important;
+        box-shadow: 0 3px 8px rgba(249, 115, 22, 0.4) !important;
     }
     
-    /* --- ELEMENTY STATUSU TYPOWANIA (NOWOŚĆ) --- */
-    /* Czerwony mrygający banner - Brak Typu */
+    /* --- ELEMENTY STATUSU TYPOWANIA W JEDNEJ LINII --- */
     .missing-bet-banner {
-        background-color: #DC2626 !important; /* Strażacka czerwień */
+        background-color: #DC2626 !important;
         color: #FFFFFF !important;
         font-weight: bold !important;
         text-align: center !important;
-        padding: 4px !important;
+        padding: 3px 6px !important;
         border-radius: 4px !important;
-        font-size: 0.75rem !important;
-        margin-top: 2px !important;
-        animation: critical-blink 1.2s infinite ease-in-out;
+        font-size: 0.8rem !important;
+        display: block !important;
+        width: 100% !important;
+        animation: simple-blink 1.2s infinite ease-in-out;
     }
-    @keyframes critical-blink {
-        0% { opacity: 0.5; }
-        50% { opacity: 1; box-shadow: 0 0 10px #DC2626; }
-        100% { opacity: 0.5; }
-    }
-    
-    /* Zielony stabilny pasek - Typ Zapisany z ptaszkiem */
     .success-bet-banner {
-        background-color: #16A34A !important; /* Głęboka zieleń */
+        background-color: #16A34A !important;
         color: #FFFFFF !important;
         font-weight: bold !important;
         text-align: center !important;
-        padding: 4px !important;
+        padding: 3px 6px !important;
         border-radius: 4px !important;
-        font-size: 0.75rem !important;
-        margin-top: 2px !important;
+        font-size: 0.8rem !important;
+        display: block !important;
+        width: 100% !important;
         border: 1px solid #22C55E;
     }
-    /* ------------------------------------------- */
+    @keyframes simple-blink {
+        0% { opacity: 0.6; }
+        50% { opacity: 1; }
+        100% { opacity: 0.6; }
+    }
     
-    /* Ultra kompaktowy terminarz inline */
+    /* --- MAKSYMALNIE CIASNY UKŁAD ELEMENTÓW LISTY MECZÓW --- */
     .match-container { 
         background: #172554 !important; 
         border: 1px solid #1E3A8A !important; 
-        border-radius: 6px; 
-        padding: 8px 12px !important; 
-        margin-bottom: 8px !important;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        border-radius: 4px; 
+        padding: 4px 10px !important; /* Minimalny padding wewnętrzny */
+        margin-bottom: 2px !important; /* Karty ciasno jedna pod drugą */
+        box-shadow: 0 1px 3px rgba(0,0,0,0.15);
     }
     .match-inline-main-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        flex-wrap: wrap;
         width: 100%;
     }
     .match-title-section {
         font-weight: bold;
         color: #F97316 !important;
-        font-size: 1.05rem !important;
+        font-size: 0.95rem !important;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
     }
-    .status-badge { padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: bold; }
+    .status-badge { padding: 1px 4px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; }
     .status-live { background-color: #DC2626 !important; color: white !important; }
     .status-ended { background-color: #111827 !important; color: #94A3B8 !important; }
     .status-waiting { background-color: #D97706 !important; color: white !important; }
     
     .teams-display-text {
-        font-size: 1.25rem !important; 
+        font-size: 1.15rem !important; 
         font-weight: bold !important;
         color: #F8FAFC !important;
     }
     .official-score-badge {
-        font-size: 1.25rem !important;
+        font-size: 1.15rem !important;
         font-weight: 800 !important;
         color: #0A1128 !important;
         background-color: #F97316 !important;
-        padding: 2px 10px;
+        padding: 1px 8px;
         border-radius: 4px;
-        border: 1px solid #FF6B00;
-        margin-left: 10px;
+        margin-left: 6px;
+        margin-right: 6px;
     }
     .match-meta-inline {
         color: #94A3B8;
-        font-size: 0.8rem;
+        font-size: 0.8 /rem;
         margin: 0;
     }
     
     .bet-sub-row {
         display: flex;
         align-items: center;
-        gap: 15px;
-        margin-top: 6px;
-        padding-top: 6px;
+        width: 100%;
+        margin-top: 2px;
+        padding-top: 2px;
         border-top: 1px dashed #1E3A8A;
     }
     .bet-label-text {
-        font-size: 0.85rem !important;
+        font-size: 0.8rem !important;
         color: #38BDF8 !important;
         font-weight: bold;
+        margin: 0 !important;
     }
     
     div[data-testid="stNumberInput"] button { background-color: #1E3A8A !important; color: #F8FAFC !important; }
-    div[data-testid="stNumberInput"] input { color: #F8FAFC !important; background-color: #0A1128 !important; font-size: 0.9rem !important; padding: 2px !important; }
+    div[data-testid="stNumberInput"] input { color: #F8FAFC !important; background-color: #0A1128 !important; font-size: 0.85rem !important; padding: 1px !important; }
     
     /* Drabinka i Tabele */
     .bracket-match-card { background: #172554 !important; border: 2px solid #1E3A8A !important; border-radius: 8px; padding: 10px; margin: 8px 0; }
@@ -485,14 +483,14 @@ else:
             sa_real = "" if m.get('score_a') is None else str(m.get('score_a'))
             oficjalny_wynik_tekst = f"{sh_real} : {sa_real}" if (sh_real != "") else "vs"
             
-            # LINIA 1: NUMER, PIŁKA, DRUŻYNY, OFICJALNY WYNIK
+            # --- LINIA 1 MAIN ROW ---
             st.markdown(f"""
             <div class='match-container'>
                 <div class='match-inline-main-row'>
                     <div class='match-title-section'>
                         <span>⚽ Mecz #{m_id}</span>
                         {status_html}
-                        <span style='font-size:0.85rem; color:#94A3B8;'>({m['stage']})</span>
+                        <span style='font-size:0.8rem; color:#94A3B8;'>({m['stage']})</span>
                     </div>
                     <div class='teams-display-text'>
                         {get_flag_html(m['home'])} {m['home']} 
@@ -507,11 +505,11 @@ else:
             has_existing_bet = st.session_state.bets[m_id].get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
             
-            # LINIA 2: EDYCJA / WPISYWANIE WŁASNEGO TYPU GRACZA
-            c_label, c_input_h, c_input_a, c_btn = st.columns([1.5, 1, 1, 3.5])
+            # --- POPRAWKA: CAŁY SYSTEM TYPOWANIA ORAZ BANNER W JEDNEJ LINII ---
+            c_label, c_input_h, c_input_a, c_btn, c_banner = st.columns([1.5, 0.8, 0.8, 1.5, 3.4])
             
             with c_label:
-                st.markdown("<p class='bet-label-text'>➔ Twój Typ na mecz:</p>", unsafe_allow_html=True)
+                st.markdown("<p class='bet-label-text'>➔ Twój Typ:</p>", unsafe_allow_html=True)
             with c_input_h:
                 b_h = st.number_input(f"H_{m_id}", 0, 20, int(cur_h), 1, key=f"input_h_{m_id}", disabled=locked, label_visibility="collapsed")
             with c_input_a:
@@ -520,12 +518,6 @@ else:
                 if locked:
                     st.button("Zablokowane", disabled=True, key=f"lock_btn_{m_id}")
                 else:
-                    # --- DYNAMICZNY PODZIAŁ STATUSÓW: CZERWONY BRAK / ZIELONY PTASZEK Z MOŻLIWOŚCIĄ EDYCJI ---
-                    if has_existing_bet:
-                        st.markdown("<div class='success-bet-banner'>✔ TYP ZAPISANY (Możesz edytować)</div>", unsafe_allow_html=True)
-                    else:
-                        st.markdown("<div class='missing-bet-banner'>🔴 ⚠️ NIEODDANY TYP</div>", unsafe_allow_html=True)
-                    
                     button_container_class = "" if has_existing_bet else "pulsing-save-btn"
                     st.markdown(f"<div class='{button_container_class}'>", unsafe_allow_html=True)
                     if st.button("Zapisz", key=f"btn_{m_id}"): 
@@ -534,6 +526,13 @@ else:
                         st.success("Zapisano!")
                         st.rerun()
                     st.markdown("</div>", unsafe_allow_html=True)
+            with c_banner:
+                # Banner umieszczony bezpośrednio po prawej stronie w tym samym rzędzie
+                if not locked:
+                    if has_existing_bet:
+                        st.markdown("<div class='success-bet-banner'>✔ TYP ZAPISANY</div>", unsafe_allow_html=True)
+                    else:
+                        st.markdown("<div class='missing-bet-banner'>🔴 ⚠️ NIEODDANY TYP</div>", unsafe_allow_html=True)
                         
             if locked or m['status'] == "Zakończony":
                 with st.expander("👁️ Zobacz typy innych graczy"):
