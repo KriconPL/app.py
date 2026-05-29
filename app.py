@@ -71,10 +71,46 @@ st.markdown("""
     div[data-baseweb="select"] div { color: #F97316 !important; font-weight: bold; }
     div[role="listbox"], ul[role="listbox"], div[data-baseweb="popover"] { background-color: #060B19 !important; border: 2px solid #F97316 !important; }
     div[role="option"], li[role="option"] { color: #F97316 !important; background-color: #060B19 !important; font-weight: bold; }
+    
     .stButton>button { background-color: #F97316 !important; color: #FFFFFF !important; border-radius: 4px !important; border: none !important; font-weight: 700 !important; height: 32px !important; line-height: 32px !important; padding: 0 12px !important; width: 100% !important; font-size: 0.85rem !important; }
     .stButton>button:hover { background-color: #EA580C !important; box-shadow: 0 3px 8px rgba(249, 115, 22, 0.4) !important; }
-    .missing-bet-banner { background-color: #DC2626 !important; color: #FFFFFF !important; font-weight: bold !important; text-align: center !important; height: 32px !important; line-height: 32px !important; border-radius: 4px !important; font-size: 0.85rem !important; display: block !important; width: 100% !important; white-space: nowrap; }
-    .success-bet-banner { background-color: #16A34A !important; color: #FFFFFF !important; font-weight: bold !important; text-align: center !important; height: 32px !important; line-height: 32px !important; border-radius: 4px !important; font-size: 0.8rem !important; display: block !important; width: 100% !important; border: 1px solid #22C55E; white-space: nowrap; }
+    
+    /* ANIMACJA PULSOWANIA DLA BANERU NIEODDANEGO TYPU */
+    @keyframes pulse-red {
+        0% { background-color: #DC2626; box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+        70% { background-color: #EF4444; box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
+        100% { background-color: #DC2626; box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+    }
+    
+    .missing-bet-banner {
+        animation: pulse-red 2s infinite !important;
+        color: #FFFFFF !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        height: 32px !important;
+        line-height: 32px !important;
+        border-radius: 4px !important;
+        font-size: 0.85rem !important;
+        display: block !important;
+        width: 100% !important;
+        white-space: nowrap;
+    }
+    
+    .success-bet-banner {
+        background-color: #16A34A !important;
+        color: #FFFFFF !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        height: 32px !important;
+        line-height: 32px !important;
+        border-radius: 4px !important;
+        font-size: 0.8rem !important;
+        display: block !important;
+        width: 100% !important;
+        border: 1px solid #22C55E;
+        white-space: nowrap;
+    }
+    
     .match-container { background: #172554 !important; border: 1px solid #1E3A8A !important; border-radius: 4px; padding: 4px 12px !important; margin-bottom: 2px !important; margin-top: 0px !important; box-shadow: 0 1px 2px rgba(0,0,0,0.15); }
     div[data-testid="stVerticalBlock"] { gap: 0px !important; }
     div[data-testid="stVerticalBlock"] > div { padding-bottom: 0px !important; padding-top: 0px !important; margin-bottom: 0px !important; margin-top: 0px !important; }
@@ -106,11 +142,12 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- SYSTEM SAKRALNEGO CZYSZCZENIA NAZW (Race-Condition Proof) ---
+# --- SYSTEM OCZYSZCZANIA WPISÓW Z KODÓW MX / ZA / cz ---
 def sanitize_team_name(name):
     if not name or name == "TBD": return "TBD"
     s_name = str(name).strip()
-    s_name = re.sub(r'^[A-Za-z]{2}\s+', '', s_name) 
+    # Usuwa przedrostki dwuliterowe wielkie i małe (MX, ZA, cz, KR) oraz ewentualne pozostałości po emoji
+    s_name = re.sub(r'^(MX|ZA|KR|cz|cv|CA|BA|QA|CH|BR|MA|HT|US|PY|AU|TR|DE|WKS|EC|NL|JP|SE|TN|BE|EG|IR|NZ|ES|SA|UY|FR|SN|IQ|NO|AR|DZ|AT|JO|PT|DR|UZ|CO|HR|GH|PA|🏴󠁧󠁢󠁥󠁮󠁧󠁿|🏴󠁧󠁢󠁳󠁣󠁴󠁿)\s+', '', s_name, flags=re.IGNORECASE)
     s_name = re.sub(r'[^a-zA-ZąęćłńóśźżĄĘĆŁŃÓŚŹŻ\s\-]', '', s_name)
     return s_name.strip()
 
@@ -148,7 +185,6 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
 
 def get_time_to_next_unbet_match(player_name, now_time):
     try:
-        if 'results' not in st.session_state or 'bets' not in st.session_state: return "..."
         upcoming = sorted([m for m in st.session_state.results.values() if m["timestamp"] > now_time], key=lambda x: x["timestamp"])
         for match in upcoming:
             m_id = [k for k, v in st.session_state.results.items() if v == match][0]
@@ -162,20 +198,18 @@ def get_time_to_next_unbet_match(player_name, now_time):
 
 def render_leaderboard_html(now_time, new_positions_dict_dest=None):
     scores = {p: 0 for p in players}
-    if 'results' in st.session_state and 'bets' in st.session_state:
-        for m_id, res in st.session_state.results.items():
-            if res.get('status') == "Zakończony":
-                for p in players:
-                    if m_id in st.session_state.bets and p in st.session_state.bets[m_id]:
-                        scores[p] += calculate_points(st.session_state.bets[m_id][p][0], st.session_state.bets[m_id][p][1], res.get('score_h'), res.get('score_a'))
-                        
+    for m_id, res in st.session_state.results.items():
+        if res.get('status') == "Zakończony":
+            for p in players:
+                if m_id in st.session_state.bets and p in st.session_state.bets[m_id]:
+                    scores[p] += calculate_points(st.session_state.bets[m_id][p][0], st.session_state.bets[m_id][p][1], res.get('score_h'), res.get('score_a'))
     df = pd.DataFrame(list(scores.items()), columns=["Gracz", "Punkty"]).sort_values(by="Punkty", ascending=False).reset_index(drop=True)
     legend_html = """<div class="points-legend"><div style="font-weight: bold; color: #F97316; margin-bottom: 6px; font-size: 1.05rem;">ℹ️ System przyznawania punktów:</div><div>🎯 <b style="color: #4ADE80;">3 Punkty</b> — dokładny wynik</div><div>⚖️ <b style="color: #38BDF8;">1 Punkt</b> — poprawny zwycięzca / remis</div></div>"""
     rows = ""
     for idx, row in df.iterrows():
         pos, p_name = idx + 1, row['Gracz']
         if new_positions_dict_dest is not None: new_positions_dict_dest[p_name] = pos
-        old_pos = st.session_state.last_positions.get(p_name, pos) if 'last_positions' in st.session_state else pos
+        old_pos = st.session_state.last_positions.get(p_name, pos)
         trend = '▲' if old_pos > pos else ('▼' if old_pos < pos else '•')
         bg = 'style="background-color: #16A34A; font-weight: bold;"' if pos == 1 and row['Punkty'] > 0 else ('style="background-color: #DC2626; font-weight: bold;"' if pos == len(df) and row['Punkty'] > 0 else '')
         rows += f"<tr {bg}><td style='text-align:center;'><b>{pos}</b></td><td style='text-align:center;'>{trend}</td><td>{p_name}</td><td><b>{row['Punkty']} pkt</b></td><td>{get_time_to_next_unbet_match(p_name, now_time)}</td></tr>"
@@ -293,12 +327,12 @@ def fetch_official_results_from_api(now_time):
                 if m['home'] == "TBD": m['home'] = "Meksyk"
                 if m['away'] == "TBD": m['away'] = "RPA"
 
-# --- ZASADNICZY SILNIK INICJALIZACJI SYSTEMU ---
+# --- WYMUSZONY PANCERNY ROZRUCH STRONY ---
 if 'results' not in st.session_state or len(st.session_state.results) != 104: st.session_state.results = generate_schedule()
 if 'bets' not in st.session_state or len(st.session_state.bets) != 104: st.session_state.bets = {m_id: {} for m_id in st.session_state.results.keys()}
 if 'last_positions' not in st.session_state: st.session_state.last_positions = {player: idx + 1 for idx, player in enumerate(players)}
 
-# Pancerne czyszczenie pamięci podręcznej serwera
+# WYMUSZONE CZYSZCZENIE SESJI PODCZAS ODŚWIEŻANIA STRONY LOKALNIE
 load_backup_local()
 for m_id in st.session_state.results.keys():
     st.session_state.results[m_id]['home'] = sanitize_team_name(st.session_state.results[m_id]['home'])
@@ -314,7 +348,7 @@ for m_id, m in st.session_state.results.items():
 
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 
-# --- WIDOKI ---
+# --- WIDOKI APKI ---
 if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
     with c1:
