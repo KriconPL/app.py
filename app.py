@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import os
 import base64
+import json 
+import requests # Służy do automatycznej synchronizacji z GitHub API
 from datetime import datetime, timedelta
 
 # 1. Konfiguracja aplikacji i Szata Graficzna Dark Navy & Orange
@@ -10,7 +12,6 @@ st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", lay
 
 st.markdown("""
     <style>
-    /* Globalne wymuszenie wyświetlania głównego suwaka przeglądarki */
     html, body, [data-testid="stAppViewContainer"], .stApp {
         background-color: #0A1128 !important; 
         overflow-y: auto !important;
@@ -22,12 +23,10 @@ st.markdown("""
         background-color: #0A1128 !important;
     }
     
-    /* Kolor tekstów globalnych */
     h1, h2, h3, h4, h5, h6, p, span, label, div {
         color: #F8FAFC !important;
     }
 
-    /* Formularz logowania */
     div[data-testid="stSelectbox"] label p, div[data-testid="stTextInput"] label p {
         color: #F97316 !important;
         font-weight: bold !important;
@@ -45,153 +44,110 @@ st.markdown("""
         -webkit-text-fill-color: #F97316 !important;
     }
     
-    /* --- SYSTEM POŁĄCZEŃ LINIAMI W DRABINCE (PAJĘCZYNA) --- */
-    /* Wrapper kolumny wymuszający wyrównanie i relatywne pozycjonowanie linii */
     .bracket-column-wrapper {
         display: flex;
         flex-direction: column;
         justify-content: space-around;
         height: 100%;
-        min-height: 1400px; /* Wysokość gwarantująca przestrzeń na linie */
+        min-height: 1400px; 
         position: relative;
     }
-    
-    /* Konstrukcja pojedynczego łącznika / bloczku meczu */
-    .bracket-connector-cell {
-        position: relative;
-        padding: 10px 0;
-        width: 100%;
-    }
-    
-    /* Bloczki meczów */
+    .bracket-connector-cell { position: relative; padding: 10px 0; width: 100%; }
     .bracket-match-box {
         background: #172554 !important;
         border: 2px solid #1E3A8A !important;
         border-radius: 8px;
         padding: 12px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.4);
-        position: relative;
-        z-index: 2;
+        position: relative; z-index: 2;
     }
     
-    /* Linie poziome wychodzące w prawo (dla lewego skrzydła) */
-    .left-wing-branch .bracket-match-box::after {
-        content: "";
-        position: absolute;
-        top: 50%;
-        right: -20px;
-        width: 20px;
-        height: 2px;
-        background-color: #F97316;
-        z-index: 1;
-    }
-    
-    /* Linie poziome wchodzące z lewej (dla prawego skrzydła) */
-    .right-wing-branch .bracket-match-box::before {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: -20px;
-        width: 20px;
-        height: 2px;
-        background-color: #F97316;
-        z-index: 1;
-    }
-    
-    /* Pionowe linie scalające dla kolejnych rund (lewa strona) */
-    .left-wing-connect::before {
-        content: "";
-        position: absolute;
-        top: 12%;
-        bottom: 12%;
-        left: -20px;
-        width: 2px;
-        background-color: #F97316;
-        z-index: 1;
-    }
-    
-    /* Pionowe linie scalające dla kolejnych rund (prawa strona) */
-    .right-wing-connect::after {
-        content: "";
-        position: absolute;
-        top: 12%;
-        bottom: 12%;
-        right: -20px;
-        width: 2px;
-        background-color: #F97316;
-        z-index: 1;
-    }
+    .left-wing-branch .bracket-match-box::after { content: ""; position: absolute; top: 50%; right: -20px; width: 20px; height: 2px; background-color: #F97316; z-index: 1; }
+    .right-wing-branch .bracket-match-box::before { content: ""; position: absolute; top: 50%; left: -20px; width: 20px; height: 2px; background-color: #F97316; z-index: 1; }
+    .left-wing-connect::before { content: ""; position: absolute; top: 12%; bottom: 12%; left: -20px; width: 2px; background-color: #F97316; z-index: 1; }
+    .right-wing-connect::after { content: ""; position: absolute; top: 12%; bottom: 12%; right: -20px; width: 2px; background-color: #F97316; z-index: 1; }
 
-    .bracket-group-box {
-        background: #0D1B3E !important;
-        border: 1px solid #F97316 !important;
-        border-radius: 8px;
-        padding: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    }
-    .bracket-match-id {
-        font-size: 0.75rem !important;
-        color: #F97316 !important;
-        font-weight: bold;
-        text-transform: uppercase;
-        margin-bottom: 4px;
-    }
-    .bracket-team-line {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 2px 0;
-        font-size: 0.95rem !important;
-    }
-    .bracket-winner {
-        color: #4ADE80 !important;
-        font-weight: 900 !important;
-    }
-    .bracket-score {
-        font-weight: bold;
-        background: #0A1128;
-        padding: 2px 6px;
-        border-radius: 4px;
-        color: #F97316;
-    }
-    
-    .center-final-box {
-        background: #23153C !important;
-        border: 3px solid #FF6B00 !important;
-        border-radius: 10px;
-        padding: 25px;
-        text-align: center;
-        box-shadow: 0 0 20px rgba(255, 107, 0, 0.5);
-        margin-bottom: 30px;
-    }
-    /* ------------------------------------------------------------- */
+    .bracket-group-box { background: #0D1B3E !important; border: 1px solid #F97316 !important; border-radius: 8px; padding: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    .bracket-match-id { font-size: 0.75rem !important; color: #F97316 !important; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
+    .bracket-team-line { display: flex; justify-content: space-between; align-items: center; padding: 2px 0; font-size: 0.95rem !important; }
+    .bracket-winner { color: #4ADE80 !important; font-weight: 900 !important; }
+    .bracket-score { font-weight: bold; background: #0A1128; padding: 2px 6px; border-radius: 4px; color: #F97316; }
+    .center-final-box { background: #23153C !important; border: 3px solid #FF6B00 !important; border-radius: 10px; padding: 25px; text-align: center; box-shadow: 0 0 20px rgba(255, 107, 0, 0.5); margin-bottom: 30px; }
 
-    .match-container {
-        background: #172554 !important; 
-        border: 1px solid #1E3A8A !important;
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 25px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-    }
-    .status-badge {
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: bold;
-    }
-    .status-live { background-color: #DC2626 !important; color: white !important; animation: pulse 1.5s infinite; }
+    .match-container { background: #172554 !important; border: 1px solid #1E3A8A !important; border-radius: 10px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+    .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
+    .status-live { background-color: #DC2626 !important; color: white !important; }
     .status-ended { background-color: #111827 !important; color: #94A3B8 !important; }
     .status-waiting { background-color: #D97706 !important; color: white !important; }
     
     .teams-display { font-size: 1.6rem !important; font-weight: bold !important; }
     .real-score { font-size: 1.3rem; font-weight: bold; background-color: #F97316 !important; color: #0A1128 !important; padding: 6px 12px; border-radius: 6px; display: inline-block; }
+    
     .kricon-table { width: 100%; border-collapse: collapse; margin: 15px 0 35px 0; background-color: #172554 !important; border-radius: 8px; overflow: hidden; }
     .kricon-table th { background-color: #F97316 !important; color: #0A1128 !important; padding: 12px; font-weight: 800; }
     .kricon-table td { padding: 11px 12px; border-bottom: 1px solid #1E3A8A !important; }
+    
     .points-legend { background-color: #060B19; border-left: 5px solid #F97316; padding: 12px; margin-bottom: 15px; border-radius: 4px; }
+    .legend-item { margin: 4px 0; font-size: 0.95rem; }
+    
+    .badge-trend { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; font-size: 0.9rem; font-weight: bold; }
+    .trend-box-up { background-color: #16A34A; color: white; }
+    .trend-box-down { background-color: #DC2626; color: white; }
+    .trend-box-stable { background-color: #374151; color: #94A3B8; }
+    .time-ok { color: #4ADE80 !important; font-weight: bold; }
+    .time-warning { color: #FF6B00 !important; font-weight: bold; }
+    .time-normal { color: #CBD5E1 !important; }
     </style>
 """, unsafe_allow_html=True)
+
+BACKUP_FILE = "typer_backup.json"
+
+def save_backup_local_and_github():
+    """Zapisuje typy lokalnie w Streamlit i automatycznie synchronizuje plik na GitHubie przez API"""
+    try:
+        serializable_bets = {str(m_id): bets for m_id in st.session_state.bets.keys() for bets in [st.session_state.bets[m_id]]}
+        json_string = json.dumps(serializable_bets, ensure_ascii=False, indent=4)
+        
+        # 1. Zapis lokalny na serwerze Streamlit
+        with open(BACKUP_FILE, "w", encoding="utf-8") as f:
+            f.write(json_string)
+            
+        # 2. Bezobsługowy zapis na GitHub (tylko jeśli zdefiniowano Secrets)
+        if "github" in st.secrets:
+            cfg = st.secrets["github"]
+            url = f"https://api.github.com/repos/{cfg['repo']}/contents/{BACKUP_FILE}"
+            headers = {"Authorization": f"token {cfg['token']}", "Accept": "application/vnd.github.v3+json"}
+            
+            # Pobranie aktualnego sha pliku (wymagane przez GitHub API do nadpisania elementu)
+            res_get = requests.get(url, headers=headers)
+            sha = res_get.json().get("sha", None) if res_get.status_with == 200 else None
+            
+            # Wypchnięcie nowej bazy typów
+            content_b64 = base64.b64encode(json_string.encode("utf-8")).decode("utf-8")
+            payload = {
+                "message": f"🤖 Automatyczna kopia zapasowa typów: {datetime.now().strftime('%Y-%m-%d %H:%M')}",
+                "content": content_b64
+            }
+            if sha:
+                payload["sha"] = sha
+                
+            requests.put(url, headers=headers, json=payload)
+    except Exception:
+        pass
+
+def load_backup_local():
+    if os.path.exists(BACKUP_FILE):
+        try:
+            with open(BACKUP_FILE, "r", encoding="utf-8") as f:
+                loaded_bets = json.load(f)
+            for m_id_str, bets_data in loaded_bets.items():
+                m_id = int(m_id_str)
+                for player, bet_tuple in bets_data.items():
+                    st.session_state.bets[m_id][player] = tuple(bet_tuple)
+            return True
+        except Exception:
+            return False
+    return False
 
 COUNTRY_FLAGS = {
     "Meksyk": "mx", "RPA": "za", "Korea Południowa": "kr", "Czechy": "cz",
@@ -255,6 +211,7 @@ def generate_schedule():
         (2026, 6, 21, 18, 0, "Grupa H", "Hiszpania", "Arabia Saudyjska"), (2026, 6, 21, 21, 0, "Grupa G", "Belgia", "Iran"),
         (2026, 6, 22, 0, 0, "Grupa H", "Urugwaj", "Wyspy Zielonego Przylądka"), (2026, 6, 22, 3, 0, "Grupa G", "Nowa Zelandia", "Egipt")
     ]
+    
     match_id = 1
     for yr, mo, dy, hr, mn, stage, home, away in raw_fixtures:
         dt = datetime(yr, mo, dy, hr, mn)
@@ -307,6 +264,54 @@ if 'results' not in st.session_state or len(st.session_state.results) != 104: st
 if 'bets' not in st.session_state or len(st.session_state.bets) != 104: st.session_state.bets = {m_id: {} for m_id in st.session_state.results.keys()}
 if 'last_positions' not in st.session_state: st.session_state.last_positions = {player: idx + 1 for idx, player in enumerate(players)}
 
+if 'backup_loaded' not in st.session_state:
+    load_backup_local()
+    st.session_state.backup_loaded = True
+
+def calculate_points(pred_h, pred_a, real_h, real_a):
+    if real_h is None or real_a is None or pred_h is None or pred_a is None: return 0
+    if pred_h == real_h and pred_a == real_a: return 3
+    if np.sign(pred_h - pred_a) == np.sign(real_h - real_a): return 1
+    return 0
+
+def get_time_to_next_unbet_match(player_name, now_time):
+    upcoming = sorted([m for m in st.session_state.results.values() if m["timestamp"] > now_time], key=lambda x: x["timestamp"])
+    for match in upcoming:
+        m_id = [k for k, v in st.session_state.results.items() if v == match][0]
+        if st.session_state.bets[m_id].get(player_name, (None, None)) == (None, None):
+            diff = match["timestamp"] - now_time
+            if diff.total_seconds() <= 0: continue
+            h, m = int(diff.total_seconds() // 3600), int((diff.total_seconds() % 3600) // 60)
+            return f'<span class="{"time-warning" if diff <= timedelta(hours=1) else "time-normal"}">Za {h}h {m}m</span>'
+    return '<span class="time-ok">✔ Wszystko obstawione</span>'
+
+def render_leaderboard_html(now_time, new_positions_dict_dest=None):
+    scores = {p: 0 for p in players}
+    for m_id, res in st.session_state.results.items():
+        if res['status'] == "Zakończony":
+            for p in players:
+                if p in st.session_state.bets[m_id]:
+                    scores[p] += calculate_points(st.session_state.bets[m_id][p][0], st.session_state.bets[m_id][p][1], res['score_h'], res['score_a'])
+    df = pd.DataFrame(list(scores.items()), columns=["Gracz", "Punkty"]).sort_values(by="Punkty", ascending=False).reset_index(drop=True)
+    
+    legend_html = """
+    <div class="points-legend">
+        <div style="font-weight: bold; color: #F97316; margin-bottom: 6px; font-size: 1.05rem;">ℹ️ System przyznawania punktów:</div>
+        <div class="legend-item">🎯 <b style="color: #4ADE80;">3 Punkty</b> — dokładne wytypowanie wyniku spotkania</div>
+        <div class="legend-item">⚖️ <b style="color: #38BDF8;">1 Punkt</b> — poprawne wskazanie zwycięzcy lub remisu</div>
+    </div>
+    """
+    rows = ""
+    for idx, row in df.iterrows():
+        pos, p_name = idx + 1, row['Gracz']
+        if new_positions_dict_dest is not None: new_positions_dict_dest[p_name] = pos
+        old_pos = st.session_state.last_positions.get(p_name, pos)
+        trend = '<div class="badge-trend trend-box-up">▲</div>' if old_pos > pos else ('<div class="badge-trend trend-box-down">▼</div>' if old_pos < pos else '<div class="badge-trend trend-box-stable">•</div>')
+        bg = 'style="background-color: #16A34A; font-weight: bold; color: #FFFFFF;"' if pos == 1 and row['Punkty'] > 0 else ('style="background-color: #DC2626; font-weight: bold; color: #FFFFFF;"' if pos == len(df) and row['Punkty'] > 0 else '')
+        rows += f"<tr {bg}><td style='text-align:center;'><b>{pos}</b></td><td style='text-align:center;'>{trend}</td><td>{p_name}</td><td><b>{row['Punkty']} pkt</b></td><td>{get_time_to_next_unbet_match(p_name, now_time)}</td></tr>"
+    
+    return legend_html + f"<table class='kricon-table'><tr><th>Msc.</th><th>Trend</th><th>Gracz</th><th>Punkty</th><th>Najbliższy mecz</th></tr>{rows}</table>"
+
 def get_bracket_match_html_string(match_id):
     m = st.session_state.results.get(match_id)
     if not m: return ""
@@ -341,6 +346,13 @@ def get_mini_group_html_string(g_code):
 now = datetime.now()
 fetch_official_results_from_api(now)
 
+# LOGIKA LIVE DLA TRANZYCJI IKON
+for m_id, m in st.session_state.results.items():
+    if m['status'] != "Zakończony":
+        time_diff = now - m['timestamp']
+        if timedelta(minutes=0) <= time_diff <= timedelta(minutes=120):
+            st.session_state.results[m_id]['status'] = "LIVE"
+
 if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
     with c1:
@@ -355,45 +367,103 @@ if st.session_state.logged_in_user is None:
         st.markdown(render_leaderboard_html(now), unsafe_allow_html=True)
 else:
     st.sidebar.write(f"👤: **{st.session_state.logged_in_user}**")
+    st.sidebar.markdown("---")
+    st.sidebar.subheader("💾 System Bezpieczeństwa")
+    if os.path.exists(BACKUP_FILE):
+        st.sidebar.success("Streamlit: Kopia OK")
+    if "github" in st.secrets:
+        st.sidebar.success("GitHub Cloud Sync: AKTYWNY")
+    else:
+        st.sidebar.info("Zdefiniuj Secrets, aby włączyć GitHub Cloud Sync")
+        
+    if st.sidebar.button("Wymuś Przywrócenie danych"):
+        if load_backup_local(): st.sidebar.success("Przywrócono!")
+        else: st.sidebar.error("Błąd odczytu.")
+        
     if st.sidebar.button("Wyloguj"): st.session_state.logged_in_user = None; st.rerun()
     
     tab1, tab2, tab3, tab4 = st.tabs(["📊 Ranking", "📅 Terminarz", "📈 Tabele", "🕸️ Drabinka Pajęczyna"])
     
-    with tab1: st.markdown(render_leaderboard_html(now), unsafe_allow_html=True)
+    with tab1: 
+        st.header("Klasyfikacja")
+        st.markdown(render_leaderboard_html(now), unsafe_allow_html=True)
+        
     with tab2:
+        st.header("Terminarz MŚ 2026")
         mode = st.radio("Widok:", ["Oczekujące", "Wszystkie", "Zakończone"], horizontal=True)
+        st.divider()
+        
         sorted_m = sorted(st.session_state.results.items(), key=lambda x: (x[1]['timestamp'], x[0]))
         for m_id, m in sorted_m:
             if (mode == "Oczekujące" and m['status'] == "Zakończony") or (mode == "Zakończone" and m['status'] == "Oczekuje"): continue
             status_html = '<span class="status-badge status-live">🔴 LIVE</span>' if m['status'] == "LIVE" else ('<span class="status-badge status-ended">⚫ Zakończony</span>' if m['status'] == "Zakończony" else '<span class="status-badge status-waiting">🟡 Oczekuje</span>')
             st.markdown(f"<div class='match-container'><div class='match-header-wrapper'><h4 class='match-header-title'>⚽ Mecz #{m_id}</h4>{status_html}</div><div class='teams-display'>{get_flag_html(m['home'])} {m['home']} vs {get_flag_html(m['away'])} {m['away']}</div><p style='color: #94A3B8;'>Faza: {m['stage']} | {m['date']}, {m['time']}</p>", unsafe_allow_html=True)
             if m['status'] == "Zakończony": st.markdown(f"<p class='real-score'>Wynik: {m['score_h']} - {m['score_a']}</p>", unsafe_allow_html=True)
+            
+            locked = (m['timestamp'] - now).total_seconds() <= 0
+            cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
+            
+            c1, c2, c3 = st.columns([1,1,2])
+            with c1: b_h = st.number_input(f"Wynik {m['home']}", 0, 20, cur_h, 1, key=f"h_{m_id}", disabled=locked)
+            with c2: b_a = st.number_input(f"Wynik {m['away']}", 0, 20, cur_a, 1, key=f"a_{m_id}", disabled=locked)
+            with c3: 
+                st.write(""); st.write("")
+                if not locked and st.button("Zapisz Typ", key=f"btn_{m_id}"): 
+                    st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a)
+                    save_backup_local_and_github() # DYNAMICZNA SYNCHRONIZACJA STREAMLIT + GITHUB W TLE
+                    st.success("Zapisano!")
+            if locked or m['status'] == "Zakończony":
+                with st.expander("👁️ Zobacz typy innych graczy"):
+                    other_bets = []
+                    for p in players:
+                        if p != st.session_state.logged_in_user:
+                            p_bet = st.session_state.bets[m_id].get(p)
+                            other_bets.append({"Gracz": p, "Typowany wynik": f"{p_bet[0]} - {p_bet[1]}" if p_bet else "Brak typu"})
+                    st.dataframe(pd.DataFrame(other_bets), use_container_width=True)
             st.markdown("</div>", unsafe_allow_html=True)
             
     with tab3:
+        st.header("Tabele Grup Turniejowych")
+        third_places_list = []
         for g_name in list(GROUPS_DICT.keys()):
             st.markdown(f"### {g_name}")
-            stats = {t: {"Pkt": 0, "BZ": 0, "BS": 0, "RB": 0, "Zwyciestwa": 0} for t in GROUPS_DICT[g_name]}
+            stats = {t: {"Pkt": 0, "BZ": 0, "BS": 0, "RB": 0, "Zwyciestwa": 0, "Grupa": g_name} for t in GROUPS_DICT[g_name]}
             for m in st.session_state.results.values():
                 if m["stage"] == g_name and m["status"] == "Zakończony":
                     h, a, sh, sa = m["home"], m["away"], m["score_h"], m["score_a"]
                     if h in stats and a in stats:
                         stats[h]["BZ"]+=sh; stats[h]["BS"]+=sa; stats[h]["RB"]+=(sh-sa)
                         stats[a]["BZ"]+=sa; stats[a]["BS"]+=sh; stats[a]["RB"]+=(sa-sh)
-                        if sh>sa: stats[h]["Pkt"]+=3
-                        elif sa>sh: stats[a]["Pkt"]+=3
+                        if sh>sa: stats[h]["Pkt"]+=3; stats[h]["Zwyciestwa"]+=1
+                        elif sa>sh: stats[a]["Pkt"]+=3; stats[a]["Zwyciestwa"]+=1
                         else: stats[h]["Pkt"]+=1; stats[a]["Pkt"]+=1
+                        
+            for t in GROUPS_DICT[g_name]:
+                if t not in stats: stats[t] = {"Pkt": 0, "BZ": 0, "BS": 0, "RB": 0, "Zwyciestwa": 0, "Grupa": g_name}
+                    
             df_g = pd.DataFrame.from_dict(stats, orient='index').reset_index().rename(columns={'index': 'Reprezentacja'}).sort_values(by=["Pkt", "RB", "BZ"], ascending=False).reset_index(drop=True)
             df_g.index+=1
+            if len(df_g) >= 3:
+                third_team_row = df_g.iloc[2]
+                third_places_list.append({"Reprezentacja": third_team_row["Reprezentacja"], "Grupa": g_name, "Pkt": third_team_row["Pkt"], "BZ": third_team_row["BZ"], "BS": third_team_row["BS"], "RB": third_team_row["RB"], "Zwyciestwa": third_team_row["Zwyciestwa"]})
             g_rows = "".join([f"<tr {'style=\"background-color: #16A34A; font-weight: bold; color: #FFFFFF;\"' if idx in [1, 2] else ('style=\"background-color: #EA580C; font-weight: bold; color: #FFFFFF;\"' if idx == 3 else '')}><td><b>{idx}</b></td><td>{get_flag_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>" for idx, r in df_g.iterrows()])
             st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table>", unsafe_allow_html=True)
 
-    # --- ZAKŁADKA 4: CZYSZCZENIE I RENDEROWANIE POŁĄCZEŃ LINIAMI ---
+        st.divider()
+        st.header("🏆 Ranking Drużyn z 3. Miejsc (Awansuje 8 najlepszych)")
+        df_third = pd.DataFrame(third_places_list)
+        if not df_third.empty:
+            df_third = df_third.sort_values(by=["Pkt", "RB", "BZ", "Zwyciestwa"], ascending=[False, False, False, False]).reset_index(drop=True)
+            df_third.index += 1
+            third_rows = ""
+            for idx, r in df_third.iterrows():
+                row_bg = 'style="background-color: #16A34A; font-weight: bold; color: #FFFFFF;"' if idx <= 8 else ''
+                third_rows += f"<tr {row_bg}><td style='text-align:center;'><b>{idx}</b></td><td><b>{r['Grupa']}</b></td><td>{get_flag_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td><td>{r['Zwyciestwa']}</td></tr>"
+            st.markdown(f"<table class='kricon-table'><tr><th style='text-align:center;'>Msc.</th><th>Źródło</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th><th>Zwycięstwa</th></tr>{third_rows}</table>", unsafe_allow_html=True)
+
     with tab4:
         st.header("🕸️ Oficjalna Drabinka Skrzydłowa z Połączeniami")
-        st.write("Wszystkie poziomy są spięte jaskrawymi liniami. Skrzydła schodzą się symetrycznie do środka.")
         st.divider()
-        
         col_l_group, col_l_16, col_l_8, col_center, col_r_8, col_r_16, col_r_group = st.columns([1.2, 1.3, 1.3, 1.8, 1.3, 1.3, 1.2])
         
         with col_l_group:
@@ -431,7 +501,7 @@ else:
             st.markdown("</div>", unsafe_allow_html=True)
             
             st.markdown("<div class='bracket-match-box' style='border-color: #38BDF8; margin-top: 100px;'>", unsafe_allow_html=True)
-            st.markdown("<h4 style='color:#38BDF8; margin:0 0 6px 0;'>🥉 MECZ O 3. MECZ</h4>", unsafe_allow_html=True)
+            st.markdown("<h4 style='color:#38BDF8; margin:0 0 6px 0;'>🥉 MECZ O 3. MIEJSCE</h4>", unsafe_allow_html=True)
             m_103 = st.session_state.results.get(103)
             st.markdown(f"<b>{m_103['home']} vs {m_103['away']}</b>", unsafe_allow_html=True)
             st.markdown("</div></div>", unsafe_allow_html=True)
