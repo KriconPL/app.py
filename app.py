@@ -1,3 +1,10 @@
+Ten błąd wynika z mechanizmu pamięci podręcznej Streamlit (st.session_state). Kiedy w poprzednim kroku dodałem klucz "time" do meczów, Twoja aplikacja wciąż pamiętała stary harmonogram (z poprzednich uruchomień), w którym tego klucza jeszcze nie było.
+
+Aby aplikacja była w 100% odporna na takie "przejścia" i nie wymagała restartowania serwera czy czyszczenia pamięci przeglądarki, zaktualizowałem sposób odwoływania się do czasu. Zamiast wymuszać match['time'], kod używa teraz bezpiecznej metody match.get("time", "18:00"), która domyślnie przyjmuje godzinę 18:00, jeśli w pamięci zapisana jest jeszcze starsza wersja meczu.
+
+Oto ostatecznie zabezpieczony kod. Zastąp nim całą zawartość pliku app.py:
+
+Python
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -188,7 +195,7 @@ def generate_schedule():
             t1_idx, t2_idx = matchups[m_round]
             schedule[match_id] = {
                 "date": dates_group[date_idx % len(dates_group)],
-                "time": "18:00", # Dodano domyślną godzinę rozpoczęcia meczu do walidacji czasu
+                "time": "18:00",
                 "stage": group_name,
                 "home": teams[t1_idx], 
                 "away": teams[t2_idx],
@@ -214,7 +221,7 @@ def generate_schedule():
         for _ in range(count):
             schedule[match_id] = {
                 "date": stage_dates[d_idx % len(stage_dates)],
-                "time": "21:00", # Faza pucharowa domyślnie o 21:00
+                "time": "21:00",
                 "stage": stage_name,
                 "home": "TBD", 
                 "away": "TBD",
@@ -269,43 +276,37 @@ else:
         st.session_state.logged_in_user = None
         st.rerun()
 
-    # --- LOGIKA AUTOMATYCZNYCH PRZYPOMNIEŃ POP-UP (WIDOCZNA DLA WSZYSTKICH PO ZALOGOWANIU) ---
+    # --- LOGIKA AUTOMATYCZNYCH PRZYPOMNIEŃ POP-UP ---
     now = datetime.now()
-    # Sztuczne ustawienie roku turnieju na 2026 na potrzeby walidacji dat
     current_year = 2026 
     
     for match_id, match in st.session_state.results.items():
         if match["status"] == "Oczekuje":
             try:
-                # Rozbicie tekstu "11 Czerwca" -> dzień: 11, miesiąc: Czerwca
                 date_parts = match["date"].split()
                 day = int(date_parts[0])
                 month_str = date_parts[1]
                 month = MONTH_MAP.get(month_str, 6)
                 
-                # Rozbicie godziny "18:00" -> godzina: 18, minuta: 00
-                time_parts = match["time"].split(":")
+                # Zabezpieczenie .get() na wypadek starych danych w pamięci
+                time_parts = match.get("time", "18:00").split(":")
                 hour = int(time_parts[0])
                 minute = int(time_parts[1])
                 
                 match_datetime = datetime(current_year, month, day, hour, minute)
                 time_to_match = match_datetime - now
                 
-                # Sprawdzamy czy do meczu została MNIEJ niż godzina, ale mecz jeszcze się NIE zaczął
+                # Przypomnienie < 1h przed
                 if timedelta(hours=0) < time_to_match <= timedelta(hours=1):
                     for player in players:
-                        # Jeśli gracz nie ma zapisanego typu (brak klucza lub puste wartości)
                         if player not in st.session_state.bets[match_id] or st.session_state.bets[match_id][player] == (None, None):
                             match_name = f"{match['home']} - {match['away']}"
                             alert_msg = f"ej typie {player}, zapomniałeś obstawić mecz {match_name}, który zaraz się zaczyna!"
                             
-                            # 1. Wyświetlenie fizycznego dymka/pop-upu na ekranie (znika po paru sekundach)
                             st.toast(alert_msg, icon="⚠️")
-                            
-                            # 2. Stałe przypomnienie na górze strony pod nagłówkiem, dopóki gracz nie kliknie "zapisz"
                             st.warning(alert_msg)
             except Exception as e:
-                pass # zabezpieczenie przed błędami parsowania dat
+                pass 
 
     tab1, tab2, tab3, tab4 = st.tabs(["📊 Klasyfikacja", "📅 Terminarz i Typy", "📈 Tabele Grup", "⚙️ Admin"])
 
@@ -358,7 +359,8 @@ else:
             for match_id, match in st.session_state.results.items():
                 if match["date"] == selected_date:
                     st.markdown(f"### {get_flag_html(match['home'])} vs {get_flag_html(match['away'])}", unsafe_allow_html=True)
-                    st.caption(f"Faza: {match['stage']} | Godzina: {match['time']} | Mecz #{match_id}")
+                    # Zabezpieczenie przed brakiem klucza 'time' 
+                    st.caption(f"Faza: {match['stage']} | Godzina: {match.get('time', '18:00')} | Mecz #{match_id}")
                     
                     if match['status'] == "Zakończony":
                         st.markdown(f"<p class='real-score'>Oficjalny wynik: {match['score_h']} - {match['score_a']}</p>", unsafe_allow_html=True)
