@@ -12,9 +12,11 @@ st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", lay
 
 st.markdown("""
     <style>
-    html, body, [data-testid="stAppViewContainer"], .stApp {
+    /* Globalne wymuszenie wyświetlania głównego suwaka przeglądarki i kontenerów st */
+    html, body, [data-testid="stAppViewContainer"], .stApp, [data-testid="stTabContent"], div.stTabs {
         background-color: #0A1128 !important; 
         overflow-y: auto !important;
+        overflow-x: auto !important;
     }
     [data-testid="stSidebar"] {
         background-color: #060B19 !important; 
@@ -63,7 +65,7 @@ st.markdown("""
         border-radius: 6px !important;
         border: none !important;
         font-weight: 700 !important;
-        padding: 0.6rem 1.8rem !important;
+        padding: 0.4rem 1.2rem !important;
         width: 100% !important;
     }
     .stButton>button:hover {
@@ -71,25 +73,57 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4) !important;
     }
     
-    /* Pulsujący jaskrawy banner ostrzegawczy zamiast mrygającego przycisku */
+    /* Mały, pulsujący banner ostrzegawczy */
     .pulse-warning-banner {
         background-color: #FF4500 !important;
         color: white !important;
         font-weight: bold !important;
         text-align: center !important;
-        padding: 6px !important;
+        padding: 4px !important;
         border-radius: 4px !important;
-        font-size: 0.85rem !important;
-        margin-bottom: 8px !important;
+        font-size: 0.75rem !important;
+        margin-bottom: 4px !important;
         animation: simple-blink 1.2s infinite ease-in-out;
     }
     @keyframes simple-blink {
-        0% { opacity: 0.4; }
-        50% { opacity: 1; box-shadow: 0 0 10px #FF4500; }
-        100% { opacity: 0.4; }
+        0% { opacity: 0.5; }
+        50% { opacity: 1; }
+        100% { opacity: 0.5; }
     }
     
-    /* Nowe czyste i stabilne karty drabinki turniejowej */
+    /* Kompaktowe karty meczów */
+    .match-container { 
+        background: #172554 !important; 
+        border: 1px solid #1E3A8A !important; 
+        border-radius: 8px; 
+        padding: 10px 15px !important; 
+        margin-bottom: 12px !important;
+        box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+    }
+    .match-header-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #1E3A8A;
+        padding-bottom: 4px;
+        margin-bottom: 8px;
+    }
+    .match-header-title {
+        color: #F97316 !important;
+        font-size: 1.1rem !important;
+        font-weight: 700;
+        margin: 0;
+    }
+    .status-badge { padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
+    .teams-display { font-size: 1.25rem !important; font-weight: bold !important; margin: 4px 0; }
+    .match-meta-text { color: #94A3B8; font-size: 0.85rem; margin: 0; }
+    .real-score { font-size: 1.05rem; font-weight: bold; background-color: #F97316 !important; color: #0A1128 !important; padding: 3px 8px; border-radius: 4px; margin-top: 4px; display: inline-block; }
+    
+    div[data-testid="stNumberInput"] label p { font-size: 0.85rem !important; color: #CBD5E1 !important; }
+    div[data-testid="stNumberInput"] button { background-color: #1E3A8A !important; color: #F8FAFC !important; }
+    div[data-testid="stNumberInput"] input { color: #F8FAFC !important; background-color: #0A1128 !important; font-size: 0.95rem !important; }
+    
+    /* Karty w Drabince */
     .bracket-match-card {
         background: #172554 !important;
         border: 2px solid #1E3A8A !important;
@@ -98,58 +132,22 @@ st.markdown("""
         margin: 8px 0;
         box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
-    .bracket-match-title {
-        font-size: 0.75rem !important;
-        color: #F97316 !important;
-        font-weight: bold;
-        margin-bottom: 4px;
-    }
-    .bracket-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 3px 0;
-        font-size: 0.9rem !important;
-    }
-    .bracket-score-cell {
-        background: #0A1128;
-        color: #F97316;
-        font-weight: bold;
-        padding: 2px 6px;
-        border-radius: 4px;
-        min-width: 20px;
-        text-align: center;
-    }
-    .bracket-team-winner {
-        color: #4ADE80 !important;
-        font-weight: bold;
-    }
-    
-    .center-final-card {
-        background: #23153C !important;
-        border: 3px solid #FF6B00 !important;
-        border-radius: 10px;
-        padding: 20px;
-        text-align: center;
-        box-shadow: 0 0 15px rgba(255, 107, 0, 0.4);
-    }
-
-    .match-container { background: #172554 !important; border: 1px solid #1E3A8A !important; border-radius: 10px; padding: 20px; margin-bottom: 25px; }
-    .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
-    .status-live { background-color: #DC2626 !important; color: white !important; }
-    .status-ended { background-color: #111827 !important; color: #94A3B8 !important; }
-    .status-waiting { background-color: #D97706 !important; color: white !important; }
-    
-    .teams-display { font-size: 1.6rem !important; font-weight: bold !important; }
-    .real-score { font-size: 1.3rem; font-weight: bold; background-color: #F97316 !important; color: #0A1128 !important; padding: 6px 12px; border-radius: 6px; display: inline-block; }
+    .bracket-match-title { font-size: 0.75rem !important; color: #F97316 !important; font-weight: bold; margin-bottom: 4px; }
+    .bracket-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; font-size: 0.9rem !important; }
+    .bracket-score-cell { background: #0A1128; color: #F97316; font-weight: bold; padding: 2px 6px; border-radius: 4px; min-width: 20px; text-align: center; }
+    .bracket-team-winner { color: #4ADE80 !important; font-weight: bold; }
+    .bracket-group-box { background: #0D1B3E !important; border: 1px solid #F97316 !important; border-radius: 8px; padding: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    .center-final-card { background: #23153C !important; border: 3px solid #FF6B00 !important; border-radius: 10px; padding: 20px; text-align: center; }
     .kricon-table { width: 100%; border-collapse: collapse; margin: 15px 0 35px 0; background-color: #172554 !important; border-radius: 8px; overflow: hidden; }
     .kricon-table th { background-color: #F97316 !important; color: #0A1128 !important; padding: 12px; font-weight: 800; }
     .kricon-table td { padding: 11px 12px; border-bottom: 1px solid #1E3A8A !important; }
     .points-legend { background-color: #060B19; border-left: 5px solid #F97316; padding: 12px; margin-bottom: 15px; border-radius: 4px; }
     
-    ::-webkit-scrollbar { width: 16px !important; display: block !important; }
+    /* GŁÓWNY POMARAŃCZOWY PASEK PRZEWIJANIA (ZWSZE WIDOCZNY) */
+    ::-webkit-scrollbar { width: 16px !important; height: 16px !important; display: block !important; }
     ::-webkit-scrollbar-track { background: #060B19 !important; }
     ::-webkit-scrollbar-thumb { background-color: #FF6B00 !important; border-radius: 8px !important; border: 2px solid #060B19 !important; }
+    ::-webkit-scrollbar-thumb:hover { background-color: #FF8833 !important; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -443,19 +441,33 @@ else:
         for m_id, m in sorted_m:
             if (mode == "Oczekujące" and m['status'] == "Zakończony") or (mode == "Zakończone" and m['status'] == "Oczekuje"): continue
             status_html = '<span class="status-badge status-live">🔴 LIVE</span>' if m['status'] == "LIVE" else ('<span class="status-badge status-ended">⚫ Zakończony</span>' if m['status'] == "Zakończony" else '<span class="status-badge status-waiting">🟡 Oczekuje</span>')
-            st.markdown(f"<div class='match-container'><div class='match-header-wrapper'><h4 class='match-header-title'>⚽ Mecz #{m_id}</h4>{status_html}</div><div class='teams-display'>{get_flag_html(m['home'])} {m['home']} vs {get_flag_html(m['away'])} {m['away']}</div><p style='color: #94A3B8;'>Faza: {m['stage']} | {m['date']}, {m['time']}</p>", unsafe_allow_html=True)
-            if m['status'] == "Zakończony": st.markdown(f"<p class='real-score'>Wynik: {m['score_h']} - {m['score_a']}</p>", unsafe_allow_html=True)
+            
+            st.markdown(f"""
+            <div class='match-container'>
+                <div class='match-header-wrapper'>
+                    <h5 class='match-header-title'>⚽ Mecz #{m_id} — <span style='font-size:0.9rem; color:#94A3B8;'>{m['stage']}</span></h5>
+                    {status_html}
+                </div>
+                <div style='display: flex; justify-content: space-between; align-items: center; wrap: wrap;'>
+                    <div style='flex: 2;'>
+                        <div class='teams-display'>{get_flag_html(m['home'])} {m['home']} vs {get_flag_html(m['away'])} {m['away']}</div>
+                        <p class='match-meta-text'>{m['date']}, {m['time']}</p>
+                    </div>
+            """, unsafe_allow_html=True)
+            
+            if m['status'] == "Zakończony": 
+                st.markdown(f"<div style='flex: 1; text-align: right;'><p class='real-score'>Wynik: {m['score_h']} - {m['score_a']}</p></div>", unsafe_allow_html=True)
+            
+            st.markdown("</div>", unsafe_allow_html=True)
             
             locked = (m['timestamp'] - now).total_seconds() <= 0
             has_existing_bet = st.session_state.bets[m_id].get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
             
-            # --- FIX: WYPROSTOWANIE UNIKALNYCH STRIGOWYCH KLUCZY DLA INPUTÓW ---
             c1, c2, c3 = st.columns([1,1,2])
-            with c1: b_h = st.number_input(f"Wynik {m['home']}", 0, 20, int(cur_h), 1, key=f"input_h_{m_id}", disabled=locked)
-            with c2: b_a = st.number_input(f"Wynik {m['away']}", 0, 20, int(cur_a), 1, key=f"input_a_{m_id}", disabled=locked)
+            with c1: b_h = st.number_input(f"Wynik {m['home']}", 0, 20, int(cur_h), 1, key=f"input_h_{m_id}", disabled=locked, label_visibility="collapsed")
+            with c2: b_a = st.number_input(f"Wynik {m['away']}", 0, 20, int(cur_a), 1, key=f"input_a_{m_id}", disabled=locked, label_visibility="collapsed")
             with c3: 
-                st.write(""); st.write("")
                 if locked:
                     st.button("Zablokowane", disabled=True, key=f"lock_btn_{m_id}")
                 else:
