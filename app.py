@@ -103,22 +103,28 @@ st.markdown("""
         100% { opacity: 0.6; }
     }
     
-    /* --- PRZYWRÓCONY ORYGINALNY KOLOR I ULTRA CIASNY UKŁAD TERMINARZA --- */
+    /* --- LIKWIDACJA CZERWONEJ PRZESTRZENI MIĘDZY MECZAMI (USUNIĘCIE GAP) --- */
     .match-container { 
-        background: #172554 !important; /* Przywrócono pierwotne, jaśniejsze tło */
+        background: #172554 !important; 
         border: 1px solid #1E3A8A !important; 
         border-radius: 4px; 
         padding: 4px 12px !important; 
-        margin-bottom: 1px !important; /* Ściskanie odległości między kontenerami do minimum */
+        margin-bottom: 0px !important; 
         margin-top: 0px !important;
         box-shadow: 0 1px 2px rgba(0,0,0,0.15);
     }
     
-    /* Likwidacja wolnych przestrzeni generowanych domyślnie przez Streamlit */
-    [data-testid="stVerticalBlock"] > div {
-        padding-bottom: 1px !important;
-        padding-top: 1px !important;
+    /* Agresywne skasowanie marginesów generowanych pionowo przez Streamlit */
+    div[data-testid="stVerticalBlock"] {
+        gap: 2px !important; /* Ściskanie klocków do 2 pikseli */
     }
+    div[data-testid="stVerticalBlock"] > div {
+        padding-bottom: 0px !important;
+        padding-top: 0px !important;
+        margin-bottom: 0px !important;
+        margin-top: 0px !important;
+    }
+    /* ---------------------------------------------------------------------- */
     
     .match-inline-main-row {
         display: flex;
@@ -160,7 +166,6 @@ st.markdown("""
         margin: 0;
     }
     
-    /* Siatka i etykiety dla rzędu typowania */
     .flex-bet-label {
         font-size: 0.85rem !important;
         color: #38BDF8 !important;
@@ -489,6 +494,7 @@ else:
             else:
                 oficjalny_wynik_tekst = "? : ?"
             
+            # GŁÓWNY WIERSZ MECZU (LINIA GÓRNA)
             st.markdown(f"""
             <div class='match-container'>
                 <div class='match-inline-main-row'>
@@ -510,7 +516,7 @@ else:
             has_existing_bet = st.session_state.bets[m_id].get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets[m_id].get(st.session_state.logged_in_user, (0,0))
             
-            # --- ZFORMTOWANIE KOLUMN W WYRÓWNANĄ STRUKTURĘ ---
+            # --- ZMODYFIKOWANA SIATKA LAYOUTU DLA IDEALNEGO WYRÓWNANIA PIONOWEGO ---
             c_label, c_input_h, c_input_a, c_btn, c_banner = st.columns([4.3, 0.7, 0.7, 1.3, 5.0])
             
             with c_label:
@@ -538,7 +544,7 @@ else:
                     else:
                         st.markdown("<div class='missing-bet-banner'>⚠️ NIEODDANY TYP</div>", unsafe_allow_html=True)
             
-            st.markdown("</div>", unsafe_allow_html=True) 
+            st.markdown("</div>", unsafe_allow_html=True) # Zamknięcie wiersza flex
                         
             if locked or m['status'] == "Zakończony":
                 with st.expander("👁️ Zobacz typy innych graczy"):
@@ -667,4 +673,3 @@ else:
             st.markdown(get_mini_group_html_string("J"), unsafe_allow_html=True)
             st.markdown(get_mini_group_html_string("K"), unsafe_allow_html=True)
             st.markdown(get_mini_group_html_string("L"), unsafe_allow_html=True)
-        
