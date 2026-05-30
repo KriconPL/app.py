@@ -99,7 +99,7 @@ st.markdown("""
         animation: pulseAlertCore 2.0s infinite ease-in-out !important;
         background-color: #D97706 !important;
         color: #FFFFFF !important;
-        padding: 1px 5px !important;
+        padding: 1px 6px !important;
         border-radius: 4px !important;
         font-weight: bold !important;
     }
@@ -118,28 +118,31 @@ st.markdown("""
         white-space: nowrap;
     }
     
-    /* LINIA INFORMACYJNA NAD MECZEM */
-    .meta-upper-container {
+    /* --- JASNY NIEBIESKI PASEK NA METADANE MECZU --- */
+    .meta-upper-bar-container {
+        background-color: #1E293B !important;
+        border: 1px solid #334155 !important;
+        border-bottom: none !important;
+        border-radius: 4px 4px 0 0;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
         font-size: 0.75rem !important;
-        color: #64748B !important;
+        color: #94A3B8 !important;
         margin-top: 6px !important;
-        margin-bottom: 2px !important;
-        padding-left: 6px;
+        padding: 4px 12px !important;
+        width: 100%;
     }
     .meta-id-text-clean { font-weight: bold; color: #F97316 !important; }
-    .meta-badge-clean { color: #94A3B8 !important; background-color: #1E293B; padding: 0px 4px; border-radius: 3px; }
-    .meta-venue-clean { color: #38BDF8 !important; background-color: #0B1329; padding: 0px 4px; border-radius: 3px; }
+    .meta-venue-clean { color: #38BDF8 !important; font-weight: 600; background-color: #0B1329; padding: 0px 4px; border-radius: 3px; }
     
-    /* ZWIDOKOWANY, NIEBIESKI BOX MECZOWY */
+    /* --- CIEMNY BOX MECZOWY (IDEALNE DOPASOWANIE W POZIOMIE) --- */
     .match-card-clean {
         background: #172554 !important; 
         border: 1px solid #1E3A8A !important; 
-        border-radius: 4px; 
-        padding: 8px 12px !important; 
-        margin-bottom: 4px !important;
+        border-radius: 0 0 4px 4px; 
+        padding: 10px 14px !important; 
+        margin-bottom: 6px !important;
         box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         width: 100%;
     }
@@ -147,30 +150,41 @@ st.markdown("""
     .team-text-align-right { font-size: 1.1rem !important; font-weight: bold !important; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%; white-space: nowrap; }
     .team-text-align-left { font-size: 1.1rem !important; font-weight: bold !important; text-align: left; display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; white-space: nowrap; }
     
-    /* SUBTELNY WYNIK OFICJALNY Z BOKU */
+    /* SUBTELNY OFICJALNY WYNIK Z BOKU */
     .official-score-subtle {
-        font-size: 0.85rem !important;
+        font-size: 0.8rem !important;
         font-weight: bold !important;
         color: #94A3B8 !important;
         background-color: #1E293B !important;
         border: 1px solid #334155 !important;
-        padding: 2px 6px;
+        padding: 3px 8px;
         border-radius: 4px;
         display: inline-block;
         text-align: center;
         white-space: nowrap;
     }
     
-    /* PRZYCISKI PLUS/MINUS NA CZYTELNYM GRAPHITE TLE */
-    div.stNumberInput { width: 80px !important; margin: 0 !important; padding: 0 !important; }
-    div.stNumberInput input { text-align: center !important; background-color: #0A1128 !important; color: #F8FAFC !important; height: 28px !important; font-size: 0.95rem !important; font-weight: bold !important; padding: 0 !important; border: 1px solid #1E3A8A !important; }
-    div.stNumberInput button { height: 28px !important; width: 22px !important; background-color: #1E293B !important; color: #F97316 !important; border: 1px solid #334155 !important; }
+    /* PRZYCISKI PLUS/MINUS Z POMARAŃCZOWYMI KONTROLERAMI DLA KRICON */
+    div.stNumberInput { width: 85px !important; margin: 0 !important; padding: 0 !important; display: inline-block !important; }
+    div.stNumberInput input { text-align: center !important; background-color: #0A1128 !important; color: #F8FAFC !important; height: 30px !important; font-size: 0.95rem !important; font-weight: bold !important; padding: 0 !important; border: 1px solid #1E3A8A !important; }
+    div.stNumberInput button { height: 30px !important; width: 24px !important; background-color: #1E293B !important; color: #F97316 !important; border: 1px solid #334155 !important; }
     div.stNumberInput button:hover { background-color: #334155 !important; color: #FFFFFF !important; }
     
-    .mini-save-btn button {
-        background-color: #F97316 !important; color: #FFFFFF !important; border-radius: 4px !important; border: none !important; font-weight: bold !important; height: 28px !important; line-height: 28px !important; padding: 0 10px !important; font-size: 0.8rem !important; width: auto !important;
+    /* WYMUSZONY FIX POMARAŃCZOWEGO PRZYCISKU ZAPISZ (STABILITY UPDATE) */
+    .mini-save-btn button, div[data-testid="stMarkdownContainer"] + div button {
+        background-color: #F97316 !important; 
+        color: #FFFFFF !important; 
+        border-radius: 4px !important; 
+        border: none !important; 
+        font-weight: bold !important; 
+        height: 30px !important; 
+        line-height: 30px !important; 
+        padding: 0 14px !important; 
+        font-size: 0.85rem !important; 
+        width: auto !important;
+        display: inline-block !important;
     }
-    .mini-save-btn button:hover { background-color: #EA580C !important; }
+    .mini-save-btn button:hover { background-color: #EA580C !important; box-shadow: 0 2px 6px rgba(249,115,22,0.4) !important; }
     
     .bracket-match-card { background: #172554 !important; border: 2px solid #1E3A8A !important; border-radius: 8px; padding: 10px; margin: 8px 0; }
     .bracket-match-title { font-size: 0.75rem !important; color: #F97316 !important; font-weight: bold; margin-bottom: 4px; }
@@ -425,7 +439,7 @@ for m_id, m in st.session_state.results.items():
 
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 
-# --- WIDOKI ---
+# --- WIDOK INTERFEJSU ---
 if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
     with c1:
@@ -469,27 +483,27 @@ else:
             home_clean = clean_and_sanitize_team_string(m['home'])
             away_clean = clean_and_sanitize_team_string(m['away'])
             
-            # --- 1. LINIA INFORMACYJNA NAD MECZEM (CZCIONKA ZMNIEJSZONA DO 0.75REM) ---
+            # --- 1. UMIESZCZENIE INFORMACJI O MECZU W JAŚNIEJSZYM NIEBIESKIM PASKU (0.75REM) ---
             st.markdown(f"""
-            <div class="meta-upper-container">
+            <div class="meta-upper-bar-container">
                 <span class="meta-id-text-clean">⚽ Mecz #{m_id}</span>
                 {status_html}
                 <span class="meta-badge-clean">📅 {m['date']}</span>
                 <span class="meta-venue-clean">📍 {m.get('venue', 'Stadion')}</span>
-                <span style="color:#475569;">({m['stage']})</span>
+                <span style="color:#64748b;">({m['stage']})</span>
             </div>
             """, unsafe_allow_html=True)
             
-            # --- 2. START PROSTEGO BOXA MECZOWEGO (ZWARTY ODSTĘP, TYP W CENTRUM) ---
+            # --- 2. START CIEMNEGO BOXA MECZOWEGO (ZGRZANY UKŁAD POZIOMY - TYP W CENTRUM) ---
             st.markdown("<div class='match-card-clean'>", unsafe_allow_html=True)
             
-            # Nowy rozkład kolumn: Lewy zespół | Pole Typu Dom | Pole Typu Wyjazd | Prawy zespół | Narzędzia akcji
+            # Struktura rzędu: Rezerwacja przestrzeni dla zachowania symetrii i wpasowania
             cf1, cf2, cf3, cf4, cf5 = st.columns([2.3, 0.7, 0.7, 2.3, 1.8])
             
             with cf1: 
                 st.markdown(f"<div class='team-text-align-right'><span>{home_clean}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
                 
-            # TYPOWANIE JAKO NAJBARDZIEJ WIDOCZNY ELEMENT (W SAMYM CENTRUM)
+            # Typowanie (Główny punkt widokowy w samym centrum boxa)
             with cf2: 
                 b_h = st.number_input(f"H_{m_id}", 0, 20, int(cur_h), 1, key=f"input_h_{m_id}", disabled=locked, label_visibility="collapsed")
             with cf3: 
@@ -499,10 +513,10 @@ else:
                 st.markdown(f"<div class='team-text-align-left'>{get_cdn_flag_img_html(m['away'])} <span>{away_clean}</span></div>", unsafe_allow_html=True)
                 
             with cf5:
-                # Blok przycisków i mały, przesunięty na bok wynik oficjalny
+                # Elastyczny flexbox dla schowania wyniku oficjalnego z boku oraz przycisku Zapisz
                 st.markdown("<div class='flex-action-container' style='display:flex; align-items:center; gap:6px; justify-content:flex-end; width:100%; height:32px;'>", unsafe_allow_html=True)
                 
-                # Subtelny, mniejszy oficjalny wynik schowany z boku
+                # Mniejszy oficjalny wynik schowany dyskretnie na prawym marginesie
                 st.markdown(f"<span class='official-score-subtle'>{oficjalny_wynik_tekst}</span>", unsafe_allow_html=True)
                 
                 if locked:
