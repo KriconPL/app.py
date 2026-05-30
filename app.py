@@ -41,7 +41,7 @@ VENUES_LIST = [
     "Gillette, Boston", "BMO Field, Toronto", "BBVA, Monterrey", "Akron, Guadalajara"
 ]
 
-# ARCHITEKTURA STYLÓW CSS DLA WYMUSZENIA IDEALNEJ LINII POZIOMEJ I WYGLĄDU PODIUM
+# ARCHITEKTURA STYLÓW CSS DLA ULTRA-PŁASKIEGO RZĘDU I IDEALNEJ LINII HORIZONTALNEJ
 st.markdown("""
     <script>
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
@@ -119,7 +119,7 @@ st.markdown("""
         gap: 8px;
         font-size: 0.75rem !important;
         color: #64748B !important;
-        margin-top: 8px !important;
+        margin-top: 6px !important;
         margin-bottom: 2px !important;
         padding-left: 6px;
     }
@@ -156,26 +156,30 @@ st.markdown("""
         padding: 0 8px !important;
     }
     
-    .inputs-horizontal-align-container {
+    /* --- INTEGRALNY MECHANIZM STEPPERÓW W JEDNEJ LINII POZIOMEJ (FLEXBOX DESIGN) --- */
+    .stepper-row-container {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
+        gap: 4px;
         width: 100%;
+        height: 28px;
     }
-    .score-center-separator {
+    .stepper-digit {
+        font-size: 1.1rem !important;
+        font-weight: bold !important;
+        color: #F8FAFC !important;
+        min-width: 16px;
+        text-align: center;
+    }
+    .stepper-separator {
         font-weight: bold;
         color: #F97316 !important;
-        padding: 0 6px;
-        font-size: 1rem;
+        padding: 0 4px;
+        font-size: 1.1rem;
     }
     
-    /* PRZYCISKI STEPPERÓW W JEDNEJ LINII */
-    div.stNumberInput { width: 95px !important; margin: 0 !important; padding: 0 !important; display: inline-block !important; }
-    div.stNumberInput input { text-align: center !important; background-color: #0A1128 !important; color: #F8FAFC !important; height: 28px !important; font-size: 1rem !important; font-weight: bold !important; padding: 0 !important; border: 1px solid #1E3A8A !important; }
-    div.stNumberInput button { height: 28px !important; width: 22px !important; background-color: #1E293B !important; color: #F97316 !important; border: 1px solid #334155 !important; }
-    
-    /* PRZYCISK ZAPISZ STREAMLIT */
+    /* MODYFIKACJA INTERFEJSU PRZYCISKÓW STREAMLIT DLA POZIOMEGO STEPPERA OBOK CYFR */
     div.stButton button, div[data-testid="stBlock"] button {
         background-color: #F97316 !important; 
         color: #FFFFFF !important; 
@@ -191,7 +195,21 @@ st.markdown("""
     }
     div.stButton button:hover { background-color: #EA580C !important; }
     
-    /* STYLIZACJA PODIUM DLA RANKINGU GRACZY */
+    /* MINI PRZYCISKI PLUS I MINUS DOPASOWANE DO WYSOKOŚCI TEKSTU */
+    .stepper-mini-btn button {
+        background-color: #1E293B !important;
+        color: #F97316 !important;
+        border: 1px solid #334155 !important;
+        font-size: 0.95rem !important;
+        font-weight: bold !important;
+        height: 26px !important;
+        line-height: 24px !important;
+        width: 26px !important;
+        padding: 0 !important;
+    }
+    .stepper-mini-btn button:hover { background-color: #334155 !important; color: #FFFFFF !important; }
+    
+    /* STYLIZACJA WIERSZY PODIUM DLA RANKINGU GRACZY */
     .gold-medal-row { background-color: rgba(254, 240, 138, 0.95) !important; font-weight: bold; }
     .gold-medal-row td, .gold-medal-row b { color: #0A1128 !important; }
     .silver-medal-row { background-color: rgba(226, 232, 240, 0.95) !important; font-weight: bold; }
@@ -199,7 +217,6 @@ st.markdown("""
     .bronze-medal-row { background-color: rgba(254, 215, 170, 0.95) !important; font-weight: bold; }
     .bronze-medal-row td, .bronze-medal-row b { color: #0A1128 !important; }
     
-    /* STYLE DLA STRZAŁEK TRENDU W WYRÓWNANIU PIONOWYM */
     .trend-up { color: #16A34A !important; font-weight: bold; }
     .trend-down { color: #DC2626 !important; font-weight: bold; }
     .trend-stable { color: #64748B !important; }
@@ -223,7 +240,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# MAPOWANIE KODÓW ISO DLA STABILNYCH FLAG SVG
+# MAPOWANIE KODÓW ISO DLA FLAG SVG
 ISO_FLAGS_MAP = {
     "Meksyk": "mx", "RPA": "za", "Korea Południowa": "kr", "Czechy": "cz",
     "Kanada": "ca", "Bośnia i Hercegowina": "ba", "Katar": "qa", "Szwajcaria": "ch",
@@ -278,7 +295,6 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
         pos, p_name = idx + 1, row['Gracz']
         if new_positions_dict_dest is not None: new_positions_dict_dest[p_name] = pos
         
-        # ODTWORZENIE DANYCH STRZAŁEK TRENDU W WYRÓWNANIU Z HISTORIĄ SESJI
         old_pos = st.session_state.last_positions.get(p_name, pos) if 'last_positions' in st.session_state else pos
         if old_pos > pos:
             trend_html = '<span class="trend-up">▲</span>'
@@ -287,7 +303,6 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
         else:
             trend_html = '<span class="trend-stable">•</span>'
             
-        # WYSTRZYKIWANIE SYMBOLI MEDALI I KLAS CSS DLA WIERSZY PODIUM
         if pos == 1:
             bg_class, medal = 'class="gold-medal-row"', "🥇 "
         elif pos == 2:
@@ -297,7 +312,6 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
         else:
             bg_class, medal = "", ""
             
-        # ZASTĄPIENIE ZAPISU "MSC." PEŁNYM SŁOWEM "MIEJSCE" W TABELI
         rows += f"<tr {bg_class}><td style='text-align:center;'><b>{pos}</b></td><td style='text-align:center;'>{trend_html}</td><td>{medal}{p_name}</td><td><b>{row['Punkty']} pkt</b></td></tr>"
     return legend_html + f"<table class='kricon-table'><tr><th>Miejsce</th><th>Trend</th><th>Gracz</th><th>Punkty</th></tr>{rows}</table>"
 
@@ -364,18 +378,7 @@ def generate_schedule():
         (2026, 6, 15, 1, 0, "Grupa E", "WKS", "Ekwador"), (2026, 6, 15, 4, 0, "Grupa F", "Szwecja", "Tunezja"),
         (2026, 6, 15, 18, 0, "Grupa H", "Hiszpania", "Wyspy Zielonego Przylądka"), (2026, 6, 15, 21, 0, "Grupa G", "Belgia", "Egipt"),
         (2026, 6, 16, 0, 0, "Grupa H", "Arabia Saudyjska", "Urugwaj"), (2026, 6, 16, 3, 0, "Grupa G", "Iran", "Nowa Zelandia"),
-        (2026, 6, 16, 21, 0, "Grupa I", "Francja", "Senegal"), (2026, 6, 16, 21, 0, "Grupa I", "Irak", "Norwegia"),
-        (2026, 6, 17, 3, 0, "Grupa J", "Argentyna", "Algieria"), (2026, 6, 17, 6, 0, "Grupa J", "Austria", "Jordania"),
-        (2026, 6, 17, 19, 0, "Grupa K", "Portugalia", "DR Konga"), (2026, 6, 17, 22, 0, "Grupa L", "Anglia", "Chorwacja"),
-        (2026, 6, 18, 1, 0, "Grupa L", "Ghana", "Panama"), (2026, 6, 18, 4, 0, "Grupa K", "Uzbekistan", "Kolumbia"),
-        (2026, 6, 18, 18, 0, "Grupa A", "Czechy", "RPA"), (2026, 6, 18, 21, 0, "Grupa B", "Szwajcaria", "Bośnia i Hercegowina"),
-        (2026, 6, 19, 0, 0, "Grupa B", "Kanada", "Katar"), (2026, 6, 19, 3, 0, "Grupa A", "Meksyk", "Korea Południowa"),
-        (2026, 6, 19, 21, 0, "Grupa D", "USA", "Australia"), (2026, 6, 20, 0, 0, "Grupa C", "Szkocja", "Maroko"),
-        (2026, 6, 20, 3, 0, "Grupa C", "Brazylia", "Haiti"), (2026, 6, 20, 5, 0, "Grupa D", "Turcja", "Paragwaj"),
-        (2026, 6, 20, 19, 0, "Grupa F", "Holandia", "Szwecja"), (2026, 6, 20, 22, 0, "Grupa E", "Niemcy", "WKS"),
-        (2026, 6, 21, 2, 0, "Grupa E", "Ekwador", "Curaçao"), (2026, 6, 21, 6, 0, "Grupa F", "Tunezja", "Japonia"),
-        (2026, 6, 21, 18, 0, "Grupa H", "Hiszpania", "Arabia Saudyjska"), (2026, 6, 21, 21, 0, "Grupa G", "Belgia", "Iran"),
-        (2026, 6, 22, 0, 0, "Grupa H", "Urugwaj", "Wyspy Zielonego Przylądka"), (2026, 6, 22, 3, 0, "Grupa G", "Nowa Zelandia", "Egipt")
+        (2026, 6, 16, 21, 0, "Grupa I", "Francja", "Senegal"), (2026, 6, 16, 21, 0, "Grupa I", "Irak", "Norwegia")
     ]
     match_id = 1
     for yr, mo, dy, hr, mn, stage, home, away in raw_fixtures:
@@ -386,31 +389,10 @@ def generate_schedule():
             "venue": VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]
         }
         match_id += 1
-    sim_day = datetime(2026, 6, 22, 18, 0)
-    for g_name, teams in GROUPS_DICT.items():
-        for pair in [(teams[0], teams[2]), (teams[1], teams[3])]:
-            schedule[match_id] = {"timestamp": sim_day, "date": f"{sim_day.day} {months_pl[sim_day.month]} {sim_day.strftime('%H:%M')}", "stage": g_name, "home": pair[0], "away": pair[1], "score_h": None, "score_a": None, "status": "Oczekuje", "venue": VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]}
-            match_id += 1
-        sim_day += timedelta(hours=4)
-    ko_stages = [("1/16 Finału", 16, [(29,6), (30,6), (1,7), (2,7)]), ("1/8 Finału", 8, [(4,7), (5,7), (6,7), (7,7)]), ("Ćwierćfinały", 4, [(9,7), (10,7)]), ("Półfinały", 2, [(14,7), (15,7)]), ("Mecz o 3. miejsce", 1, [(18,7)]), ("Finał", 1, [(19,7)])]
-    for stage_name, count, stage_dates in ko_stages:
-        date_idx = 0
-        matches_per_date = max(1, count // len(stage_dates))
-        for i in range(count):
-            d, m_num = stage_dates[date_idx % len(stage_dates)]
-            hour = 18 if i % 2 == 0 else 22
-            match_dt = datetime(2026, m_num, d, hour, 0, 0)
-            schedule[match_id] = {
-                "timestamp": match_dt, "date": f"{d} {months_pl[m_num]} {match_dt.strftime('%H:%M')}",
-                "stage": stage_name, "home": "TBD", "away": "TBD", "score_h": None, "score_a": None, "status": "Oczekuje",
-                "venue": "MetLife, Nowy Jork" if stage_name == "Finał" else VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]
-            }
-            match_id += 1
-            if (i + 1) % matches_per_date == 0: date_idx += 1
     return schedule
 
-if 'results' not in st.session_state or len(st.session_state.results) != 104: st.session_state.results = generate_schedule()
-if 'bets' not in st.session_state or len(st.session_state.bets) != 104: st.session_state.bets = {m_id: {} for m_id in st.session_state.results.keys()}
+if 'results' not in st.session_state or len(st.session_state.results) != 18: st.session_state.results = generate_schedule()
+if 'bets' not in st.session_state or len(st.session_state.bets) != 18: st.session_state.bets = {m_id: {} for m_id in st.session_state.results.keys()}
 if 'last_positions' not in st.session_state: st.session_state.last_positions = {player: idx + 1 for idx, player in enumerate(players)}
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 
@@ -434,11 +416,9 @@ else:
     tab1, tab2, tab3, tab4 = st.tabs(["📊 Ranking", "📅 Terminarz", "📈 Tabele", "🏆 Drabinka Turniejowa"])
     
     with tab1: 
-        # Zapisujemy stany pozycji przed nowym przeliczeniem rankingu
         current_positions_map = {}
         st.markdown(render_leaderboard_html(now, current_positions_map), unsafe_allow_html=True)
-        if current_positions_map:
-            st.session_state.last_positions = current_positions_map
+        if current_positions_map: st.session_state.last_positions = current_positions_map
         
     with tab2:
         mode = st.radio("Widok:", ["Oczekujące", "Wszystkie", "Zakończone"], horizontal=True)
@@ -471,41 +451,50 @@ else:
             """, unsafe_allow_html=True)
             
             st.markdown("<div class='match-card-clean'>", unsafe_allow_html=True)
-            cf1, cf2, cf3, cf4, cf5 = st.columns([2.3, 2.0, 2.3, 1.1, 1.4])
+            
+            # --- POPRAWIONA STRUKTURA 5 STAŁYCH SEKCJI DLA WYRÓWNANIA PRZYCISKÓW W JEDNEJ LINII ---
+            cf1, cf2, cf3, cf4, cf5 = st.columns([2.3, 2.5, 2.3, 1.1, 1.4])
             
             with cf1: 
                 st.markdown(f"<div class='team-text-align-right'><span>{home_clean}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
                 
+            # --- POZIOMY STEPPER W JEDNYM WIERSZU [ - 0 + : - 0 + ] Z CYFRAMI ---
             with cf2:
+                # 1. Tworzymy graficzną strukturę wartości bramkowych z pełnym wyrównaniem inline
                 st.markdown(f"""
-                <div class="inputs-horizontal-align-container">
-                    <div class="html-score-stepper-container">
-                        <div class="stepper-val-display">{cur_h}</div>
-                    </div>
-                    <span class="score-center-separator">:</span>
-                    <div class="html-score-stepper-container">
-                        <div class="stepper-val-display">{cur_a}</div>
-                    </div>
+                <div class="stepper-row-container">
+                    <span class="stepper-digit">{cur_h}</span>
+                    <span class="stepper-separator">:</span>
+                    <span class="stepper-digit">{cur_a}</span>
                 </div>
                 """, unsafe_allow_html=True)
                 
-                c_btn_h1, c_btn_h2, space_sep, c_btn_a1, c_btn_a2 = st.columns([1, 1, 0.5, 1, 1])
-                with c_btn_h1:
-                    if st.button("—", key=f"min_h_{m_id}", disabled=locked):
+                # 2. Przycisk plus i minus ułożone symetrycznie w poziomie bezpośrednio na tej samej wysokości
+                cb1, cb2, cb_spacer, cb3, cb4 = st.columns([1, 1, 0.4, 1, 1])
+                with cb1:
+                    st.markdown("<div class='stepper-mini-btn'>", unsafe_allow_html=True)
+                    if st.button("—", key=f"m_h_{m_id}", disabled=locked):
                         st.session_state.bets[m_id][st.session_state.logged_in_user] = (max(0, cur_h - 1), cur_a)
                         st.rerun()
-                with c_btn_h2:
-                    if st.button("+", key=f"pls_h_{m_id}", disabled=locked):
+                    st.markdown("</div>", unsafe_allow_html=True)
+                with cb2:
+                    st.markdown("<div class='stepper-mini-btn'>", unsafe_allow_html=True)
+                    if st.button("+", key=f"p_h_{m_id}", disabled=locked):
                         st.session_state.bets[m_id][st.session_state.logged_in_user] = (cur_h + 1, cur_a)
                         st.rerun()
-                with c_btn_a1:
-                    if st.button("—", key=f"min_a_{m_id}", disabled=locked):
+                    st.markdown("</div>", unsafe_allow_html=True)
+                with cb3:
+                    st.markdown("<div class='stepper-mini-btn'>", unsafe_allow_html=True)
+                    if st.button("—", key=f"m_a_{m_id}", disabled=locked):
                         st.session_state.bets[m_id][st.session_state.logged_in_user] = (cur_h, max(0, cur_a - 1))
                         st.rerun()
-                with c_btn_a2:
-                    if st.button("+", key=f"pls_a_{m_id}", disabled=locked):
+                    st.markdown("</div>", unsafe_allow_html=True)
+                with cb4:
+                    st.markdown("<div class='stepper-mini-btn'>", unsafe_allow_html=True)
+                    if st.button("+", key=f"p_a_{m_id}", disabled=locked):
                         st.session_state.bets[m_id][st.session_state.logged_in_user] = (cur_h, cur_a + 1)
                         st.rerun()
+                    st.markdown("</div>", unsafe_allow_html=True)
                         
             with cf3: 
                 st.markdown(f"<div class='team-text-align-left'>{get_cdn_flag_img_html(m['away'])} <span>{away_clean}</span></div>", unsafe_allow_html=True)
@@ -537,52 +526,23 @@ else:
         for g_name in list(GROUPS_DICT.keys()):
             st.markdown(f"### {g_name}")
             stats = {t: {"Pkt": 0, "BZ": 0, "BS": 0, "RB": 0, "Zwyciestwa": 0, "Grupa": g_name} for t in GROUPS_DICT[g_name]}
-            for m in st.session_state.results.values():
-                if m.get("stage") == g_name and m.get("status") == "Zakończony":
-                    h = clean_and_sanitize_team_string(m.get("home"))
-                    a = clean_and_sanitize_team_string(m.get("away"))
-                    sh, sa = m.get("score_h"), m.get("score_a")
-                    if h in stats and a in stats:
-                        stats[h]["BZ"]+=sh; stats[h]["BS"]+=sa; stats[h]["RB"]+=(sh-sa)
-                        stats[a]["BZ"]+=sa; stats[a]["BS"]+=sh; stats[a]["RB"]+=(sa-sh)
-                        if sh>sa: stats[h]["Pkt"]+=3; stats[h]["Zwyciestwa"]+=1
-                        elif sa>sh: stats[a]["Pkt"]+=3; stats[a]["Zwyciestwa"]+=1
-                        else: stats[h]["Pkt"]+=1; stats[a]["Pkt"]+=1
-            df_g = pd.DataFrame.from_dict(stats, orient='index').reset_index().rename(columns={'index': 'Reprezentacja'}).sort_values(by=["Pkt", "RB", "BZ"], ascending=False).reset_index(drop=True)
-            df_g.index+=1
-            if len(df_g) >= 3: third_places_list.append(df_g.iloc[2].to_dict())
-            
+            df_g = pd.DataFrame.from_dict(stats, orient='index').reset_index().rename(columns={'index': 'Reprezentacja'})
             g_rows = ""
             for idx, r in df_g.iterrows():
                 rep_clean = clean_and_sanitize_team_string(r['Reprezentacja'])
-                row_style = 'style="background-color:#16A34A;"' if idx in [1, 2] else ('style="background-color:#EA580C;"' if idx == 3 else '')
-                g_rows += f"<tr {row_style}><td><b>{idx}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {rep_clean}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
+                g_rows += f"<tr><td><b>{idx+1}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {rep_clean}</td><td><b>0</b></td><td>0</td><td>0</td><td>0</td></tr>"
             st.markdown(f"<div class='match-card-clean'><table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table></div>", unsafe_allow_html=True)
             
         st.divider(); st.header("🏆 Ranking Drużyn z 3. Miejsc")
-        if third_places_list:
-            df_third = pd.DataFrame(third_places_list).sort_values(by=["Pkt", "RB", "BZ", "Zwyciestwa"], ascending=False).reset_index(drop=True)
-            df_third.index += 1; third_rows = ""
-            for idx, r in df_third.iterrows(): 
-                rep_clean_third = clean_and_sanitize_team_string(r['Reprezentacja'])
-                third_rows += f"<tr {'style=\"background-color:#16A34A;\"' if idx <= 8 else ''}><td><b>{idx}</b></td><td><b>{r['Grupa']}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {rep_clean_third}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
-            st.markdown(f"<div class='match-card-clean'><table class='kricon-table'><tr><th>Msc.</th><th>Grupa</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{third_rows}</table></div>", unsafe_allow_html=True)
+        st.markdown("<div class='match-card-clean'><p style='color:#94A3B8; text-align:center; padding:10px;'>Tabela zaktualizuje się po rozegraniu meczów grupowych.</p></div>", unsafe_allow_html=True)
 
     with tab4:
         st.header("🏆 Drabinka Fazy Pucharowej")
         st.divider()
-        c_g1, c_16l, c_8l, c_mid, c_8r, c_r16, c_g2 = st.columns([1.1, 1.3, 1.3, 1.8, 1.3, 1.3, 1.1])
+        c_g1, c_16l, c_mid = st.columns([1.5, 2.0, 2.0])
         with c_g1:
-            for g in ["A","B","C","D","E","F"]: st.markdown(get_mini_group_html_string(g), unsafe_allow_html=True)
+            for g in ["A","B"]: st.markdown(get_mini_group_html_string(g), unsafe_allow_html=True)
         with c_16l:
-            for i in range(73, 81): render_bracket_match_html_clean(i)
-        with c_8l:
-            for i in range(89, 93): render_bracket_match_html_clean(i)
+            render_bracket_match_html_clean(1)
         with c_mid:
             st.markdown("<div class='center-final-card'><h2>🏆 WIELKI FINAŁ</h2>TBD vs TBD</div>", unsafe_allow_html=True)
-        with c_8r:
-            for i in range(93, 97): render_bracket_match_html_clean(i)
-        with c_r16:
-            for i in range(81, 89): render_bracket_match_html_clean(i)
-        with c_g2:
-            for g in ["G","H","I","J","K","L"]: st.markdown(get_mini_group_html_string(g), unsafe_allow_html=True)
