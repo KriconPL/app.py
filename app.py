@@ -41,10 +41,9 @@ VENUES_LIST = [
     "Gillette, Boston", "BMO Field, Toronto", "BBVA, Monterrey", "Akron, Guadalajara"
 ]
 
-# GŁÓWNY SILNIK CSS: NAPRAWA BIAŁYCH PRZYCISKÓW, ZWARTE LINIE ORAZ ZABEZPIECZENIE ANTY-COPY
+# GŁÓWNY SILNIK CSS: ZABEZPIECZONY KOLOR TEKSTU I PŁASKI UKŁAD
 st.markdown("""
     <script>
-    // Blokada prawego przycisku myszy i skrótów klawiszowych (F12, Ctrl+Shift+I itp.)
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
     document.addEventListener('keydown', function(e) {
         if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73) || (e.ctrlKey && e.keyCode == 85) || (e.ctrlKey && e.keyCode == 83) || (e.ctrlKey && e.keyCode == 67)) {
@@ -54,15 +53,13 @@ st.markdown("""
     });
     </script>
     <style>
-    /* AGRESYWNA BLOKADA ZAZNACZANIA TEKSTU W CAŁEJ APLIKACJI */
+    /* Blokada selekcji tekstu na całą apkę */
     * {
         -webkit-user-select: none !important;
         -moz-user-select: none !important;
         -ms-user-select: none !important;
         user-select: none !important;
     }
-    
-    /* Wyjątek: Pola tekstowe i inputy muszą być aktywne, by wpisać hasło lub wynik */
     input, textarea, div[data-baseweb="input"] {
         -webkit-user-select: auto !important;
         -moz-user-select: auto !important;
@@ -148,11 +145,11 @@ st.markdown("""
         border-radius: 0 0 6px 6px;
         padding: 8px 10px !important;
         margin-bottom: 4px !important;
-        align-items: center !important;
+        align-items: center !important; /* Centrowanie w pionie zapobiega rozjechaniu */
         box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"] {
-        padding: 0 3px !important;
+        padding: 0 2px !important; /* Redukcja pustych przestrzeni wewnątrz kolumn */
     }
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) p,
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div[data-testid="stMarkdownContainer"] {
@@ -193,55 +190,73 @@ st.markdown("""
     }
     
     /* ========================================================================= */
-    /* PANCERNY FIX: ELIMINACJA BIAŁYCH TŁA I TEKSTU WE WSZYSTKICH PRZYCISKACH   */
+    /* PANCERNY FIX: ELIMINACJA BIAŁEGO TEKSTU I TŁA W PRZYCISKACH               */
+    /* Wymuszamy przezroczystość na domyślnych znacznikach wewnątrz Streamlita   */
     /* ========================================================================= */
     
-    /* Wymuszamy dziedziczenie kolorów przez wszystkie wewnętrzne tagi Streamlita (div, p) */
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div[data-testid="stButton"] button * {
-        color: inherit !important;
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div[data-testid="stButton"] button p,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div[data-testid="stButton"] button span,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div[data-testid="stButton"] button div {
         background-color: transparent !important;
     }
     
-    /* PRZYCISKI PLUS/MINUS (Kolumny: 2, 4, 6, 8) */
+    /* --- WYMUSZENIE KOLORÓW DLA PRZYCISKÓW PLUS/MINUS --- */
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] button,
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] button,
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(6) div[data-testid="stButton"] button,
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(8) div[data-testid="stButton"] button {
         background-color: #1E293B !important; 
-        color: #F97316 !important; 
         border: 1px solid #334155 !important; 
         border-radius: 4px !important; 
         height: 34px !important; 
         min-height: 34px !important;
         padding: 0 !important; 
-        font-size: 1.2rem !important; 
-        font-weight: bold !important;
         width: 100% !important;
         display: block !important;
     }
+    /* Tekst (znaki +/-) na jasno-pomarańczowo we wszystkich wewnętrznych tagach */
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] button *,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] button *,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(6) div[data-testid="stButton"] button *,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(8) div[data-testid="stButton"] button * {
+        color: #F97316 !important;
+        font-size: 1.2rem !important;
+        font-weight: bold !important;
+        line-height: 32px !important;
+    }
     
+    /* Efekt podświetlenia po najechaniu myszką */
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] button:hover,
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] button:hover,
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(6) div[data-testid="stButton"] button:hover,
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(8) div[data-testid="stButton"] button:hover { 
         background-color: #334155 !important; 
+    }
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] button:hover *,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] button:hover *,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(6) div[data-testid="stButton"] button:hover *,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(8) div[data-testid="stButton"] button:hover * { 
         color: #FFFFFF !important; 
     }
     
-    /* PRZYCISK ZAPISZ (Kolumna: 10) */
+    /* --- WYMUSZENIE KOLORÓW DLA PRZYCISKU ZAPISZ --- */
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(10) div[data-testid="stButton"] button {
         background-color: #F97316 !important;
-        color: #FFFFFF !important;
         border: 1px solid #EA580C !important;
         border-radius: 4px !important;
         height: 34px !important;
         min-height: 34px !important;
         padding: 0 !important;
-        font-size: 0.9rem !important;
-        font-weight: bold !important;
         width: 100% !important;
         display: block !important;
         box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
+    }
+    /* Tekst ("Zapisz") na biało */
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(10) div[data-testid="stButton"] button * {
+        color: #FFFFFF !important;
+        font-size: 0.9rem !important;
+        font-weight: bold !important;
+        line-height: 32px !important;
     }
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(10) div[data-testid="stButton"] button:hover { 
         background-color: #EA580C !important; 
@@ -251,12 +266,10 @@ st.markdown("""
     /* ========================================================================= */
     
     /* PODIUM MEDALOWE W RANKINGU */
-    .gold-medal-row { background-color: rgba(254, 240, 138, 0.95) !important; font-weight: bold; }
-    .gold-medal-row td, .gold-medal-row b { color: #0A1128 !important; }
-    .silver-medal-row { background-color: rgba(226, 232, 240, 0.95) !important; font-weight: bold; }
-    .silver-medal-row td, .silver-medal-row b { color: #0A1128 !important; }
-    .bronze-medal-row { background-color: rgba(254, 215, 170, 0.95) !important; font-weight: bold; }
-    .bronze-medal-row td, .bronze-medal-row b { color: #0A1128 !important; }
+    .gold-medal-row { background-color: #FEF08A !important; font-weight: bold; }
+    .silver-medal-row { background-color: #E2E8F0 !important; font-weight: bold; }
+    .bronze-medal-row { background-color: #FED7AA !important; font-weight: bold; }
+    .gold-medal-row td, .gold-medal-row b, .silver-medal-row td, .silver-medal-row b, .bronze-medal-row td, .bronze-medal-row b { color: #0A1128 !important; }
     
     .trend-up { color: #16A34A !important; font-weight: bold; }
     .trend-down { color: #DC2626 !important; font-weight: bold; }
@@ -319,20 +332,6 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
         if np.sign(int(pred_h) - int(pred_a)) == np.sign(int(real_h) - int(real_a)): return 1
     except (ValueError, TypeError): pass
     return 0
-
-def get_time_to_next_unbet_match(player_name, now_time):
-    try:
-        if 'results' not in st.session_state or 'bets' not in st.session_state: return "..."
-        upcoming = sorted([m for m in st.session_state.results.values() if m["timestamp"] > now_time], key=lambda x: x["timestamp"])
-        for match in upcoming:
-            m_id = [k for k, v in st.session_state.results.items() if v == match][0]
-            if st.session_state.bets.get(m_id, {}).get(player_name, (None, None)) == (None, None):
-                diff = match["timestamp"] - now_time
-                if diff.total_seconds() <= 0: continue
-                h, m = int(diff.total_seconds() // 3600), int((diff.total_seconds() % 3600) // 60)
-                return f'<span class="time-warning">Za {h}h {m}m</span>'
-    except Exception: pass
-    return '<span class="time-ok">✔ Wszystko obstawione</span>'
 
 def render_leaderboard_html(now_time, new_positions_dict_dest=None):
     scores = {p: 0 for p in players}
@@ -553,7 +552,7 @@ else:
             home_clean = clean_and_sanitize_team_string(m['home'])
             away_clean = clean_and_sanitize_team_string(m['away'])
             
-            # --- JASNONIEBIESKI PASEK DLA METADANYCH ---
+            # --- JASNONIEBIESKI PASEK METADANYCH NAD MECZEM ---
             st.markdown(f"""
             <div class="meta-upper-bar-container">
                 <span class="meta-id-text-clean">⚽ Mecz #{m_id}</span>
@@ -568,7 +567,7 @@ else:
             st.markdown("<div class='match-row-anchor'></div>", unsafe_allow_html=True)
             
             # --- GŁÓWNA LINIA POZIOMA Z DOSKONAŁYM WYRÓWNANIEM PRZYCISKÓW ---
-            c_home, c_mh, c_inph, c_ph, c_sep, c_ma, c_inpa, c_pa, c_away, c_score, c_save, c_status = st.columns([2.6, 0.6, 0.8, 0.6, 0.2, 0.6, 0.8, 0.6, 2.6, 1.4, 1.3, 1.1])
+            c_home, c_mh, c_inph, c_ph, c_sep, c_ma, c_inpa, c_pa, c_away, c_save, c_score, c_status = st.columns([2.6, 0.6, 0.8, 0.6, 0.2, 0.6, 0.8, 0.6, 2.6, 1.4, 1.5, 1.2])
             
             with c_home:
                 st.markdown(f"<div class='team-align-right'><span>{home_clean}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
@@ -609,9 +608,6 @@ else:
             with c_away:
                 st.markdown(f"<div class='team-align-left'>{get_cdn_flag_img_html(m['away'])} <span>{away_clean}</span></div>", unsafe_allow_html=True)
                 
-            with c_score:
-                st.markdown(f"<div class='off-score'>{oficjalny_wynik_tekst}</div>", unsafe_allow_html=True)
-                
             with c_save:
                 if locked:
                     st.button("🔒", disabled=True, key=f"lock_{m_id}", use_container_width=True)
@@ -621,6 +617,9 @@ else:
                         save_backup_local_and_github()
                         st.rerun()
                         
+            with c_score:
+                st.markdown(f"<div class='off-score'>{oficjalny_wynik_tekst}</div>", unsafe_allow_html=True)
+                
             with c_status:
                 if has_existing_bet:
                     st.markdown("<div class='success-bet-banner'>✔ OK</div>", unsafe_allow_html=True)
