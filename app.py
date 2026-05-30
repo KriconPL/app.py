@@ -41,7 +41,7 @@ VENUES_LIST = [
     "Gillette, Boston", "BMO Field, Toronto", "BBVA, Monterrey", "Akron, Guadalajara"
 ]
 
-# ANTY-COPY GUARD ORAZ SYSTEM WYMUSZONYCH ANIMACJI PULSOWANIA CSS
+# ANTY-COPY GUARD ORAZ BAZOWE STYLE LAYOUTU
 st.markdown("""
     <script>
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
@@ -75,42 +75,6 @@ st.markdown("""
     
     .stButton>button { background-color: #F97316 !important; color: #FFFFFF !important; border-radius: 4px !important; border: none !important; font-weight: 700 !important; height: 32px !important; line-height: 32px !important; padding: 0 12px !important; width: 100% !important; font-size: 0.85rem !important; }
     .stButton>button:hover { background-color: #EA580C !important; box-shadow: 0 3px 8px rgba(249, 115, 22, 0.4) !important; }
-    
-    /* --- SYSTEM WYMUSZONEGO MRUGANIA CHMURY (MOCNE SELEKTORY) --- */
-    @keyframes kriconAlertPulse {
-        0% { background-color: #DC2626 !important; box-shadow: 0 0 2px #DC2626; }
-        50% { background-color: #450A0A !important; box-shadow: 0 0 0px transparent; }
-        100% { background-color: #DC2626 !important; box-shadow: 0 0 2px #DC2626; }
-    }
-    @keyframes kriconWaitingPulse {
-        0% { background-color: #D97706 !important; opacity: 1.0; }
-        50% { background-color: #78350F !important; opacity: 0.7; }
-        100% { background-color: #D97706 !important; opacity: 1.0; }
-    }
-    
-    /* Agresywne przypisanie animacji do klas */
-    .missing-bet-banner {
-        animation: kriconAlertPulse 1.4s infinite ease-in-out !important;
-        color: #FFFFFF !important;
-        font-weight: bold !important;
-        text-align: center !important;
-        height: 32px !important;
-        line-height: 32px !important;
-        border-radius: 4px !important;
-        font-size: 0.85rem !important;
-        display: block !important;
-        width: 100% !important;
-        white-space: nowrap !important;
-    }
-    
-    .status-waiting {
-        animation: kriconWaitingPulse 2.0s infinite ease-in-out !important;
-        color: #FFFFFF !important;
-        padding: 2px 6px !important;
-        border-radius: 4px !important;
-        font-weight: bold !important;
-        display: inline-block !important;
-    }
     
     .success-bet-banner {
         background-color: #16A34A !important;
@@ -367,7 +331,7 @@ def fetch_official_results_from_api(now_time):
                 if m['home'] == "TBD": m['home'] = "Meksyk"
                 if m['away'] == "TBD": m['away'] = "RPA"
 
-# --- SILNIK INICJALIZACJI SYSTEMU ---
+# --- SILNIK ROZRUCHU ---
 force_reset_needed = False
 if 'results' in st.session_state:
     for m in st.session_state.results.values():
@@ -396,7 +360,7 @@ for m_id, m in st.session_state.results.items():
 
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 
-# --- WIDOK INTERFEJSU GRAFICZNEGO ---
+# --- STRUKTURA GRAFICZNA ---
 if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
     with c1:
@@ -425,12 +389,13 @@ else:
         for m_id, m in sorted_m:
             if (mode == "Oczekujące" and m.get('status') == "Zakończony") or (mode == "Zakończone" and m.get('status') == "Oczekuje"): continue
             
+            # WTRZYKNIĘCIE IN-LINE ANIMACJI DLA STATUSÓW (OMINIĘCIE FILTRÓW PLATFORMY)
             if m.get('status') == "LIVE":
                 status_html = '<span class="status-badge status-live">🔴 LIVE</span>'
             elif m.get('status') == "Zakończony":
                 status_html = '<span class="status-badge status-ended">⚫ Zakończony</span>'
             else:
-                status_html = '<span class="status-waiting">🟡 Oczekuje</span>'
+                status_html = '<span class="status-waiting" style="animation: kriconWaitingPulse 1.6s infinite ease-in-out !important;">🟡 Oczekuje</span>'
                 
             oficjalny_wynik_tekst = f"{m.get('score_h') if m.get('score_h') is not None else '?'} : {m.get('score_a') if m.get('score_a') is not None else '?'}"
             locked = (m['timestamp'] - now).total_seconds() <= 0
@@ -461,7 +426,8 @@ else:
             with c_banner:
                 if not locked:
                     if has_existing_bet: st.markdown("<div class='success-bet-banner'>✔ ZAPISANY</div>", unsafe_allow_html=True)
-                    else: st.markdown("<div class='missing-bet-banner'>⚠️ NIEODDANY TYP</div>", unsafe_allow_html=True)
+                    # WSTRZYKNIĘCIE IN-LINE ZABEZPIECZONEJ ANIMACJI DLA BANERU NIEODDANEGO TYPU
+                    else: st.markdown("<div class='missing-bet-banner' style='animation: kriconAlertPulse 1.1s infinite ease-in-out !important;'>⚠️ NIEODDANY TYP</div>", unsafe_allow_html=True)
             if locked or m.get('status') == "Zakończony":
                 with st.expander("👁️ Zobacz typy innych graczy"):
                     other_bets = [{"Gracz": p, "Typowany wynik": f"{st.session_state.bets.get(m_id, {}).get(p)[0]} - {st.session_state.bets.get(m_id, {}).get(p)[1]}" if st.session_state.bets.get(m_id, {}).get(p) else "Brak typu"} for p in players if p != st.session_state.logged_in_user]
