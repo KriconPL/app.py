@@ -41,7 +41,7 @@ VENUES_LIST = [
     "Gillette, Boston", "BMO Field, Toronto", "BBVA, Monterrey", "Akron, Guadalajara"
 ]
 
-# ANTY-COPY GUARD ORAZ SYSTEM ANIMACJI STYLÓW DLA STATUSÓW W CHMURZE
+# ANTY-COPY GUARD ORAZ SYSTEM WYMUSZONYCH ANIMACJI PULSOWANIA CSS
 st.markdown("""
     <script>
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
@@ -76,20 +76,21 @@ st.markdown("""
     .stButton>button { background-color: #F97316 !important; color: #FFFFFF !important; border-radius: 4px !important; border: none !important; font-weight: 700 !important; height: 32px !important; line-height: 32px !important; padding: 0 12px !important; width: 100% !important; font-size: 0.85rem !important; }
     .stButton>button:hover { background-color: #EA580C !important; box-shadow: 0 3px 8px rgba(249, 115, 22, 0.4) !important; }
     
-    /* SYSTEM AGRESYWNEGO PULSOWANIA W WIDOKACH STREAMLIT */
+    /* --- SYSTEM WYMUSZONEGO MRUGANIA CHMURY (MOCNE SELEKTORY) --- */
     @keyframes kriconAlertPulse {
-        0% { background-color: #DC2626 !important; opacity: 1.0 !important; }
-        50% { background-color: #EF4444 !important; opacity: 0.4 !important; }
-        100% { background-color: #DC2626 !important; opacity: 1.0 !important; }
+        0% { background-color: #DC2626 !important; box-shadow: 0 0 2px #DC2626; }
+        50% { background-color: #450A0A !important; box-shadow: 0 0 0px transparent; }
+        100% { background-color: #DC2626 !important; box-shadow: 0 0 2px #DC2626; }
     }
     @keyframes kriconWaitingPulse {
-        0% { background-color: #D97706 !important; opacity: 1.0 !important; }
-        50% { background-color: #F59E0B !important; opacity: 0.5 !important; }
-        100% { background-color: #D97706 !important; opacity: 1.0 !important; }
+        0% { background-color: #D97706 !important; opacity: 1.0; }
+        50% { background-color: #78350F !important; opacity: 0.7; }
+        100% { background-color: #D97706 !important; opacity: 1.0; }
     }
     
+    /* Agresywne przypisanie animacji do klas */
     .missing-bet-banner {
-        animation: kriconAlertPulse 1.2s infinite ease-in-out !important;
+        animation: kriconAlertPulse 1.4s infinite ease-in-out !important;
         color: #FFFFFF !important;
         font-weight: bold !important;
         text-align: center !important;
@@ -103,11 +104,12 @@ st.markdown("""
     }
     
     .status-waiting {
-        animation: kriconWaitingPulse 1.5s infinite ease-in-out !important;
+        animation: kriconWaitingPulse 2.0s infinite ease-in-out !important;
         color: #FFFFFF !important;
         padding: 2px 6px !important;
         border-radius: 4px !important;
         font-weight: bold !important;
+        display: inline-block !important;
     }
     
     .success-bet-banner {
@@ -157,7 +159,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- MAPOWANIE KODÓW ISO (SERWER CDN - USUWAMY RYZYKO KODOWANIA ZNAKÓW SYSTEMU) ---
+# --- MAPOWANIE KODÓW ISO DLA SERWERA CDN ---
 ISO_FLAGS_MAP = {
     "Meksyk": "mx", "RPA": "za", "Korea Południowa": "kr", "Czechy": "cz",
     "Kanada": "ca", "Bośnia i Hercegowina": "ba", "Katar": "qa", "Szwajcaria": "ch",
@@ -176,7 +178,6 @@ ISO_FLAGS_MAP = {
 def clean_and_sanitize_team_string(raw_name):
     if not raw_name or raw_name == "TBD": return "TBD"
     s = str(raw_name).strip()
-    # Usuwanie złośliwych i zmiennych dopisków dwuliterowych (MS, XA, KR, cz, CE, EM itd.)
     s = re.sub(r'^(MS|MX|ZA|XA|KR|cz|cv|CA|BA|QA|CH|BR|MA|HT|US|PY|AU|TR|DE|WKS|EC|NL|JP|SE|TN|BEL|CE|EM|IR|EGI|IRA|NZ|ESP|SA|URU|FRA|SEN|IRQ|NOR|ARG|ALG|AUT|JOR|POR|DRK|UZB|COL|ANG|CRO|GHA|PAN)\s+', '', s, flags=re.IGNORECASE)
     s = re.sub(r'[^\w\s\-ąęćłńóśźżĄĘĆŁŃÓŚŹŻ]', '', s)
     return s.strip()
@@ -366,7 +367,7 @@ def fetch_official_results_from_api(now_time):
                 if m['home'] == "TBD": m['home'] = "Meksyk"
                 if m['away'] == "TBD": m['away'] = "RPA"
 
-# --- SYSTEM AUTOMATYCZNEJ TRANSMUTACJI USZKODZONEGO STANÓW ---
+# --- SILNIK INICJALIZACJI SYSTEMU ---
 force_reset_needed = False
 if 'results' in st.session_state:
     for m in st.session_state.results.values():
