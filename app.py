@@ -41,7 +41,7 @@ VENUES_LIST = [
     "Gillette, Boston", "BMO Field, Toronto", "BBVA, Monterrey", "Akron, Guadalajara"
 ]
 
-# MATRYCOWY SYSTEM STYLIZACJI FLEXBOX
+# GŁÓWNY SILNIK CSS DLA WYMUSZENIA JEDNEJ LINII HORIZONTALNEJ PRZEZ :HAS()
 st.markdown("""
     <script>
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
@@ -74,45 +74,23 @@ st.markdown("""
         100% { opacity: 1.0; }
     }
     
-    .missing-bet-banner-blink {
-        animation: pulseAlertCore 1.2s infinite ease-in-out !important;
-        background-color: #DC2626 !important;
-        color: #FFFFFF !important;
-        font-weight: bold !important;
-        text-align: center !important;
-        height: 28px !important;
-        line-height: 28px !important;
-        border-radius: 4px !important;
-        font-size: 0.75rem !important;
-        padding: 0 10px !important;
-        white-space: nowrap !important;
-        display: inline-block !important;
+    /* --- ZŁOTA REGULA: STYLIZACJA NATYWNEGO WIERSZA STREAMLIT --- */
+    /* Targetujemy cały wiersz kolumn za pomocą osadzonej ukrytej kotwicy .match-row-anchor */
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) {
+        background: #172554 !important;
+        border: 1px solid #1E3A8A !important;
+        border-radius: 6px;
+        padding: 6px 10px !important;
+        margin-bottom: 6px !important;
+        align-items: center !important; /* Wymuszenie centrowania w pionie wszystkich elementów */
+        box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    /* Pozbywamy się marginesów wewnątrz kolumn dla max zagęszczenia */
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"] {
+        padding: 0 4px !important;
     }
     
-    .status-waiting-blink {
-        animation: pulseAlertCore 2.0s infinite ease-in-out !important;
-        background-color: #D97706 !important;
-        color: #FFFFFF !important;
-        padding: 1px 5px !important;
-        border-radius: 4px !important;
-        font-weight: bold !important;
-        font-size: 0.65rem !important;
-    }
-    
-    .success-bet-banner {
-        background-color: #16A34A !important;
-        color: #FFFFFF !important;
-        font-weight: bold !important;
-        text-align: center !important;
-        height: 28px !important;
-        line-height: 28px !important;
-        border-radius: 4px !important;
-        font-size: 0.75rem !important;
-        display: inline-block !important;
-        padding: 0 10px !important;
-        white-space: nowrap;
-    }
-    
+    /* METADANE PO LEWEJ STRONIE (W JEDNYM BLOKU) */
     .meta-inline-box {
         display: flex;
         flex-direction: column;
@@ -124,68 +102,75 @@ st.markdown("""
         white-space: nowrap;
     }
     .meta-inline-id { font-weight: bold; color: #F97316 !important; font-size: 0.75rem !important; }
+    .status-waiting-blink { animation: pulseAlertCore 2.0s infinite ease-in-out !important; color: #D97706 !important; font-weight: bold !important; font-size: 0.65rem !important; }
+    .status-badge-ended { color: #94A3B8 !important; font-weight: bold; font-size: 0.65rem !important;}
+    .status-badge-live { color: #DC2626 !important; font-weight: bold; font-size: 0.65rem !important;}
     
-    .match-card-clean {
-        background: #172554 !important; 
-        border: 1px solid #1E3A8A !important; 
-        border-radius: 4px; 
-        padding: 5px 12px !important; 
-        margin-bottom: 2px !important; 
-        box-shadow: 0 1px 2px rgba(0,0,0,0.15);
-        width: 100%;
-    }
+    /* DRUŻYNY W CENTRUM */
+    .team-align-right { font-size: 1.05rem !important; font-weight: bold !important; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%; white-space: nowrap; height: 34px; line-height: 34px;}
+    .team-align-left { font-size: 1.05rem !important; font-weight: bold !important; text-align: left; display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; white-space: nowrap; height: 34px; line-height: 34px;}
     
-    .team-text-align-right { font-size: 1.05rem !important; font-weight: bold !important; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%; white-space: nowrap; }
-    .team-text-align-left { font-size: 1.05rem !important; font-weight: bold !important; text-align: left; display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; white-space: nowrap; }
-    
-    .official-score-subtle {
+    /* SUBTELNY WYNIK OFICJALNY */
+    .off-score {
         font-size: 0.8rem !important;
         font-weight: bold !important;
         color: #94A3B8 !important;
         background-color: #1E293B !important;
         border: 1px solid #334155 !important;
         border-radius: 4px;
-        display: inline-block;
+        display: block;
         text-align: center;
         white-space: nowrap;
-        height: 28px !important;
-        line-height: 28px !important;
-        padding: 0 8px !important;
-    }
-    
-    .inputs-horizontal-align-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
+        height: 34px !important;
+        line-height: 32px !important;
         width: 100%;
     }
-    .score-center-separator {
-        font-weight: bold;
-        color: #F97316 !important;
-        padding: 0 4px;
-        font-size: 1.1rem;
+    
+    .score-colon { text-align: center; font-weight: bold; color: #F97316 !important; font-size: 1.3rem; height: 34px; line-height: 30px; width: 100%; }
+    
+    /* --- IDEALNE NATYWNE SUWAKI +/- (STREAMLIT NUMBER INPUT) --- */
+    div[data-testid="stNumberInput"] { width: 100% !important; min-width: 0 !important; margin: 0 !important; padding: 0 !important; }
+    div[data-testid="stNumberInput"] input { 
+        text-align: center !important; 
+        background-color: #0A1128 !important; 
+        color: #F8FAFC !important; 
+        height: 34px !important; 
+        font-size: 1.1rem !important; 
+        font-weight: bold !important; 
+        border: 1px solid #1E3A8A !important; 
+        padding: 0 !important;
     }
+    /* Customizacja wbudowanych przycisków + i - w polu inputu */
+    div[data-testid="stNumberInput"] button { 
+        height: 34px !important; 
+        width: 26px !important; 
+        background-color: #1E293B !important; 
+        color: #F97316 !important; 
+        border: 1px solid #334155 !important; 
+    }
+    div[data-testid="stNumberInput"] button:hover { background-color: #334155 !important; color: #FFFFFF !important; }
     
-    div.stNumberInput { width: 95px !important; margin: 0 !important; padding: 0 !important; display: inline-block !important; }
-    div.stNumberInput input { text-align: center !important; background-color: #0A1128 !important; color: #F8FAFC !important; height: 28px !important; font-size: 1rem !important; font-weight: bold !important; padding: 0 !important; border: 1px solid #1E3A8A !important; }
-    div.stNumberInput button { height: 28px !important; width: 22px !important; background-color: #1E293B !important; color: #F97316 !important; border: 1px solid #334155 !important; }
-    
-    div.stButton button, div[data-testid="stBlock"] button {
+    /* PRZYCISK ZAPISZ DLA CAŁEJ APLIKACJI */
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div[data-testid="stButton"] button {
         background-color: #F97316 !important; 
         color: #FFFFFF !important; 
         border-radius: 4px !important; 
         border: 1px solid #EA580C !important; 
         font-weight: bold !important; 
-        height: 28px !important; 
-        line-height: 26px !important; 
-        padding: 0 12px !important; 
+        height: 34px !important; 
+        line-height: 1 !important; 
+        padding: 0 !important; 
         font-size: 0.85rem !important; 
         width: 100% !important;
-        display: inline-block !important;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
     }
-    div.stButton button:hover { background-color: #EA580C !important; }
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div[data-testid="stButton"] button:hover { background-color: #EA580C !important; }
     
+    /* STATUSY TYPOWANIA (Z PRAWY DO STRONY) */
+    .bet-ok { background: #16A34A; color: white; text-align: center; font-weight: bold; border-radius: 4px; height: 34px; line-height: 34px; font-size: 0.8rem; width: 100%; white-space: nowrap; }
+    .bet-brak { background: #DC2626; color: white; text-align: center; font-weight: bold; border-radius: 4px; height: 34px; line-height: 34px; font-size: 0.8rem; width: 100%; animation: pulseAlertCore 1.2s infinite ease-in-out; white-space: nowrap; }
+    
+    /* PODIUM MEDALOWE W RANKINGU */
     .gold-medal-row { background-color: rgba(254, 240, 138, 0.95) !important; font-weight: bold; }
     .gold-medal-row td, .gold-medal-row b { color: #0A1128 !important; }
     .silver-medal-row { background-color: rgba(226, 232, 240, 0.95) !important; font-weight: bold; }
@@ -200,6 +185,12 @@ st.markdown("""
     .silver-medal-row .trend-up, .silver-medal-row .trend-down, .silver-medal-row .trend-stable,
     .bronze-medal-row .trend-up, .bronze-medal-row .trend-down, .bronze-medal-row .trend-stable { color: #0A1128 !important; }
     
+    .kricon-table { width: 100%; border-collapse: collapse; margin: 15px 0 35px 0; background-color: #172554 !important; border-radius: 8px; overflow: hidden; }
+    .kricon-table th { background-color: #F97316 !important; color: #0A1128 !important; padding: 12px; font-weight: 800; }
+    .kricon-table td { padding: 11px 12px; border-bottom: 1px solid #1E3A8A !important; }
+    .flag-img { width: 22px !important; height: 14px !important; object-fit: cover !important; border-radius: 2px !important; display: inline-block; vertical-align: middle; border: 1px solid rgba(255,255,255,0.2); }
+    
+    /* TABELA 3 MIEJSC & DRABINKA */
     .bracket-match-card { background: #172554 !important; border: 2px solid #1E3A8A !important; border-radius: 8px; padding: 10px; margin: 6px 0; }
     .bracket-match-title { font-size: 0.75rem !important; color: #F97316 !important; font-weight: bold; margin-bottom: 4px; }
     .bracket-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; font-size: 0.9rem !important; }
@@ -207,12 +198,6 @@ st.markdown("""
     .bracket-team-winner { color: #4ADE80 !important; font-weight: bold; }
     .bracket-group-box { background: #0D1B3E !important; border: 1px solid #F97316 !important; border-radius: 8px; padding: 8px; }
     .center-final-card { background: #23153C !important; border: 3px solid #FF6B00 !important; border-radius: 10px; padding: 20px; text-align: center; }
-    
-    .kricon-table { width: 100%; border-collapse: collapse; margin: 15px 0 35px 0; background-color: #172554 !important; border-radius: 8px; overflow: hidden; }
-    .kricon-table th { background-color: #F97316 !important; color: #0A1128 !important; padding: 12px; font-weight: 800; }
-    .kricon-table td { padding: 11px 12px; border-bottom: 1px solid #1E3A8A !important; }
-    .points-legend { background-color: #060B19; border-left: 5px solid #F97316; padding: 12px; margin-bottom: 15px; border-radius: 4px; }
-    .flag-img { width: 22px !important; height: 14px !important; object-fit: cover !important; border-radius: 2px !important; display: inline-block; vertical-align: middle; border: 1px solid rgba(255,255,255,0.2); }
     </style>
 """, unsafe_allow_html=True)
 
@@ -460,11 +445,11 @@ else:
             if (mode == "Oczekujące" and m.get('status') == "Zakończony") or (mode == "Zakończone" and m.get('status') == "Oczekuje"): continue
             
             if m.get('status') == "LIVE":
-                status_html = '<span class="status-badge status-live">🔴 LIVE</span>'
+                status_html = '<span class="status-badge-live">🔴 LIVE</span>'
             elif m.get('status') == "Zakończony":
-                status_html = '<span class="status-badge status-ended">⚫ Zakończony</span>'
+                status_html = '<span class="status-badge-ended">⚫ Zakończony</span>'
             else:
-                status_html = '<span class="status-waiting-blink" style="animation: pulseAlertCore 2.0s infinite ease-in-out !important;">🟡 Oczekuje</span>'
+                status_html = '<span class="status-waiting-blink">🟡 Oczekuje</span>'
                 
             oficjalny_wynik_tekst = f"Wynik: {m.get('score_h') if m.get('score_h') is not None else '?'} : {m.get('score_a') if m.get('score_a') is not None else '?'}"
             locked = (m['timestamp'] - now).total_seconds() <= 0
@@ -474,14 +459,14 @@ else:
             home_clean = clean_and_sanitize_team_string(m['home'])
             away_clean = clean_and_sanitize_team_string(m['away'])
             
-            st.markdown("<div class='match-card-clean'>", unsafe_allow_html=True)
+            # --- ZŁOTY UKŁAD STREAMLIT W JEDNYM WIERSZU (ST.COLUMNS WEWNĄTRZ MARKERA :HAS) ---
             
-            # --- ZMINIMALIZOWANY UKŁAD: WSZYSTKO W JEDNEJ LINII RAZEM Z METADANYMI ---
-            # c1: Metadane, c2: Zespół 1, c3: Wyniki [X : X], c4: Zespół 2, c5: Wynik oficjalny, c6: Akcje
-            c1, c2, c3, c4, c5, c6 = st.columns([1.6, 2.0, 2.4, 2.0, 1.2, 1.4])
+            # 1. KOTWICA HTML uruchamiająca regułę CSS :has() dla tego konkretnego rzędu
+            c_meta, c_home, c_inp_h, c_colon, c_inp_a, c_away, c_score, c_save, c_status = st.columns([1.8, 2.3, 1.1, 0.2, 1.1, 2.3, 1.4, 1.2, 1.1])
             
-            with c1:
+            with c_meta:
                 st.markdown(f"""
+                <div class="match-row-anchor"></div>
                 <div class="meta-inline-box">
                     <span class="meta-inline-id">Mecz #{m_id}</span>
                     <div>{status_html}</div>
@@ -490,39 +475,38 @@ else:
                 </div>
                 """, unsafe_allow_html=True)
                 
-            with c2:
-                st.markdown(f"<div class='team-text-align-right'><span>{home_clean}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
+            with c_home:
+                st.markdown(f"<div class='team-align-right'><span>{home_clean}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
                 
-            with c3:
-                st.markdown("<div class='inputs-horizontal-align-container'>", unsafe_allow_html=True)
-                b_h = st.number_input(f"H_{m_id}", 0, 20, int(cur_h), 1, key=f"h_{m_id}", label_visibility="collapsed")
-                st.markdown("<span class='score-center-separator'>:</span>", unsafe_allow_html=True)
-                b_a = st.number_input(f"A_{m_id}", 0, 20, int(cur_a), 1, key=f"a_{m_id}", label_visibility="collapsed")
-                st.markdown("</div>", unsafe_allow_html=True)
+            with c_inp_h:
+                b_h = st.number_input(f"H_{m_id}", 0, 20, int(cur_h), 1, key=f"h_{m_id}", label_visibility="collapsed", disabled=locked)
                 
-            with c4:
-                st.markdown(f"<div class='team-text-align-left'>{get_cdn_flag_img_html(m['away'])} <span>{away_clean}</span></div>", unsafe_allow_html=True)
+            with c_colon:
+                st.markdown("<div class='score-colon'>:</div>", unsafe_allow_html=True)
                 
-            with c5:
-                st.markdown(f"<div class='official-score-subtle'>{oficjalny_wynik_tekst}</div>", unsafe_allow_html=True)
+            with c_inp_a:
+                b_a = st.number_input(f"A_{m_id}", 0, 20, int(cur_a), 1, key=f"a_{m_id}", label_visibility="collapsed", disabled=locked)
                 
-            with c6:
-                st.markdown("<div style='display:flex; align-items:center; gap:6px; justify-content:flex-start; width:100%;'>", unsafe_allow_html=True)
+            with c_away:
+                st.markdown(f"<div class='team-align-left'>{get_cdn_flag_img_html(m['away'])} <span>{away_clean}</span></div>", unsafe_allow_html=True)
+                
+            with c_score:
+                st.markdown(f"<div class='off-score'>{oficjalny_wynik_tekst}</div>", unsafe_allow_html=True)
+                
+            with c_save:
                 if locked:
-                    st.button("🔒", disabled=True, key=f"lock_{m_id}")
+                    st.button("🔒", disabled=True, key=f"lock_{m_id}", use_container_width=True)
                 else:
-                    if st.button("Zapisz", key=f"save_{m_id}"):
+                    if st.button("Zapisz", key=f"save_{m_id}", use_container_width=True):
                         st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a)
                         save_backup_local_and_github()
                         st.rerun()
-                    
-                    if has_existing_bet:
-                        st.markdown("<div class='success-bet-banner'>✔ OK</div>", unsafe_allow_html=True)
-                    else:
-                        st.markdown("<div class='missing-bet-banner-blink' style='animation: pulseAlertCore 1.2s infinite ease-in-out !important;'>⚠️ BRAK</div>", unsafe_allow_html=True)
-                st.markdown("</div>", unsafe_allow_html=True)
-                
-            st.markdown("</div>", unsafe_allow_html=True)
+                        
+            with c_status:
+                if has_existing_bet:
+                    st.markdown("<div class='success-bet-banner'>✔ OK</div>", unsafe_allow_html=True)
+                else:
+                    st.markdown("<div class='missing-bet-banner-blink'>⚠️ BRAK</div>", unsafe_allow_html=True)
 
     with tab3:
         st.header("Tabele Grup Turniejowych")
@@ -550,8 +534,9 @@ else:
                 rep_clean = clean_and_sanitize_team_string(r['Reprezentacja'])
                 row_style = 'style="background-color:#16A34A;"' if idx in [1, 2] else ('style="background-color:#EA580C;"' if idx == 3 else '')
                 g_rows += f"<tr {row_style}><td><b>{idx}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {rep_clean}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
-            st.markdown(f"<div class='match-card-clean'><table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table></div>", unsafe_allow_html=True)
+            st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table>", unsafe_allow_html=True)
             
+        # ODTWORZENIE STRUKTURALNEGO RANKINGU TRZECICH MIEJSC
         st.divider(); st.header("🏆 Ranking Drużyn z 3. Miejsc")
         if third_places_list:
             df_third = pd.DataFrame(third_places_list).sort_values(by=["Pkt", "RB", "BZ", "Zwyciestwa"], ascending=False).reset_index(drop=True)
@@ -559,7 +544,7 @@ else:
             for idx, r in df_third.iterrows(): 
                 rep_clean_third = clean_and_sanitize_team_string(r['Reprezentacja'])
                 third_rows += f"<tr {'style=\"background-color:#16A34A;\"' if idx <= 8 else ''}><td><b>{idx}</b></td><td><b>{r['Grupa']}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {rep_clean_third}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
-            st.markdown(f"<div class='match-card-clean'><table class='kricon-table'><tr><th>Msc.</th><th>Grupa</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{third_rows}</table></div>", unsafe_allow_html=True)
+            st.markdown(f"<table class='kricon-table'><tr><th>Msc.</th><th>Grupa</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{third_rows}</table>", unsafe_allow_html=True)
 
     with tab4:
         st.header("🏆 Drabinka Fazy Pucharowej")
