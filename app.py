@@ -41,7 +41,7 @@ VENUES_LIST = [
     "Gillette, Boston", "BMO Field, Toronto", "BBVA, Monterrey", "Akron, Guadalajara"
 ]
 
-# ANTY-COPY GUARD ORAZ SYSTEM WYMUSZONYCH ANIMACJI PULSOWANIA CSS
+# ANTY-COPY GUARD ORAZ SYSTEM WYMUSZONYCH ANIMACJI CSS
 st.markdown("""
     <script>
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
@@ -93,7 +93,6 @@ st.markdown("""
         display: inline-block !important;
         padding: 0 8px !important;
         white-space: nowrap !important;
-        border: none !important;
     }
     
     .status-waiting-blink {
@@ -119,14 +118,14 @@ st.markdown("""
         white-space: nowrap;
     }
     
-    /* SUPER MINI LINIA INFORMACYJNA NAD MECZEM */
+    /* LINIA INFORMACYJNA NAD MECZEM */
     .meta-upper-container {
         display: flex;
         align-items: center;
         gap: 8px;
-        font-size: 0.7rem !important;
+        font-size: 0.75rem !important;
         color: #64748B !important;
-        margin-top: 2px !important;
+        margin-top: 6px !important;
         margin-bottom: 2px !important;
         padding-left: 6px;
     }
@@ -134,37 +133,37 @@ st.markdown("""
     .meta-badge-clean { color: #94A3B8 !important; background-color: #1E293B; padding: 0px 4px; border-radius: 3px; }
     .meta-venue-clean { color: #38BDF8 !important; background-color: #0B1329; padding: 0px 4px; border-radius: 3px; }
     
-    /* ZWIDOKOWANY, ZWARTY BOX MECZOWY */
+    /* ZWIDOKOWANY, NIEBIESKI BOX MECZOWY */
     .match-card-clean {
         background: #172554 !important; 
         border: 1px solid #1E3A8A !important; 
         border-radius: 4px; 
-        padding: 6px 12px !important; 
-        margin-bottom: 2px !important;
+        padding: 8px 12px !important; 
+        margin-bottom: 4px !important;
         box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         width: 100%;
     }
     
-    /* PURE HTML/CSS ROW DLA IDEALNEGO WPASOWANIA W BOX */
-    .match-inner-flex-row {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        justify-content: space-between;
-        gap: 10px;
+    .team-text-align-right { font-size: 1.1rem !important; font-weight: bold !important; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%; white-space: nowrap; }
+    .team-text-align-left { font-size: 1.1rem !important; font-weight: bold !important; text-align: left; display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; white-space: nowrap; }
+    
+    /* SUBTELNY WYNIK OFICJALNY Z BOKU */
+    .official-score-subtle {
+        font-size: 0.85rem !important;
+        font-weight: bold !important;
+        color: #94A3B8 !important;
+        background-color: #1E293B !important;
+        border: 1px solid #334155 !important;
+        padding: 2px 6px;
+        border-radius: 4px;
+        display: inline-block;
+        text-align: center;
+        white-space: nowrap;
     }
     
-    .flex-home-team { flex: 1 1 35%; text-align: right; font-size: 1.05rem !important; font-weight: bold !important; display: flex; align-items: center; justify-content: flex-end; gap: 8px; color: #F8FAFC !important; }
-    .flex-score-badge { flex: 0 0 65px; text-align: center; }
-    .flex-away-team { flex: 1 1 35%; text-align: left; font-size: 1.05rem !important; font-weight: bold !important; display: flex; align-items: center; justify-content: flex-start; gap: 8px; color: #F8FAFC !important; }
-    .flex-input-container { flex: 0 0 160px; display: flex; align-items: center; gap: 4px; }
-    .flex-action-container { flex: 0 0 180px; display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
-    
-    .official-score-badge { font-size: 1.05rem !important; font-weight: 800 !important; color: #0A1128 !important; background-color: #F97316 !important; padding: 2px 10px; border-radius: 4px; display: inline-block; text-align: center; min-width: 55px; height: 28px; line-height: 24px; }
-    
-    /* ZMIANA TŁA DLA PRZYCISKÓW PLUS/MINUS NA CZYTELNE (CIEMNY GRAFIT) */
-    div.stNumberInput { width: 75px !important; margin: 0 !important; padding: 0 !important; }
-    div.stNumberInput input { text-align: center !important; background-color: #0A1128 !important; color: #F8FAFC !important; height: 28px !important; font-size: 0.9rem !important; font-weight: bold !important; padding: 0 !important; border: 1px solid #1E3A8A !important; }
+    /* PRZYCISKI PLUS/MINUS NA CZYTELNYM GRAPHITE TLE */
+    div.stNumberInput { width: 80px !important; margin: 0 !important; padding: 0 !important; }
+    div.stNumberInput input { text-align: center !important; background-color: #0A1128 !important; color: #F8FAFC !important; height: 28px !important; font-size: 0.95rem !important; font-weight: bold !important; padding: 0 !important; border: 1px solid #1E3A8A !important; }
     div.stNumberInput button { height: 28px !important; width: 22px !important; background-color: #1E293B !important; color: #F97316 !important; border: 1px solid #334155 !important; }
     div.stNumberInput button:hover { background-color: #334155 !important; color: #FFFFFF !important; }
     
@@ -189,7 +188,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- INDYWIDUALNE MAPOWANIE KODÓW ISO DLA STABILNEGO WEKTOROWEGO CDN ---
+# --- MAPOWANIE KODÓW ISO DLA SERWERA CDN ---
 ISO_FLAGS_MAP = {
     "Meksyk": "mx", "RPA": "za", "Korea Południowa": "kr", "Czechy": "cz",
     "Kanada": "ca", "Bośnia i Hercegowina": "ba", "Katar": "qa", "Szwajcaria": "ch",
@@ -218,7 +217,6 @@ def get_cdn_flag_img_html(team_name):
         return f'<span style="font-size:1rem; margin-right:4px;">🌐</span>'
     code = ISO_FLAGS_MAP.get(c_name, None)
     if code:
-        # Oficjalne stabilne repozytorium SVG unika błędów renderowania czcionek chmury
         return f'<img src="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/{code}.svg" class="flag-img" />'
     return f'<span style="font-size:1rem; margin-right:4px;">🌐</span>'
 
@@ -463,7 +461,7 @@ else:
             else:
                 status_html = '<span class="status-waiting-blink" style="animation: pulseAlertCore 2.0s infinite ease-in-out !important;">🟡 Oczekuje</span>'
                 
-            oficjalny_wynik_tekst = f"{m.get('score_h') if m.get('score_h') is not None else '?'} : {m.get('score_a') if m.get('score_a') is not None else '?'}"
+            oficjalny_wynik_tekst = f"Wynik: {m.get('score_h') if m.get('score_h') is not None else '?'} : {m.get('score_a') if m.get('score_a') is not None else '?'}"
             locked = (m['timestamp'] - now).total_seconds() <= 0
             has_existing_bet = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user) is not None
             cur_h, cur_a = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user, (0,0))
@@ -471,7 +469,7 @@ else:
             home_clean = clean_and_sanitize_team_string(m['home'])
             away_clean = clean_and_sanitize_team_string(m['away'])
             
-            # 1. LINIA INFORMACYJNA NAD MECZEM (CZCIONKA 0.7rem)
+            # --- 1. LINIA INFORMACYJNA NAD MECZEM (CZCIONKA ZMNIEJSZONA DO 0.75REM) ---
             st.markdown(f"""
             <div class="meta-upper-container">
                 <span class="meta-id-text-clean">⚽ Mecz #{m_id}</span>
@@ -482,30 +480,35 @@ else:
             </div>
             """, unsafe_allow_html=True)
             
-            # 2. START PROSTEGO BOXA MECZOWEGO (ZMINIMALIZOWANY ODSTĘP DO 2PX)
+            # --- 2. START PROSTEGO BOXA MECZOWEGO (ZWARTY ODSTĘP, TYP W CENTRUM) ---
             st.markdown("<div class='match-card-clean'>", unsafe_allow_html=True)
             
-            st.markdown(f"""
-            <div class="match-inner-flex-row">
-                <div class="flex-home-team"><span>{home_clean}</span> {get_cdn_flag_img_html(m['home'])}</div>
-                <div class="flex-score-badge"><span class="official-score-badge">{oficjalny_wynik_tekst}</span></div>
-                <div class="flex-away-team">{get_cdn_flag_img_html(m['away'])} <span>{away_clean}</span></div>
-            """, unsafe_allow_html=True)
+            # Nowy rozkład kolumn: Lewy zespół | Pole Typu Dom | Pole Typu Wyjazd | Prawy zespół | Narzędzia akcji
+            cf1, cf2, cf3, cf4, cf5 = st.columns([2.3, 0.7, 0.7, 2.3, 1.8])
             
-            col_inputs, col_actions = st.columns([1.2, 1.5])
-            
-            with col_inputs:
-                st.markdown("<div class='flex-input-container'>", unsafe_allow_html=True)
-                b_h = st.number_input(f"H_{m_id}", 0, 20, int(cur_h), 1, key=f"input_h_{m_id}", disabled=locked, label_visibility="collapsed")
-                b_a = st.number_input(f"A_{m_id}", 0, 20, int(cur_a), 1, key=f"input_a_{m_id}", disabled=locked, label_visibility="collapsed")
-                st.markdown("</div>", unsafe_allow_html=True)
+            with cf1: 
+                st.markdown(f"<div class='team-text-align-right'><span>{home_clean}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
                 
-            with col_actions:
-                st.markdown("<div class='flex-action-container'>", unsafe_allow_html=True)
+            # TYPOWANIE JAKO NAJBARDZIEJ WIDOCZNY ELEMENT (W SAMYM CENTRUM)
+            with cf2: 
+                b_h = st.number_input(f"H_{m_id}", 0, 20, int(cur_h), 1, key=f"input_h_{m_id}", disabled=locked, label_visibility="collapsed")
+            with cf3: 
+                b_a = st.number_input(f"A_{m_id}", 0, 20, int(cur_a), 1, key=f"input_a_{m_id}", disabled=locked, label_visibility="collapsed")
+                
+            with cf4: 
+                st.markdown(f"<div class='team-text-align-left'>{get_cdn_flag_img_html(m['away'])} <span>{away_clean}</span></div>", unsafe_allow_html=True)
+                
+            with cf5:
+                # Blok przycisków i mały, przesunięty na bok wynik oficjalny
+                st.markdown("<div class='flex-action-container' style='display:flex; align-items:center; gap:6px; justify-content:flex-end; width:100%; height:32px;'>", unsafe_allow_html=True)
+                
+                # Subtelny, mniejszy oficjalny wynik schowany z boku
+                st.markdown(f"<span class='official-score-subtle'>{oficjalny_wynik_tekst}</span>", unsafe_allow_html=True)
+                
                 if locked:
-                    st.button("Zablokowane", disabled=True, key=f"lock_btn_{m_id}")
+                    st.button("🔒", disabled=True, key=f"lock_btn_{m_id}")
                 else:
-                    st.markdown("<div class='mini-save-btn'>", unsafe_allow_html=True)
+                    st.markdown("<div class='mini-save-btn' style='display:inline-block;'>", unsafe_allow_html=True)
                     if st.button("Zapisz", key=f"btn_{m_id}"):
                         if m_id not in st.session_state.bets: st.session_state.bets[m_id] = {}
                         st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a)
@@ -517,10 +520,10 @@ else:
                     if has_existing_bet:
                         st.markdown("<div class='success-bet-banner'>✔ ZAPISANY</div>", unsafe_allow_html=True)
                     else:
-                        st.markdown("<div class='missing-bet-banner-blink' style='animation: pulseAlertCore 1.2s infinite ease-in-out !important;'>⚠️ NIEODDANY TYP</div>", unsafe_allow_html=True)
+                        st.markdown("<div class='missing-bet-banner-blink' style='animation: pulseAlertCore 1.2s infinite ease-in-out !important;'>⚠️ BRAK</div>", unsafe_allow_html=True)
                 st.markdown("</div>", unsafe_allow_html=True)
                 
-            st.markdown("</div></div>", unsafe_allow_html=True) # Zamknięcie flex-row i .match-card-clean
+            st.markdown("</div>", unsafe_allow_html=True) # Zamknięcie .match-card-clean
             
             if locked or m.get('status') == "Zakończony":
                 with st.expander("👁️ Zobacz typy innych graczy"):
