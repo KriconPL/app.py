@@ -41,7 +41,7 @@ VENUES_LIST = [
     "Gillette, Boston", "BMO Field, Toronto", "BBVA, Monterrey", "Akron, Guadalajara"
 ]
 
-# GŁÓWNY SILNIK CSS DLA WYMUSZENIA JEDNEJ LINII HORIZONTALNEJ PRZEZ :HAS()
+# ZAAWANSOWANA ARCHITEKTURA CSS DLA ZWARTEGO UKŁADU KART MECZOWYCH
 st.markdown("""
     <script>
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
@@ -74,101 +74,113 @@ st.markdown("""
         100% { opacity: 1.0; }
     }
     
-    /* --- ZŁOTA REGULA: STYLIZACJA NATYWNEGO WIERSZA STREAMLIT --- */
-    /* Targetujemy cały wiersz kolumn za pomocą osadzonej ukrytej kotwicy .match-row-anchor */
+    /* --- JASNONIEBIESKI GÓRNY PASEK METADANYCH (ZAZNACZONY NA RYSUNKU) --- */
+    .meta-upper-bar-container {
+        background-color: #1E293B !important;
+        border: 1px solid #1E3A8A !important;
+        border-bottom: none !important;
+        border-radius: 6px 6px 0 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.75rem !important;
+        color: #94A3B8 !important;
+        padding: 6px 14px !important;
+        width: 100%;
+        margin-top: 10px !important;
+    }
+    .meta-id-text-clean { font-weight: bold; color: #F97316 !important; }
+    .status-waiting-blink { animation: pulseAlertCore 2.0s infinite ease-in-out !important; color: #D97706 !important; font-weight: bold !important; font-size: 0.65rem !important; }
+    .status-badge-ended { color: #94A3B8 !important; font-weight: bold; font-size: 0.65rem !important; }
+    .status-badge-live { color: #DC2626 !important; font-weight: bold; font-size: 0.65rem !important; }
+    
+    /* --- CIEMNONIEBIESKI GŁÓWNY WIERSZ MECZU (STEROWANY PRZEZ :HAS) --- */
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) {
         background: #172554 !important;
         border: 1px solid #1E3A8A !important;
-        border-radius: 6px;
-        padding: 6px 10px !important;
-        margin-bottom: 6px !important;
-        align-items: center !important; /* Wymuszenie centrowania w pionie wszystkich elementów */
-        box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        border-radius: 0 0 6px 6px;
+        padding: 8px 10px !important;
+        margin-bottom: 4px !important;
+        align-items: center !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
-    /* Pozbywamy się marginesów wewnątrz kolumn dla max zagęszczenia */
+    /* Usunięcie marginesów wewnątrz kolumn dla zachowania zwartej linii */
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"] {
-        padding: 0 4px !important;
+        padding: 0 2px !important;
+    }
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) p,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div[data-testid="stMarkdownContainer"] {
+        margin-bottom: 0 !important;
     }
     
-    /* METADANE PO LEWEJ STRONIE (W JEDNYM BLOKU) */
-    .meta-inline-box {
-        display: flex;
-        flex-direction: column;
-        gap: 1px;
-        font-size: 0.65rem !important;
-        color: #64748B !important;
-        line-height: 1.2;
-        text-align: left;
-        white-space: nowrap;
-    }
-    .meta-inline-id { font-weight: bold; color: #F97316 !important; font-size: 0.75rem !important; }
-    .status-waiting-blink { animation: pulseAlertCore 2.0s infinite ease-in-out !important; color: #D97706 !important; font-weight: bold !important; font-size: 0.65rem !important; }
-    .status-badge-ended { color: #94A3B8 !important; font-weight: bold; font-size: 0.65rem !important;}
-    .status-badge-live { color: #DC2626 !important; font-weight: bold; font-size: 0.65rem !important;}
+    .team-align-right { font-size: 1.05rem !important; font-weight: bold !important; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%; white-space: nowrap; height: 32px; line-height: 32px; }
+    .team-align-left { font-size: 1.05rem !important; font-weight: bold !important; text-align: left; display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; white-space: nowrap; height: 32px; line-height: 32px; }
     
-    /* DRUŻYNY W CENTRUM */
-    .team-align-right { font-size: 1.05rem !important; font-weight: bold !important; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%; white-space: nowrap; height: 34px; line-height: 34px;}
-    .team-align-left { font-size: 1.05rem !important; font-weight: bold !important; text-align: left; display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; white-space: nowrap; height: 34px; line-height: 34px;}
+    /* ZABEZPIECZONE I WYRÓWNANE POLA WPISYWANIA CYFR */
+    input[type="number"]::-webkit-inner-spin-button, 
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type="number"] { -moz-appearance: textfield; }
     
-    /* SUBTELNY WYNIK OFICJALNY */
-    .off-score {
-        font-size: 0.8rem !important;
-        font-weight: bold !important;
-        color: #94A3B8 !important;
-        background-color: #1E293B !important;
-        border: 1px solid #334155 !important;
-        border-radius: 4px;
-        display: block;
-        text-align: center;
-        white-space: nowrap;
-        height: 34px !important;
-        line-height: 32px !important;
-        width: 100%;
-    }
-    
-    .score-colon { text-align: center; font-weight: bold; color: #F97316 !important; font-size: 1.3rem; height: 34px; line-height: 30px; width: 100%; }
-    
-    /* --- IDEALNE NATYWNE SUWAKI +/- (STREAMLIT NUMBER INPUT) --- */
-    div[data-testid="stNumberInput"] { width: 100% !important; min-width: 0 !important; margin: 0 !important; padding: 0 !important; }
+    div[data-testid="stNumberInput"] { margin: 0 !important; padding: 0 !important; width: 100% !important; min-width: 0 !important; }
     div[data-testid="stNumberInput"] input { 
         text-align: center !important; 
         background-color: #0A1128 !important; 
         color: #F8FAFC !important; 
-        height: 34px !important; 
+        height: 32px !important; 
         font-size: 1.1rem !important; 
         font-weight: bold !important; 
         border: 1px solid #1E3A8A !important; 
         padding: 0 !important;
+        border-radius: 4px !important;
     }
-    /* Customizacja wbudowanych przycisków + i - w polu inputu */
-    div[data-testid="stNumberInput"] button { 
-        height: 34px !important; 
-        width: 26px !important; 
+    
+    .score-colon { text-align: center; font-weight: bold; color: #F97316 !important; font-size: 1.2rem; height: 32px; line-height: 28px; width: 100%; }
+    
+    /* SUBTELNY WYNIK OFICJALNY Z BOKU */
+    .off-score {
+        font-size: 0.75rem !important;
+        font-weight: bold !important;
+        color: #94A3B8 !important;
+        background-color: #0F172A !important;
+        border: 1px solid #1E3A8A !important;
+        border-radius: 4px;
+        display: block;
+        text-align: center;
+        white-space: nowrap;
+        height: 32px !important;
+        line-height: 30px !important;
+        width: 100%;
+        overflow: hidden;
+    }
+    
+    /* BANERY STATUSU NA SAMYM KOŃCU */
+    .bet-ok { background: #16A34A; color: white; text-align: center; font-weight: bold; border-radius: 4px; height: 32px; line-height: 32px; font-size: 0.75rem; width: 100%; white-space: nowrap; }
+    .bet-brak { background: #DC2626; color: white; text-align: center; font-weight: bold; border-radius: 4px; height: 32px; line-height: 32px; font-size: 0.75rem; width: 100%; animation: pulseAlertCore 1.2s infinite ease-in-out; white-space: nowrap; }
+    
+    /* --- STRUKTURA PRZYCISKÓW W JEDNEJ LINII --- */
+    /* Domyślny wygląd przycisków w wierszu meczu (używany dla przycisków +/-) */
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div.stButton button {
         background-color: #1E293B !important; 
         color: #F97316 !important; 
         border: 1px solid #334155 !important; 
-    }
-    div[data-testid="stNumberInput"] button:hover { background-color: #334155 !important; color: #FFFFFF !important; }
-    
-    /* PRZYCISK ZAPISZ DLA CAŁEJ APLIKACJI */
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div[data-testid="stButton"] button {
-        background-color: #F97316 !important; 
-        color: #FFFFFF !important; 
         border-radius: 4px !important; 
-        border: 1px solid #EA580C !important; 
-        font-weight: bold !important; 
-        height: 34px !important; 
-        line-height: 1 !important; 
+        height: 32px !important; 
+        min-height: 32px !important;
         padding: 0 !important; 
-        font-size: 0.85rem !important; 
+        font-size: 1.1rem !important; 
+        font-weight: bold !important;
         width: 100% !important;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
     }
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div[data-testid="stButton"] button:hover { background-color: #EA580C !important; }
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div.stButton button:hover { background-color: #334155 !important; color: #FFFFFF !important; }
     
-    /* STATUSY TYPOWANIA (Z PRAWY DO STRONY) */
-    .bet-ok { background: #16A34A; color: white; text-align: center; font-weight: bold; border-radius: 4px; height: 34px; line-height: 34px; font-size: 0.8rem; width: 100%; white-space: nowrap; }
-    .bet-brak { background: #DC2626; color: white; text-align: center; font-weight: bold; border-radius: 4px; height: 34px; line-height: 34px; font-size: 0.8rem; width: 100%; animation: pulseAlertCore 1.2s infinite ease-in-out; white-space: nowrap; }
+    /* SPECYFICZNE NADPISANIE WYGLĄDU DLA PRZYCISKU "Zapisz" (znajduje się w 10 kolumnie rzędu) */
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(10) div.stButton button {
+        background-color: #F97316 !important;
+        color: #FFFFFF !important;
+        border: 1px solid #EA580C !important;
+        font-size: 0.85rem !important;
+    }
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(10) div.stButton button:hover { background-color: #EA580C !important; border-color: #C2410C !important; }
     
     /* PODIUM MEDALOWE W RANKINGU */
     .gold-medal-row { background-color: rgba(254, 240, 138, 0.95) !important; font-weight: bold; }
@@ -188,9 +200,10 @@ st.markdown("""
     .kricon-table { width: 100%; border-collapse: collapse; margin: 15px 0 35px 0; background-color: #172554 !important; border-radius: 8px; overflow: hidden; }
     .kricon-table th { background-color: #F97316 !important; color: #0A1128 !important; padding: 12px; font-weight: 800; }
     .kricon-table td { padding: 11px 12px; border-bottom: 1px solid #1E3A8A !important; }
+    .points-legend { background-color: #060B19; border-left: 5px solid #F97316; padding: 12px; margin-bottom: 15px; border-radius: 4px; }
     .flag-img { width: 22px !important; height: 14px !important; object-fit: cover !important; border-radius: 2px !important; display: inline-block; vertical-align: middle; border: 1px solid rgba(255,255,255,0.2); }
     
-    /* TABELA 3 MIEJSC & DRABINKA */
+    /* DRABINKA I TABELE */
     .bracket-match-card { background: #172554 !important; border: 2px solid #1E3A8A !important; border-radius: 8px; padding: 10px; margin: 6px 0; }
     .bracket-match-title { font-size: 0.75rem !important; color: #F97316 !important; font-weight: bold; margin-bottom: 4px; }
     .bracket-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; font-size: 0.9rem !important; }
@@ -201,7 +214,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# MAPOWANIE KODÓW ISO
 ISO_FLAGS_MAP = {
     "Meksyk": "mx", "RPA": "za", "Korea Południowa": "kr", "Czechy": "cz",
     "Kanada": "ca", "Bośnia i Hercegowina": "ba", "Katar": "qa", "Szwajcaria": "ch",
@@ -459,54 +471,80 @@ else:
             home_clean = clean_and_sanitize_team_string(m['home'])
             away_clean = clean_and_sanitize_team_string(m['away'])
             
-            # --- ZŁOTY UKŁAD STREAMLIT W JEDNYM WIERSZU (ST.COLUMNS WEWNĄTRZ MARKERA :HAS) ---
+            # 1. JASNONIEBIESKI PASEK DLA METADANYCH
+            st.markdown(f"""
+            <div class="meta-upper-bar-container">
+                <span class="meta-id-text-clean">⚽ Mecz #{m_id}</span>
+                {status_html}
+                <span style="color:#94A3B8;">📅 {m['date']}</span>
+                <span style="color:#38BDF8; font-weight:bold;">📍 {m.get('venue').split(',')[0]}</span>
+                <span style="color:#64748B;">({m['stage']})</span>
+            </div>
+            """, unsafe_allow_html=True)
             
-            # 1. KOTWICA HTML uruchamiająca regułę CSS :has() dla tego konkretnego rzędu
-            c_meta, c_home, c_inp_h, c_colon, c_inp_a, c_away, c_score, c_save, c_status = st.columns([1.8, 2.3, 1.1, 0.2, 1.1, 2.3, 1.4, 1.2, 1.1])
+            # 2. ZZNACZNIK CSS DLA ZŁOTEJ REGUŁY :has()
+            st.markdown("<div class='match-row-anchor'></div>", unsafe_allow_html=True)
             
-            with c_meta:
-                st.markdown(f"""
-                <div class="match-row-anchor"></div>
-                <div class="meta-inline-box">
-                    <span class="meta-inline-id">Mecz #{m_id}</span>
-                    <div>{status_html}</div>
-                    <span>📅 {m['date']}</span>
-                    <span>📍 {m.get('venue').split(',')[0]}</span>
-                </div>
-                """, unsafe_allow_html=True)
-                
+            # 3. GŁÓWNA LINIA POZIOMA Z WYRÓWNANYMI KROPKAMI:
+            # HOME(2.6) | -(0.5)| inp(0.7)| +(0.5)| :(0.2)| -(0.5)| inp(0.7)| +(0.5)| AWAY(2.6)| ZAPISZ(1.3)| WYNIK(1.4)| STATUS(1.1)
+            c_home, c_mh, c_inph, c_ph, c_sep, c_ma, c_inpa, c_pa, c_away, c_save, c_score, c_status = st.columns([2.6, 0.5, 0.7, 0.5, 0.2, 0.5, 0.7, 0.5, 2.6, 1.3, 1.4, 1.1])
+            
             with c_home:
                 st.markdown(f"<div class='team-align-right'><span>{home_clean}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
                 
-            with c_inp_h:
-                b_h = st.number_input(f"H_{m_id}", 0, 20, int(cur_h), 1, key=f"h_{m_id}", label_visibility="collapsed", disabled=locked)
+            with c_mh:
+                if st.button("—", key=f"mh_{m_id}", disabled=locked):
+                    st.session_state.bets[m_id][st.session_state.logged_in_user] = (max(0, cur_h - 1), cur_a)
+                    save_backup_local_and_github()
+                    st.rerun()
+                    
+            with c_inph:
+                b_h = st.number_input("H", min_value=0, max_value=20, value=int(cur_h), key=f"h_{m_id}", label_visibility="collapsed", disabled=locked)
                 
-            with c_colon:
+            with c_ph:
+                if st.button("＋", key=f"ph_{m_id}", disabled=locked):
+                    st.session_state.bets[m_id][st.session_state.logged_in_user] = (cur_h + 1, cur_a)
+                    save_backup_local_and_github()
+                    st.rerun()
+                    
+            with c_sep:
                 st.markdown("<div class='score-colon'>:</div>", unsafe_allow_html=True)
                 
-            with c_inp_a:
-                b_a = st.number_input(f"A_{m_id}", 0, 20, int(cur_a), 1, key=f"a_{m_id}", label_visibility="collapsed", disabled=locked)
+            with c_ma:
+                if st.button("—", key=f"ma_{m_id}", disabled=locked):
+                    st.session_state.bets[m_id][st.session_state.logged_in_user] = (cur_h, max(0, cur_a - 1))
+                    save_backup_local_and_github()
+                    st.rerun()
+                    
+            with c_inpa:
+                b_a = st.number_input("A", min_value=0, max_value=20, value=int(cur_a), key=f"a_{m_id}", label_visibility="collapsed", disabled=locked)
                 
+            with c_pa:
+                if st.button("＋", key=f"pa_{m_id}", disabled=locked):
+                    st.session_state.bets[m_id][st.session_state.logged_in_user] = (cur_h, cur_a + 1)
+                    save_backup_local_and_github()
+                    st.rerun()
+                    
             with c_away:
                 st.markdown(f"<div class='team-align-left'>{get_cdn_flag_img_html(m['away'])} <span>{away_clean}</span></div>", unsafe_allow_html=True)
                 
-            with c_score:
-                st.markdown(f"<div class='off-score'>{oficjalny_wynik_tekst}</div>", unsafe_allow_html=True)
-                
             with c_save:
                 if locked:
-                    st.button("🔒", disabled=True, key=f"lock_{m_id}", use_container_width=True)
+                    st.button("🔒", disabled=True, key=f"lock_{m_id}")
                 else:
-                    if st.button("Zapisz", key=f"save_{m_id}", use_container_width=True):
+                    if st.button("Zapisz", key=f"save_{m_id}"):
                         st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a)
                         save_backup_local_and_github()
                         st.rerun()
                         
+            with c_score:
+                st.markdown(f"<div class='off-score'>{oficjalny_wynik_tekst}</div>", unsafe_allow_html=True)
+                
             with c_status:
                 if has_existing_bet:
-                    st.markdown("<div class='success-bet-banner'>✔ OK</div>", unsafe_allow_html=True)
+                    st.markdown("<div class='bet-ok'>✔ OK</div>", unsafe_allow_html=True)
                 else:
-                    st.markdown("<div class='missing-bet-banner-blink'>⚠️ BRAK</div>", unsafe_allow_html=True)
+                    st.markdown("<div class='bet-brak'>⚠️ BRAK</div>", unsafe_allow_html=True)
 
     with tab3:
         st.header("Tabele Grup Turniejowych")
@@ -536,7 +574,6 @@ else:
                 g_rows += f"<tr {row_style}><td><b>{idx}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {rep_clean}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
             st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table>", unsafe_allow_html=True)
             
-        # ODTWORZENIE STRUKTURALNEGO RANKINGU TRZECICH MIEJSC
         st.divider(); st.header("🏆 Ranking Drużyn z 3. Miejsc")
         if third_places_list:
             df_third = pd.DataFrame(third_places_list).sort_values(by=["Pkt", "RB", "BZ", "Zwyciestwa"], ascending=False).reset_index(drop=True)
