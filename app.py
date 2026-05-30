@@ -76,7 +76,7 @@ st.markdown("""
     /* SYSTEM AGRESYWNEGO MRUGANIA OPACITY (GPU RENDERED) */
     @keyframes pulseAlertCore {
         0% { opacity: 1.0; }
-        50% { opacity: 0.1; }
+        50% { opacity: 0.2; }
         100% { opacity: 1.0; }
     }
     
@@ -86,20 +86,20 @@ st.markdown("""
         color: #FFFFFF !important;
         font-weight: bold !important;
         text-align: center !important;
-        height: 28px !important;
-        line-height: 28px !important;
+        height: 30px !important;
+        line-height: 30px !important;
         border-radius: 4px !important;
         font-size: 0.75rem !important;
-        display: inline-block !important;
-        padding: 0 8px !important;
+        padding: 0 10px !important;
         white-space: nowrap !important;
+        display: inline-block !important;
     }
     
     .status-waiting-blink {
         animation: pulseAlertCore 2.0s infinite ease-in-out !important;
         background-color: #D97706 !important;
         color: #FFFFFF !important;
-        padding: 1px 6px !important;
+        padding: 1px 5px !important;
         border-radius: 4px !important;
         font-weight: bold !important;
     }
@@ -109,40 +109,37 @@ st.markdown("""
         color: #FFFFFF !important;
         font-weight: bold !important;
         text-align: center !important;
-        height: 28px !important;
-        line-height: 28px !important;
+        height: 30px !important;
+        line-height: 30px !important;
         border-radius: 4px !important;
         font-size: 0.75rem !important;
         display: inline-block !important;
-        padding: 0 10px !important;
+        padding: 0 12px !important;
         white-space: nowrap;
     }
     
-    /* --- JASNY NIEBIESKI PASEK NA METADANE MECZU --- */
-    .meta-upper-bar-container {
-        background-color: #1E293B !important;
-        border: 1px solid #334155 !important;
-        border-bottom: none !important;
-        border-radius: 4px 4px 0 0;
+    /* LINIA INFORMACYJNA NAD MECZEM */
+    .meta-upper-container {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
         font-size: 0.75rem !important;
-        color: #94A3B8 !important;
+        color: #64748B !important;
         margin-top: 6px !important;
-        padding: 4px 12px !important;
-        width: 100%;
+        margin-bottom: 2px !important;
+        padding-left: 6px;
     }
     .meta-id-text-clean { font-weight: bold; color: #F97316 !important; }
-    .meta-venue-clean { color: #38BDF8 !important; font-weight: 600; background-color: #0B1329; padding: 0px 4px; border-radius: 3px; }
+    .meta-badge-clean { color: #94A3B8 !important; background-color: #1E293B; padding: 0px 4px; border-radius: 3px; }
+    .meta-venue-clean { color: #38BDF8 !important; background-color: #0B1329; padding: 0px 4px; border-radius: 3px; }
     
-    /* --- CIEMNY BOX MECZOWY (IDEALNE DOPASOWANIE W POZIOMIE) --- */
+    /* ZWIDOKOWANY, NIEBIESKI BOX MECZOWY */
     .match-card-clean {
         background: #172554 !important; 
         border: 1px solid #1E3A8A !important; 
-        border-radius: 0 0 4px 4px; 
-        padding: 10px 14px !important; 
-        margin-bottom: 6px !important;
+        border-radius: 4px; 
+        padding: 6px 12px !important; 
+        margin-bottom: 4px !important;
         box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         width: 100%;
     }
@@ -150,41 +147,63 @@ st.markdown("""
     .team-text-align-right { font-size: 1.1rem !important; font-weight: bold !important; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%; white-space: nowrap; }
     .team-text-align-left { font-size: 1.1rem !important; font-weight: bold !important; text-align: left; display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; white-space: nowrap; }
     
-    /* SUBTELNY OFICJALNY WYNIK Z BOKU */
+    /* SUBTELNY WYNIK OFICJALNY W POZIOMIE */
     .official-score-subtle {
-        font-size: 0.8rem !important;
+        font-size: 0.82rem !important;
         font-weight: bold !important;
         color: #94A3B8 !important;
         background-color: #1E293B !important;
         border: 1px solid #334155 !important;
-        padding: 3px 8px;
+        padding: 4px 8px;
         border-radius: 4px;
         display: inline-block;
         text-align: center;
         white-space: nowrap;
+        height: 30px !important;
+        line-height: 22px !important;
     }
     
-    /* PRZYCISKI PLUS/MINUS Z POMARAŃCZOWYMI KONTROLERAMI DLA KRICON */
-    div.stNumberInput { width: 85px !important; margin: 0 !important; padding: 0 !important; display: inline-block !important; }
+    /* PRZYCISKI PLUS/MINUS NA CZYTELNYM GRAPHITE TLE */
+    div.stNumberInput { width: 80px !important; margin: 0 !important; padding: 0 !important; display: inline-block !important; }
     div.stNumberInput input { text-align: center !important; background-color: #0A1128 !important; color: #F8FAFC !important; height: 30px !important; font-size: 0.95rem !important; font-weight: bold !important; padding: 0 !important; border: 1px solid #1E3A8A !important; }
-    div.stNumberInput button { height: 30px !important; width: 24px !important; background-color: #1E293B !important; color: #F97316 !important; border: 1px solid #334155 !important; }
+    div.stNumberInput button { height: 30px !important; width: 22px !important; background-color: #1E293B !important; color: #F97316 !important; border: 1px solid #334155 !important; }
     div.stNumberInput button:hover { background-color: #334155 !important; color: #FFFFFF !important; }
     
-    /* WYMUSZONY FIX POMARAŃCZOWEGO PRZYCISKU ZAPISZ (STABILITY UPDATE) */
-    .mini-save-btn button, div[data-testid="stMarkdownContainer"] + div button {
+    /* --- INTEGRACJA ELEMENTÓW AKCJI W JEDNEJ POZIOMEJ LINII (ROW FIX) --- */
+    .action-horizontal-row {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        width: 100%;
+        height: 30px;
+    }
+    
+    /* --- PANCERNY FIX IDEALNEGO POMARAŃCZOWEGO PRZYCISKU ZAPISZ --- */
+    div[data-testid="stBlock"] div[data-testid="stMarkdownContainer"] + div button,
+    .action-horizontal-row button, 
+    div.stButton button {
         background-color: #F97316 !important; 
         color: #FFFFFF !important; 
         border-radius: 4px !important; 
-        border: none !important; 
+        border: 1px solid #EA580C !important; 
         font-weight: bold !important; 
         height: 30px !important; 
-        line-height: 30px !important; 
-        padding: 0 14px !important; 
+        line-height: 28px !important; 
+        padding: 0 16px !important; 
         font-size: 0.85rem !important; 
         width: auto !important;
         display: inline-block !important;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
+        transition: all 0.2s ease !important;
     }
-    .mini-save-btn button:hover { background-color: #EA580C !important; box-shadow: 0 2px 6px rgba(249,115,22,0.4) !important; }
+    div[data-testid="stBlock"] div[data-testid="stMarkdownContainer"] + div button:hover,
+    .action-horizontal-row button:hover,
+    div.stButton button:hover {
+        background-color: #EA580C !important;
+        border-color: #C2410C !important;
+        box-shadow: 0 2px 6px rgba(249,115,22,0.4) !important;
+    }
     
     .bracket-match-card { background: #172554 !important; border: 2px solid #1E3A8A !important; border-radius: 8px; padding: 10px; margin: 8px 0; }
     .bracket-match-title { font-size: 0.75rem !important; color: #F97316 !important; font-weight: bold; margin-bottom: 4px; }
@@ -211,7 +230,7 @@ ISO_FLAGS_MAP = {
     "Niemcy": "de", "Curaçao": "cw", "WKS": "ci", "Ekwador": "ec",
     "Holandia": "nl", "Japonia": "jp", "Szwecja": "se", "Tunezja": "tn",
     "Belgia": "be", "Egipt": "eg", "Iran": "ir", "Nowa Zelandia": "nz",
-    "Hiszpania": "es", "Wyspy Zielonego Przylądka": "cv", "Arabia Saudyjska": "sa", "Urugwaj": "uy",
+    "Hiszpania": "es", "Wyspy Zielonego Przylążka": "cv", "Arabia Saudyjska": "sa", "Urugwaj": "uy",
     "Francja": "fr", "Senegal": "sn", "Irak": "iq", "Norwegia": "no",
     "Argentyna": "ar", "Algieria": "dz", "Austria": "at", "Jordania": "jo",
     "Portugalia": "pt", "DR Konga": "cd", "Uzbekistan": "uz", "Kolumbia": "co",
@@ -410,15 +429,8 @@ def fetch_official_results_from_api(now_time):
                 if m['home'] == "TBD": m['home'] = "Meksyk"
                 if m['away'] == "TBD": m['away'] = "RPA"
 
-# --- RESTART STANU DANYCH ---
-force_reset_needed = False
-if 'results' in st.session_state:
-    for m in st.session_state.results.values():
-        if "MX " in str(m.get('home')) or "ZA " in str(m.get('away')) or "KR " in str(m.get('home')) or "MS " in str(m.get('home')):
-            force_reset_needed = True
-            break
-
-if force_reset_needed or 'results' not in st.session_state or len(st.session_state.results) != 104:
+# --- DEZYNFEKCJA STANÓW ---
+if 'results' not in st.session_state or len(st.session_state.results) != 104:
     st.session_state.results = generate_schedule()
 else:
     for m_id in list(st.session_state.results.keys()):
@@ -439,7 +451,7 @@ for m_id, m in st.session_state.results.items():
 
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 
-# --- WIDOK INTERFEJSU ---
+# --- GRAFIKA INTERFEJSU ---
 if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
     with c1:
@@ -473,7 +485,7 @@ else:
             elif m.get('status') == "Zakończony":
                 status_html = '<span class="status-badge status-ended">⚫ Zakończony</span>'
             else:
-                status_html = '<span class="status-waiting-blink" style="animation: pulseAlertCore 2.0s infinite ease-in-out !important;">🟡 Oczekuje</span>'
+                status_html = '<span class="status-waiting-blink">🟡 Oczekuje</span>'
                 
             oficjalny_wynik_tekst = f"Wynik: {m.get('score_h') if m.get('score_h') is not None else '?'} : {m.get('score_a') if m.get('score_a') is not None else '?'}"
             locked = (m['timestamp'] - now).total_seconds() <= 0
@@ -483,22 +495,22 @@ else:
             home_clean = clean_and_sanitize_team_string(m['home'])
             away_clean = clean_and_sanitize_team_string(m['away'])
             
-            # --- 1. UMIESZCZENIE INFORMACJI O MECZU W JAŚNIEJSZYM NIEBIESKIM PASKU (0.75REM) ---
+            # 1. LINIA INFORMACYJNA NAD MECZEM (0.75REM)
             st.markdown(f"""
-            <div class="meta-upper-bar-container">
+            <div class="meta-upper-container">
                 <span class="meta-id-text-clean">⚽ Mecz #{m_id}</span>
                 {status_html}
                 <span class="meta-badge-clean">📅 {m['date']}</span>
                 <span class="meta-venue-clean">📍 {m.get('venue', 'Stadion')}</span>
-                <span style="color:#64748b;">({m['stage']})</span>
+                <span style="color:#475569;">({m['stage']})</span>
             </div>
             """, unsafe_allow_html=True)
             
-            # --- 2. START CIEMNEGO BOXA MECZOWEGO (ZGRZANY UKŁAD POZIOMY - TYP W CENTRUM) ---
+            # 2. START PROSTEGO BOXA MECZOWEGO
             st.markdown("<div class='match-card-clean'>", unsafe_allow_html=True)
             
-            # Struktura rzędu: Rezerwacja przestrzeni dla zachowania symetrii i wpasowania
-            cf1, cf2, cf3, cf4, cf5 = st.columns([2.3, 0.7, 0.7, 2.3, 1.8])
+            # Podział kolumnowy wpasowany w jeden płaski rząd
+            cf1, cf2, cf3, cf4, cf5 = st.columns([2.3, 0.7, 0.7, 2.3, 2.0])
             
             with cf1: 
                 st.markdown(f"<div class='team-text-align-right'><span>{home_clean}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
@@ -513,28 +525,26 @@ else:
                 st.markdown(f"<div class='team-text-align-left'>{get_cdn_flag_img_html(m['away'])} <span>{away_clean}</span></div>", unsafe_allow_html=True)
                 
             with cf5:
-                # Elastyczny flexbox dla schowania wyniku oficjalnego z boku oraz przycisku Zapisz
-                st.markdown("<div class='flex-action-container' style='display:flex; align-items:center; gap:6px; justify-content:flex-end; width:100%; height:32px;'>", unsafe_allow_html=True)
+                # --- KOMPLETNE USTANOWIENIE AKCJI W JEDNEJ POZIOMEJ LINII (ROW POZIOMY FIX) ---
+                st.markdown("<div class='action-horizontal-row'>", unsafe_allow_html=True)
                 
-                # Mniejszy oficjalny wynik schowany dyskretnie na prawym marginesie
+                # Subtelny, mniejszy rezultat oficjalny spotkania z lewej strony
                 st.markdown(f"<span class='official-score-subtle'>{oficjalny_wynik_tekst}</span>", unsafe_allow_html=True)
                 
                 if locked:
                     st.button("🔒", disabled=True, key=f"lock_btn_{m_id}")
                 else:
-                    st.markdown("<div class='mini-save-btn' style='display:inline-block;'>", unsafe_allow_html=True)
                     if st.button("Zapisz", key=f"btn_{m_id}"):
                         if m_id not in st.session_state.bets: st.session_state.bets[m_id] = {}
                         st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a)
                         save_backup_local_and_github()
                         st.success("OK!")
                         st.rerun()
-                    st.markdown("</div>", unsafe_allow_html=True)
                     
                     if has_existing_bet:
-                        st.markdown("<div class='success-bet-banner'>✔ ZAPISANY</div>", unsafe_allow_html=True)
+                        st.markdown("<div class='success-bet-banner'>✔ OK</div>", unsafe_allow_html=True)
                     else:
-                        st.markdown("<div class='missing-bet-banner-blink' style='animation: pulseAlertCore 1.2s infinite ease-in-out !important;'>⚠️ BRAK</div>", unsafe_allow_html=True)
+                        st.markdown("<div class='missing-bet-banner-blink'>⚠️ BRAK</div>", unsafe_allow_html=True)
                 st.markdown("</div>", unsafe_allow_html=True)
                 
             st.markdown("</div>", unsafe_allow_html=True) # Zamknięcie .match-card-clean
