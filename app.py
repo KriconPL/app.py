@@ -41,7 +41,7 @@ VENUES_LIST = [
     "Gillette, Boston", "BMO Field, Toronto", "BBVA, Monterrey", "Akron, Guadalajara"
 ]
 
-# GŁÓWNY SILNIK CSS: ZABEZPIECZONY KOLOR TEKSTU I PŁASKI UKŁAD
+# ZAAWANSOWANA ARCHITEKTURA CSS DLA KONTROLI NATYWNYCH KOMPONENTÓW
 st.markdown("""
     <script>
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
@@ -53,223 +53,98 @@ st.markdown("""
     });
     </script>
     <style>
-    /* Blokada selekcji tekstu na całą apkę */
-    * {
-        -webkit-user-select: none !important;
-        -moz-user-select: none !important;
-        -ms-user-select: none !important;
-        user-select: none !important;
-    }
-    input, textarea, div[data-baseweb="input"] {
-        -webkit-user-select: auto !important;
-        -moz-user-select: auto !important;
-        -ms-user-select: auto !important;
-        user-select: auto !important;
-    }
+    * { -webkit-user-select: none !important; -moz-user-select: none !important; -ms-user-select: none !important; user-select: none !important; }
+    input, textarea, div[data-baseweb="input"] { -webkit-user-select: auto !important; -moz-user-select: auto !important; -ms-user-select: auto !important; user-select: auto !important; }
 
-    body, html, [data-testid="stAppViewContainer"], .stApp, [data-testid="stTabContent"], div.stTabs {
-        background-color: #0A1128 !important; 
-    }
+    body, html, [data-testid="stAppViewContainer"], .stApp, [data-testid="stTabContent"], div.stTabs { background-color: #0A1128 !important; }
     [data-testid="stSidebar"] { background-color: #060B19 !important; }
     [data-testid="stHeader"] { background-color: #0A1128 !important; }
     h1, h2, h3, h4, h5, h6, p, span, label, div { color: #F8FAFC !important; }
     
-    @keyframes pulseAlertCore {
-        0% { opacity: 1.0; }
-        50% { opacity: 0.2; }
-        100% { opacity: 1.0; }
-    }
+    @keyframes pulseAlertCore { 0% { opacity: 1.0; } 50% { opacity: 0.2; } 100% { opacity: 1.0; } }
     
     .missing-bet-banner-blink {
-        animation: pulseAlertCore 1.2s infinite ease-in-out !important;
-        background-color: #DC2626 !important;
-        color: #FFFFFF !important;
-        font-weight: bold !important;
-        text-align: center !important;
-        height: 34px !important;
-        line-height: 34px !important;
-        border-radius: 4px !important;
-        font-size: 0.8rem !important;
-        display: block !important;
-        width: 100% !important;
-        margin: 0 !important;
-        white-space: nowrap !important;
+        animation: pulseAlertCore 1.2s infinite ease-in-out !important; background-color: #DC2626 !important; color: #FFFFFF !important; font-weight: bold !important; text-align: center !important; height: 32px !important; line-height: 32px !important; border-radius: 4px !important; font-size: 0.8rem !important; display: block !important; width: 100% !important; margin: 0 !important; white-space: nowrap !important;
     }
     
-    .status-waiting-blink {
-        animation: pulseAlertCore 2.0s infinite ease-in-out !important;
-        color: #D97706 !important;
-        font-weight: bold !important;
-        font-size: 0.65rem !important;
-    }
-    
+    .status-waiting-blink { animation: pulseAlertCore 2.0s infinite ease-in-out !important; color: #D97706 !important; font-weight: bold !important; font-size: 0.65rem !important; }
     .status-badge-ended { color: #94A3B8 !important; font-weight: bold; font-size: 0.65rem !important; }
     .status-badge-live { color: #DC2626 !important; font-weight: bold; font-size: 0.65rem !important; }
     
-    .success-bet-banner {
-        background-color: #16A34A !important;
-        color: #FFFFFF !important;
-        font-weight: bold !important;
-        text-align: center !important;
-        height: 34px !important;
-        line-height: 34px !important;
-        border-radius: 4px !important;
-        font-size: 0.8rem !important;
-        display: block !important;
-        width: 100% !important;
-        margin: 0 !important;
-        white-space: nowrap;
-    }
+    .success-bet-banner { background-color: #16A34A !important; color: #FFFFFF !important; font-weight: bold !important; text-align: center !important; height: 32px !important; line-height: 32px !important; border-radius: 4px !important; font-size: 0.8rem !important; display: block !important; width: 100% !important; margin: 0 !important; white-space: nowrap; }
     
-    /* --- JASNONIEBIESKI GÓRNY PASEK METADANYCH --- */
-    .meta-upper-bar-container {
-        background-color: #1E293B !important;
-        border: 1px solid #1E3A8A !important;
-        border-bottom: none !important;
-        border-radius: 6px 6px 0 0;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 0.75rem !important;
-        color: #94A3B8 !important;
-        padding: 6px 14px !important;
-        width: 100%;
-        margin-top: 10px !important;
-    }
+    .meta-upper-bar-container { background-color: #1E293B !important; border: 1px solid #1E3A8A !important; border-bottom: none !important; border-radius: 6px 6px 0 0; display: flex; align-items: center; gap: 12px; font-size: 0.75rem !important; color: #94A3B8 !important; padding: 6px 14px !important; width: 100%; margin-top: 10px !important; }
     .meta-id-text-clean { font-weight: bold; color: #F97316 !important; }
     
-    /* --- CIEMNONIEBIESKI GŁÓWNY WIERSZ MECZU --- */
+    /* CIEMNONIEBIESKI GŁÓWNY WIERSZ MECZU */
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) {
-        background: #172554 !important;
-        border: 1px solid #1E3A8A !important;
-        border-radius: 0 0 6px 6px;
-        padding: 8px 10px !important;
-        margin-bottom: 4px !important;
-        align-items: center !important; /* Centrowanie w pionie zapobiega rozjechaniu */
-        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        background: #172554 !important; border: 1px solid #1E3A8A !important; border-radius: 0 0 6px 6px; padding: 6px 10px !important; margin-bottom: 4px !important; align-items: center !important; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"] {
-        padding: 0 2px !important; /* Redukcja pustych przestrzeni wewnątrz kolumn */
-    }
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) p,
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div[data-testid="stMarkdownContainer"] {
-        margin-bottom: 0 !important;
-    }
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"] { padding: 0 2px !important; }
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) p, div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div[data-testid="stMarkdownContainer"] { margin-bottom: 0 !important; }
     
-    .team-align-right { font-size: 1.05rem !important; font-weight: bold !important; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%; white-space: nowrap; height: 34px; line-height: 34px; color: #F8FAFC !important; }
-    .team-align-left { font-size: 1.05rem !important; font-weight: bold !important; text-align: left; display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; white-space: nowrap; height: 34px; line-height: 34px; color: #F8FAFC !important; }
+    .team-align-right { font-size: 1.05rem !important; font-weight: bold !important; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%; white-space: nowrap; height: 32px; line-height: 32px; color: #F8FAFC !important; }
+    .team-align-left { font-size: 1.05rem !important; font-weight: bold !important; text-align: left; display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; white-space: nowrap; height: 32px; line-height: 32px; color: #F8FAFC !important; }
     
-    .off-score {
-        font-size: 0.8rem !important;
-        font-weight: bold !important;
-        color: #94A3B8 !important;
-        background-color: #1E293B !important;
-        border: 1px solid #334155 !important;
-        border-radius: 4px;
-        display: block;
-        text-align: center;
-        white-space: nowrap;
-        height: 34px !important;
-        line-height: 32px !important;
-        width: 100%;
-    }
+    .off-score { font-size: 0.8rem !important; font-weight: bold !important; color: #94A3B8 !important; background-color: #1E293B !important; border: 1px solid #334155 !important; border-radius: 4px; display: block; text-align: center; white-space: nowrap; height: 32px !important; line-height: 30px !important; width: 100%; }
+    .score-colon { text-align: center; font-weight: bold; color: #F97316 !important; font-size: 1.3rem; height: 32px; line-height: 28px; width: 100%; }
     
-    .score-colon { text-align: center; font-weight: bold; color: #F97316 !important; font-size: 1.3rem; height: 34px; line-height: 30px; width: 100%; }
-    
+    /* INPUTY NUMERYCZNE Z UKRYTYMI PRZYCISKAMI SYSTEMOWYMI */
+    input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type="number"] { -moz-appearance: textfield; }
     div[data-testid="stNumberInput"] { margin: 0 !important; padding: 0 !important; width: 100% !important; min-width: 0 !important; }
-    div[data-testid="stNumberInput"] input { 
-        text-align: center !important; 
-        background-color: #0A1128 !important; 
-        color: #F8FAFC !important; 
-        height: 34px !important; 
-        font-size: 1.1rem !important; 
-        font-weight: bold !important; 
-        border: 1px solid #1E3A8A !important; 
-        padding: 0 !important;
-        border-radius: 4px !important;
-    }
+    div[data-testid="stNumberInput"] div[data-baseweb="input"] { background-color: #0A1128 !important; border: 1px solid #1E3A8A !important; border-radius: 4px !important; }
+    div[data-testid="stNumberInput"] input { text-align: center !important; color: #F8FAFC !important; height: 30px !important; font-size: 1.1rem !important; font-weight: bold !important; padding: 0 !important; }
     
     /* ========================================================================= */
-    /* PANCERNY FIX: ELIMINACJA BIAŁEGO TEKSTU I TŁA W PRZYCISKACH               */
-    /* Wymuszamy przezroczystość na domyślnych znacznikach wewnątrz Streamlita   */
+    /* PANCERNE KOLORY PRZYCISKÓW WG KINDS (BEZWZGLĘDNE NADPISANIE STREAMLITA) */
     /* ========================================================================= */
     
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div[data-testid="stButton"] button p,
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div[data-testid="stButton"] button span,
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div[data-testid="stButton"] button div {
-        background-color: transparent !important;
-    }
-    
-    /* --- WYMUSZENIE KOLORÓW DLA PRZYCISKÓW PLUS/MINUS --- */
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] button,
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] button,
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(6) div[data-testid="stButton"] button,
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(8) div[data-testid="stButton"] button {
+    /* PRZYCISKI DRUGORZĘDNE (+, -, USUŃ) */
+    button[kind="secondary"] {
         background-color: #1E293B !important; 
         border: 1px solid #334155 !important; 
         border-radius: 4px !important; 
-        height: 34px !important; 
-        min-height: 34px !important;
+        height: 32px !important; 
+        min-height: 32px !important;
         padding: 0 !important; 
         width: 100% !important;
         display: block !important;
     }
-    /* Tekst (znaki +/-) na jasno-pomarańczowo we wszystkich wewnętrznych tagach */
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] button *,
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] button *,
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(6) div[data-testid="stButton"] button *,
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(8) div[data-testid="stButton"] button * {
+    button[kind="secondary"] * {
         color: #F97316 !important;
-        font-size: 1.2rem !important;
         font-weight: bold !important;
-        line-height: 32px !important;
+        font-size: 1.1rem !important;
     }
+    button[kind="secondary"]:hover { background-color: #334155 !important; }
+    button[kind="secondary"]:hover * { color: #FFFFFF !important; }
     
-    /* Efekt podświetlenia po najechaniu myszką */
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] button:hover,
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] button:hover,
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(6) div[data-testid="stButton"] button:hover,
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(8) div[data-testid="stButton"] button:hover { 
-        background-color: #334155 !important; 
-    }
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] button:hover *,
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] button:hover *,
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(6) div[data-testid="stButton"] button:hover *,
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(8) div[data-testid="stButton"] button:hover * { 
-        color: #FFFFFF !important; 
-    }
-    
-    /* --- WYMUSZENIE KOLORÓW DLA PRZYCISKU ZAPISZ --- */
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(10) div[data-testid="stButton"] button {
+    /* PRZYCISK GŁÓWNY (ZAPISZ) */
+    button[kind="primary"] {
         background-color: #F97316 !important;
         border: 1px solid #EA580C !important;
         border-radius: 4px !important;
-        height: 34px !important;
-        min-height: 34px !important;
+        height: 32px !important;
+        min-height: 32px !important;
         padding: 0 !important;
         width: 100% !important;
         display: block !important;
         box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
     }
-    /* Tekst ("Zapisz") na biało */
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(10) div[data-testid="stButton"] button * {
+    button[kind="primary"] * {
         color: #FFFFFF !important;
         font-size: 0.9rem !important;
         font-weight: bold !important;
-        line-height: 32px !important;
     }
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(10) div[data-testid="stButton"] button:hover { 
-        background-color: #EA580C !important; 
-        border-color: #C2410C !important; 
-    }
-    
-    /* ========================================================================= */
+    button[kind="primary"]:hover { background-color: #EA580C !important; border-color: #C2410C !important; }
     
     /* PODIUM MEDALOWE W RANKINGU */
-    .gold-medal-row { background-color: #FEF08A !important; font-weight: bold; }
-    .silver-medal-row { background-color: #E2E8F0 !important; font-weight: bold; }
-    .bronze-medal-row { background-color: #FED7AA !important; font-weight: bold; }
-    .gold-medal-row td, .gold-medal-row b, .silver-medal-row td, .silver-medal-row b, .bronze-medal-row td, .bronze-medal-row b { color: #0A1128 !important; }
+    .gold-medal-row { background-color: rgba(254, 240, 138, 0.95) !important; font-weight: bold; }
+    .gold-medal-row td, .gold-medal-row b { color: #0A1128 !important; }
+    .silver-medal-row { background-color: rgba(226, 232, 240, 0.95) !important; font-weight: bold; }
+    .silver-medal-row td, .silver-medal-row b { color: #0A1128 !important; }
+    .bronze-medal-row { background-color: rgba(254, 215, 170, 0.95) !important; font-weight: bold; }
+    .bronze-medal-row td, .bronze-medal-row b { color: #0A1128 !important; }
     
     .trend-up { color: #16A34A !important; font-weight: bold; }
     .trend-down { color: #DC2626 !important; font-weight: bold; }
@@ -321,8 +196,7 @@ def get_cdn_flag_img_html(team_name):
     c_name = clean_and_sanitize_team_string(team_name)
     if c_name == "TBD": return f'🌐'
     code = ISO_FLAGS_MAP.get(c_name, None)
-    if code:
-        return f'<img src="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/{code}.svg" class="flag-img" />'
+    if code: return f'<img src="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/{code}.svg" class="flag-img" />'
     return f'🌐'
 
 def calculate_points(pred_h, pred_a, real_h, real_a):
@@ -350,21 +224,14 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
         if new_positions_dict_dest is not None: new_positions_dict_dest[p_name] = pos
         
         old_pos = st.session_state.last_positions.get(p_name, pos) if 'last_positions' in st.session_state else pos
-        if old_pos > pos:
-            trend_html = '<span class="trend-up">▲</span>'
-        elif old_pos < pos:
-            trend_html = '<span class="trend-down">▼</span>'
-        else:
-            trend_html = '<span class="trend-stable">•</span>'
+        if old_pos > pos: trend_html = '<span class="trend-up">▲</span>'
+        elif old_pos < pos: trend_html = '<span class="trend-down">▼</span>'
+        else: trend_html = '<span class="trend-stable">•</span>'
             
-        if pos == 1:
-            bg_class, medal = 'class="gold-medal-row"', "🥇 "
-        elif pos == 2:
-            bg_class, medal = 'class="silver-medal-row"', "🥈 "
-        elif pos == 3:
-            bg_class, medal = 'class="bronze-medal-row"', "🥉 "
-        else:
-            bg_class, medal = "", ""
+        if pos == 1: bg_class, medal = 'class="gold-medal-row"', "🥇 "
+        elif pos == 2: bg_class, medal = 'class="silver-medal-row"', "🥈 "
+        elif pos == 3: bg_class, medal = 'class="bronze-medal-row"', "🥉 "
+        else: bg_class, medal = "", ""
             
         rows += f"<tr {bg_class}><td style='text-align:center;'><b>{pos}</b></td><td style='text-align:center;'>{trend_html}</td><td>{medal}{p_name}</td><td><b>{row['Punkty']} pkt</b></td></tr>"
     return legend_html + f"<table class='kricon-table'><tr><th>Miejsce</th><th>Trend</th><th>Gracz</th><th>Punkty</th></tr>{rows}</table>"
@@ -546,13 +413,20 @@ else:
                 
             oficjalny_wynik_tekst = f"Wynik: {m.get('score_h') if m.get('score_h') is not None else '?'} : {m.get('score_a') if m.get('score_a') is not None else '?'}"
             locked = (m['timestamp'] - now).total_seconds() <= 0
+            
+            # --- ZARZĄDZANIE STANEM TYPU I ZMIANĄ PRZYCISKÓW ---
+            h_key = f"h_{m_id}"
+            a_key = f"a_{m_id}"
             has_existing_bet = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user) is not None
-            cur_h, cur_a = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user, (0,0))
+            saved_h, saved_a = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user, (0,0))
+            
+            if h_key not in st.session_state: st.session_state[h_key] = int(saved_h)
+            if a_key not in st.session_state: st.session_state[a_key] = int(saved_a)
             
             home_clean = clean_and_sanitize_team_string(m['home'])
             away_clean = clean_and_sanitize_team_string(m['away'])
             
-            # --- JASNONIEBIESKI PASEK METADANYCH NAD MECZEM ---
+            # PASEK METADANYCH
             st.markdown(f"""
             <div class="meta-upper-bar-container">
                 <span class="meta-id-text-clean">⚽ Mecz #{m_id}</span>
@@ -561,65 +435,68 @@ else:
                 <span style="color:#38BDF8; font-weight:bold;">📍 {m.get('venue').split(',')[0]}</span>
                 <span style="color:#64748B;">({m['stage']})</span>
             </div>
+            <div class='match-row-anchor'></div>
             """, unsafe_allow_html=True)
             
-            # --- ZNACZNIK CSS DLA ZŁOTEJ REGUŁY :has() ---
-            st.markdown("<div class='match-row-anchor'></div>", unsafe_allow_html=True)
-            
-            # --- GŁÓWNA LINIA POZIOMA Z DOSKONAŁYM WYRÓWNANIEM PRZYCISKÓW ---
-            c_home, c_mh, c_inph, c_ph, c_sep, c_ma, c_inpa, c_pa, c_away, c_save, c_score, c_status = st.columns([2.6, 0.6, 0.8, 0.6, 0.2, 0.6, 0.8, 0.6, 2.6, 1.4, 1.5, 1.2])
+            # --- GŁÓWNA LINIA POZIOMA Z WYRÓWNANIEM DO 13 KOLUMN ---
+            c_home, c_mh, c_inph, c_ph, c_sep, c_ma, c_inpa, c_pa, c_away, c_score, c_save, c_del, c_status = st.columns([2.6, 0.6, 0.9, 0.6, 0.2, 0.6, 0.9, 0.6, 2.4, 1.4, 1.0, 0.8, 1.1])
             
             with c_home:
                 st.markdown(f"<div class='team-align-right'><span>{home_clean}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
                 
+            # PRZYCISKI PLUS/MINUS ZMIENIAJĄCE WYNIK W ST.SESSION_STATE
             with c_mh:
-                if st.button("—", key=f"mh_{m_id}", disabled=locked, use_container_width=True):
-                    st.session_state.bets[m_id][st.session_state.logged_in_user] = (max(0, cur_h - 1), cur_a)
-                    save_backup_local_and_github()
+                if st.button("—", key=f"mh_{m_id}", disabled=locked, type="secondary"):
+                    st.session_state[h_key] = max(0, st.session_state[h_key] - 1)
                     st.rerun()
-                    
             with c_inph:
-                b_h = st.number_input("H", min_value=0, max_value=20, value=int(cur_h), key=f"h_{m_id}", label_visibility="collapsed", disabled=locked)
-                
+                st.number_input("H", min_value=0, max_value=20, key=h_key, label_visibility="collapsed", disabled=locked)
             with c_ph:
-                if st.button("＋", key=f"ph_{m_id}", disabled=locked, use_container_width=True):
-                    st.session_state.bets[m_id][st.session_state.logged_in_user] = (cur_h + 1, cur_a)
-                    save_backup_local_and_github()
+                if st.button("＋", key=f"ph_{m_id}", disabled=locked, type="secondary"):
+                    st.session_state[h_key] += 1
                     st.rerun()
-                    
             with c_sep:
                 st.markdown("<div class='score-colon'>:</div>", unsafe_allow_html=True)
-                
             with c_ma:
-                if st.button("—", key=f"ma_{m_id}", disabled=locked, use_container_width=True):
-                    st.session_state.bets[m_id][st.session_state.logged_in_user] = (cur_h, max(0, cur_a - 1))
-                    save_backup_local_and_github()
+                if st.button("—", key=f"ma_{m_id}", disabled=locked, type="secondary"):
+                    st.session_state[a_key] = max(0, st.session_state[a_key] - 1)
                     st.rerun()
-                    
             with c_inpa:
-                b_a = st.number_input("A", min_value=0, max_value=20, value=int(cur_a), key=f"a_{m_id}", label_visibility="collapsed", disabled=locked)
-                
+                st.number_input("A", min_value=0, max_value=20, key=a_key, label_visibility="collapsed", disabled=locked)
             with c_pa:
-                if st.button("＋", key=f"pa_{m_id}", disabled=locked, use_container_width=True):
-                    st.session_state.bets[m_id][st.session_state.logged_in_user] = (cur_h, cur_a + 1)
-                    save_backup_local_and_github()
+                if st.button("＋", key=f"pa_{m_id}", disabled=locked, type="secondary"):
+                    st.session_state[a_key] += 1
                     st.rerun()
                     
             with c_away:
                 st.markdown(f"<div class='team-align-left'>{get_cdn_flag_img_html(m['away'])} <span>{away_clean}</span></div>", unsafe_allow_html=True)
                 
-            with c_save:
-                if locked:
-                    st.button("🔒", disabled=True, key=f"lock_{m_id}", use_container_width=True)
-                else:
-                    if st.button("Zapisz", key=f"save_{m_id}", use_container_width=True):
-                        st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a)
-                        save_backup_local_and_github()
-                        st.rerun()
-                        
             with c_score:
                 st.markdown(f"<div class='off-score'>{oficjalny_wynik_tekst}</div>", unsafe_allow_html=True)
                 
+            with c_save:
+                if locked:
+                    st.button("🔒", disabled=True, key=f"lock_{m_id}")
+                else:
+                    if st.button("Zapisz", key=f"save_{m_id}", type="primary"):
+                        st.session_state.bets[m_id][st.session_state.logged_in_user] = (st.session_state[h_key], st.session_state[a_key])
+                        save_backup_local_and_github()
+                        st.rerun()
+            
+            with c_del:
+                if locked:
+                    st.empty()
+                else:
+                    if has_existing_bet:
+                        if st.button("✖", key=f"del_{m_id}", type="secondary"):
+                            del st.session_state.bets[m_id][st.session_state.logged_in_user]
+                            st.session_state[h_key] = 0
+                            st.session_state[a_key] = 0
+                            save_backup_local_and_github()
+                            st.rerun()
+                    else:
+                        st.empty()
+                        
             with c_status:
                 if has_existing_bet:
                     st.markdown("<div class='success-bet-banner'>✔ OK</div>", unsafe_allow_html=True)
