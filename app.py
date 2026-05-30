@@ -41,7 +41,7 @@ VENUES_LIST = [
     "Gillette, Boston", "BMO Field, Toronto", "BBVA, Monterrey", "Akron, Guadalajara"
 ]
 
-# MATRYCOWY SYSTEM STYLIZACJI FLEXBOX DLA ULTRA-KOMPAKTOWEGO INTERFEJSU W POZIOMIE
+# ARCHITEKTURA STYLÓW CSS DLA WYMUSZENIA IDEALNEJ LINII POZIOMEJ I WYGLĄDU PODIUM
 st.markdown("""
     <script>
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
@@ -68,7 +68,6 @@ st.markdown("""
     [data-testid="stHeader"] { background-color: #0A1128 !important; }
     h1, h2, h3, h4, h5, h6, p, span, label, div { color: #F8FAFC !important; }
     
-    /* SYSTEM ANIMACJI OPACITY BLINK DLA WSZYSTKICH ALERTÓW SYSTEMOWYCH */
     @keyframes pulseAlertCore {
         0% { opacity: 1.0; }
         50% { opacity: 0.2; }
@@ -114,26 +113,27 @@ st.markdown("""
         white-space: nowrap;
     }
     
-    /* DETALE METADANYCH (ZINTEGROWANE I ODCHUDZONE) */
-    .meta-inline-box {
+    .meta-upper-container {
         display: flex;
-        flex-direction: column;
-        gap: 1px;
-        font-size: 0.65rem !important;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.75rem !important;
         color: #64748B !important;
-        line-height: 1.2;
-        text-align: left;
-        white-space: nowrap;
+        margin-top: 8px !important;
+        margin-bottom: 2px !important;
+        padding-left: 6px;
     }
-    .meta-inline-id { font-weight: bold; color: #F97316 !important; font-size: 0.75rem !important; }
+    .meta-id-text-clean { font-weight: bold; color: #F97316 !important; }
+    .meta-badge-clean { color: #94A3B8 !important; background-color: #1E293B; padding: 0px 4px; border-radius: 3px; }
+    .meta-venue-clean { color: #38BDF8 !important; background-color: #0B1329; padding: 0px 4px; border-radius: 3px; }
     
-    /* --- ZMINIMALIZOWANY, ULTRA-PŁASKI BOX MECZOWY --- */
+    /* ULTRA-PŁASKI BOX MECZOWY */
     .match-card-clean {
         background: #172554 !important; 
         border: 1px solid #1E3A8A !important; 
         border-radius: 4px; 
-        padding: 5px 12px !important; /* Odchudzenie wysokości wiersza */
-        margin-bottom: 2px !important; /* Maksymalne zagęszczenie linii meczowych */
+        padding: 4px 12px !important; 
+        margin-bottom: 2px !important;
         box-shadow: 0 1px 2px rgba(0,0,0,0.15);
         width: 100%;
     }
@@ -156,7 +156,6 @@ st.markdown("""
         padding: 0 8px !important;
     }
     
-    /* --- INTEGRALNE WYRÓWNANIE POL TYPOWANIA OBOK SIEBIE [ X : X ] --- */
     .inputs-horizontal-align-container {
         display: flex;
         align-items: center;
@@ -164,14 +163,19 @@ st.markdown("""
         gap: 6px;
         width: 100%;
     }
-    .score-separator-text { font-weight: bold; color: #F97316 !important; font-size: 1.1rem; }
+    .score-center-separator {
+        font-weight: bold;
+        color: #F97316 !important;
+        padding: 0 6px;
+        font-size: 1rem;
+    }
     
-    /* POWIĘKSZONE PRZYCISKI PLUS/MINUS Z DOPASOWANIEM DO JEDNEJ LINII */
+    /* PRZYCISKI STEPPERÓW W JEDNEJ LINII */
     div.stNumberInput { width: 95px !important; margin: 0 !important; padding: 0 !important; display: inline-block !important; }
     div.stNumberInput input { text-align: center !important; background-color: #0A1128 !important; color: #F8FAFC !important; height: 28px !important; font-size: 1rem !important; font-weight: bold !important; padding: 0 !important; border: 1px solid #1E3A8A !important; }
     div.stNumberInput button { height: 28px !important; width: 22px !important; background-color: #1E293B !important; color: #F97316 !important; border: 1px solid #334155 !important; }
     
-    /* WYMUSZONY ARCHITEKTONICZNIE POMARAŃCZOWY PRZYCISK ZAPISZ */
+    /* PRZYCISK ZAPISZ STREAMLIT */
     div.stButton button, div[data-testid="stBlock"] button {
         background-color: #F97316 !important; 
         color: #FFFFFF !important; 
@@ -181,37 +185,45 @@ st.markdown("""
         height: 28px !important; 
         line-height: 26px !important; 
         padding: 0 12px !important; 
-        font-size: 0.8rem !important; 
+        font-size: 0.85rem !important; 
         width: 100% !important;
         display: inline-block !important;
     }
     div.stButton button:hover { background-color: #EA580C !important; }
     
-    /* STYLIZACJA PODIUM W RANKINGU (ZŁOTO, SREBRO, BRĄZ) */
-    .gold-row { background-color: #FEF08A !important; color: #0A1128 !important; font-weight: bold; }
-    .gold-row td, .gold-row b { color: #0A1128 !important; }
-    .silver-row { background-color: #E2E8F0 !important; color: #0A1128 !important; font-weight: bold; }
-    .silver-row td, .silver-row b { color: #0A1128 !important; }
-    .bronze-row { background-color: #FED7AA !important; color: #0A1128 !important; font-weight: bold; }
-    .bronze-row td, .bronze-row b { color: #0A1128 !important; }
+    /* STYLIZACJA PODIUM DLA RANKINGU GRACZY */
+    .gold-medal-row { background-color: rgba(254, 240, 138, 0.95) !important; font-weight: bold; }
+    .gold-medal-row td, .gold-medal-row b { color: #0A1128 !important; }
+    .silver-medal-row { background-color: rgba(226, 232, 240, 0.95) !important; font-weight: bold; }
+    .silver-medal-row td, .silver-medal-row b { color: #0A1128 !important; }
+    .bronze-medal-row { background-color: rgba(254, 215, 170, 0.95) !important; font-weight: bold; }
+    .bronze-medal-row td, .bronze-medal-row b { color: #0A1128 !important; }
     
-    .bracket-match-card { background: #172554 !important; border: 2px solid #1E3A8A !important; border-radius: 8px; padding: 8px; margin: 4px 0; }
-    .bracket-match-title { font-size: 0.75rem !important; color: #F97316 !important; font-weight: bold; margin-bottom: 2px; }
-    .bracket-row { display: flex; justify-content: space-between; align-items: center; padding: 2px 0; font-size: 0.85rem !important; }
-    .bracket-score-cell { background: #0A1128; color: #F97316; font-weight: bold; padding: 1px 5px; border-radius: 4px; min-width: 18px; text-align: center; }
+    /* STYLE DLA STRZAŁEK TRENDU W WYRÓWNANIU PIONOWYM */
+    .trend-up { color: #16A34A !important; font-weight: bold; }
+    .trend-down { color: #DC2626 !important; font-weight: bold; }
+    .trend-stable { color: #64748B !important; }
+    .gold-medal-row .trend-up, .gold-medal-row .trend-down, .gold-medal-row .trend-stable,
+    .silver-medal-row .trend-up, .silver-medal-row .trend-down, .silver-medal-row .trend-stable,
+    .bronze-medal-row .trend-up, .bronze-medal-row .trend-down, .bronze-medal-row .trend-stable { color: #0A1128 !important; }
+    
+    .bracket-match-card { background: #172554 !important; border: 2px solid #1E3A8A !important; border-radius: 8px; padding: 10px; margin: 6px 0; }
+    .bracket-match-title { font-size: 0.75rem !important; color: #F97316 !important; font-weight: bold; margin-bottom: 4px; }
+    .bracket-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; font-size: 0.9rem !important; }
+    .bracket-score-cell { background: #0A1128; color: #F97316; font-weight: bold; padding: 2px 6px; border-radius: 4px; min-width: 20px; text-align: center; }
     .bracket-team-winner { color: #4ADE80 !important; font-weight: bold; }
-    .bracket-group-box { background: #0D1B3E !important; border: 1px solid #F97316 !important; border-radius: 8px; padding: 6px; margin-bottom: 4px; }
-    .center-final-card { background: #23153C !important; border: 3px solid #FF6B00 !important; border-radius: 10px; padding: 16px; text-align: center; }
+    .bracket-group-box { background: #0D1B3E !important; border: 1px solid #F97316 !important; border-radius: 8px; padding: 8px; }
+    .center-final-card { background: #23153C !important; border: 3px solid #FF6B00 !important; border-radius: 10px; padding: 20px; text-align: center; }
     
-    .kricon-table { width: 100%; border-collapse: collapse; margin: 10px 0 25px 0; background-color: #172554 !important; border-radius: 8px; overflow: hidden; }
-    .kricon-table th { background-color: #F97316 !important; color: #0A1128 !important; padding: 10px; font-weight: 800; }
-    .kricon-table td { padding: 9px 10px; border-bottom: 1px solid #1E3A8A !important; }
+    .kricon-table { width: 100%; border-collapse: collapse; margin: 15px 0 35px 0; background-color: #172554 !important; border-radius: 8px; overflow: hidden; }
+    .kricon-table th { background-color: #F97316 !important; color: #0A1128 !important; padding: 12px; font-weight: 800; }
+    .kricon-table td { padding: 11px 12px; border-bottom: 1px solid #1E3A8A !important; }
     .points-legend { background-color: #060B19; border-left: 5px solid #F97316; padding: 12px; margin-bottom: 15px; border-radius: 4px; }
     .flag-img { width: 22px !important; height: 14px !important; object-fit: cover !important; border-radius: 2px !important; display: inline-block; vertical-align: middle; border: 1px solid rgba(255,255,255,0.2); }
     </style>
 """, unsafe_allow_html=True)
 
-# MAPOWANIE KODÓW ISO DLA SERWERA CDN
+# MAPOWANIE KODÓW ISO DLA STABILNYCH FLAG SVG
 ISO_FLAGS_MAP = {
     "Meksyk": "mx", "RPA": "za", "Korea Południowa": "kr", "Czechy": "cz",
     "Kanada": "ca", "Bośnia i Hercegowina": "ba", "Katar": "qa", "Szwajcaria": "ch",
@@ -266,18 +278,28 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
         pos, p_name = idx + 1, row['Gracz']
         if new_positions_dict_dest is not None: new_positions_dict_dest[p_name] = pos
         
-        # DODAWANIE DEKORACYJNYCH IKON MEDALI DLA PIERWSZYCH TRZECH GRACZY
-        if pos == 1:
-            bg_class, medal_icon = 'class="gold-row"', "🥇 "
-        elif pos == 2:
-            bg_class, medal_icon = 'class="silver-row"', "🥈 "
-        elif pos == 3:
-            bg_class, medal_icon = 'class="bronze-row"', "🥉 "
+        # ODTWORZENIE DANYCH STRZAŁEK TRENDU W WYRÓWNANIU Z HISTORIĄ SESJI
+        old_pos = st.session_state.last_positions.get(p_name, pos) if 'last_positions' in st.session_state else pos
+        if old_pos > pos:
+            trend_html = '<span class="trend-up">▲</span>'
+        elif old_pos < pos:
+            trend_html = '<span class="trend-down">▼</span>'
         else:
-            bg_class, medal_icon = "", ""
+            trend_html = '<span class="trend-stable">•</span>'
             
-        rows += f"<tr {bg_class}><td style='text-align:center;'><b>{pos}</b></td><td>{medal_icon}{p_name}</td><td><b>{row['Punkty']} pkt</b></td></tr>"
-    return legend_html + f"<table class='kricon-table'><tr><th>Msc.</th><th>Gracz</th><th>Punkty</th></tr>{rows}</table>"
+        # WYSTRZYKIWANIE SYMBOLI MEDALI I KLAS CSS DLA WIERSZY PODIUM
+        if pos == 1:
+            bg_class, medal = 'class="gold-medal-row"', "🥇 "
+        elif pos == 2:
+            bg_class, medal = 'class="silver-medal-row"', "🥈 "
+        elif pos == 3:
+            bg_class, medal = 'class="bronze-medal-row"', "🥉 "
+        else:
+            bg_class, medal = "", ""
+            
+        # ZASTĄPIENIE ZAPISU "MSC." PEŁNYM SŁOWEM "MIEJSCE" W TABELI
+        rows += f"<tr {bg_class}><td style='text-align:center;'><b>{pos}</b></td><td style='text-align:center;'>{trend_html}</td><td>{medal}{p_name}</td><td><b>{row['Punkty']} pkt</b></td></tr>"
+    return legend_html + f"<table class='kricon-table'><tr><th>Miejsce</th><th>Trend</th><th>Gracz</th><th>Punkty</th></tr>{rows}</table>"
 
 def render_bracket_match_html_clean(match_id):
     m = st.session_state.results.get(match_id)
@@ -293,11 +315,11 @@ def render_bracket_match_html_clean(match_id):
     <div class="bracket-match-card">
         <div class="bracket-match-title">Mecz #{match_id}</div>
         <div class='bracket-row {"bracket-team-winner" if win_h else ""}'>
-            <div style="display:flex; align-items:center; gap:6px;">{get_cdn_flag_img_html(h_clean)} <span>{h_clean}</span></div>
+            <div style="display:flex; align-items:center; gap:8px;">{get_cdn_flag_img_html(h_clean)} <span>{h_clean}</span></div>
             <span class="bracket-score-cell">{sh}</span>
         </div>
         <div class='bracket-row {"bracket-team-winner" if win_a else ""}'>
-            <div style="display:flex; align-items:center; gap:6px;">{get_cdn_flag_img_html(a_clean)} <span>{a_clean}</span></div>
+            <div style="display:flex; align-items:center; gap:8px;">{get_cdn_flag_img_html(a_clean)} <span>{a_clean}</span></div>
             <span class="bracket-score-cell">{sa}</span>
         </div>
     </div>
@@ -308,8 +330,8 @@ def get_mini_group_html_string(g_code):
     lines = ""
     for t in teams:
         t_clean = clean_and_sanitize_team_string(t)
-        lines += f"<div style='text-align:left; padding:1px 0; font-size:0.85rem; display:flex; align-items:center; gap:6px;'>{get_cdn_flag_img_html(t_clean)} <span>{t_clean}</span></div>"
-    return f"""<div class="bracket-group-box"><div style="font-weight:bold; color:#F97316; margin-bottom:2px; font-size:0.8rem;">GRUPA {g_code}</div>{lines}</div>"""
+        lines += f"<div style='text-align:left; padding:2px 0; font-size:0.9rem; display:flex; align-items:center; gap:8px;'>{get_cdn_flag_img_html(t_clean)} <span>{t_clean}</span></div>"
+    return f"""<div class="bracket-group-box"><div style="font-weight:bold; color:#F97316; margin-bottom:4px; font-size:0.85rem;">GRUPA {g_code}</div>{lines}</div>"""
 
 def save_backup_local_and_github():
     try:
@@ -412,7 +434,11 @@ else:
     tab1, tab2, tab3, tab4 = st.tabs(["📊 Ranking", "📅 Terminarz", "📈 Tabele", "🏆 Drabinka Turniejowa"])
     
     with tab1: 
-        st.markdown(render_leaderboard_html(now), unsafe_allow_html=True)
+        # Zapisujemy stany pozycji przed nowym przeliczeniem rankingu
+        current_positions_map = {}
+        st.markdown(render_leaderboard_html(now, current_positions_map), unsafe_allow_html=True)
+        if current_positions_map:
+            st.session_state.last_positions = current_positions_map
         
     with tab2:
         mode = st.radio("Widok:", ["Oczekujące", "Wszystkie", "Zakończone"], horizontal=True)
@@ -434,7 +460,6 @@ else:
             home_clean = clean_and_sanitize_team_string(m['home'])
             away_clean = clean_and_sanitize_team_string(m['away'])
             
-            # LINIA INFORMACYJNA NAD MECZEM (CZCIONKA 0.75REM)
             st.markdown(f"""
             <div class="meta-upper-container">
                 <span class="meta-id-text-clean">⚽ Mecz #{m_id}</span>
@@ -445,36 +470,57 @@ else:
             </div>
             """, unsafe_allow_html=True)
             
-            # --- START BOXA MECZOWEGO: IDEALNA LINIA POZIOMA Z SUWAKAMI OBOK SIEBIE ---
             st.markdown("<div class='match-card-clean'>", unsafe_allow_html=True)
+            cf1, cf2, cf3, cf4, cf5 = st.columns([2.3, 2.0, 2.3, 1.1, 1.4])
             
-            c_home, c_inputs, c_away, c_score, c_actions = st.columns([2.3, 2.4, 2.3, 1.1, 1.4])
-            
-            with c_home:
+            with cf1: 
                 st.markdown(f"<div class='team-text-align-right'><span>{home_clean}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
                 
-            # --- SUWAKI MATRYCOWE Z PRZYCISKAMI +/- UMIESZCZONE OBOK SIEBIE [ X : X ] ---
-            with c_inputs:
-                st.markdown("<div class='inputs-horizontal-align-container'>", unsafe_allow_html=True)
-                b_h = st.number_input(f"H_{m_id}", 0, 20, int(cur_h), 1, key=f"h_{m_id}", label_visibility="collapsed")
-                st.markdown("<span class='score-separator-text'>:</span>", unsafe_allow_html=True)
-                b_a = st.number_input(f"A_{m_id}", 0, 20, int(cur_a), 1, key=f"a_{m_id}", label_visibility="collapsed")
-                st.markdown("</div>", unsafe_allow_html=True)
+            with cf2:
+                st.markdown(f"""
+                <div class="inputs-horizontal-align-container">
+                    <div class="html-score-stepper-container">
+                        <div class="stepper-val-display">{cur_h}</div>
+                    </div>
+                    <span class="score-center-separator">:</span>
+                    <div class="html-score-stepper-container">
+                        <div class="stepper-val-display">{cur_a}</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
                 
-            with c_away:
+                c_btn_h1, c_btn_h2, space_sep, c_btn_a1, c_btn_a2 = st.columns([1, 1, 0.5, 1, 1])
+                with c_btn_h1:
+                    if st.button("—", key=f"min_h_{m_id}", disabled=locked):
+                        st.session_state.bets[m_id][st.session_state.logged_in_user] = (max(0, cur_h - 1), cur_a)
+                        st.rerun()
+                with c_btn_h2:
+                    if st.button("+", key=f"pls_h_{m_id}", disabled=locked):
+                        st.session_state.bets[m_id][st.session_state.logged_in_user] = (cur_h + 1, cur_a)
+                        st.rerun()
+                with c_btn_a1:
+                    if st.button("—", key=f"min_a_{m_id}", disabled=locked):
+                        st.session_state.bets[m_id][st.session_state.logged_in_user] = (cur_h, max(0, cur_a - 1))
+                        st.rerun()
+                with c_btn_a2:
+                    if st.button("+", key=f"pls_a_{m_id}", disabled=locked):
+                        st.session_state.bets[m_id][st.session_state.logged_in_user] = (cur_h, cur_a + 1)
+                        st.rerun()
+                        
+            with cf3: 
                 st.markdown(f"<div class='team-text-align-left'>{get_cdn_flag_img_html(m['away'])} <span>{away_clean}</span></div>", unsafe_allow_html=True)
                 
-            with c_score:
+            with cf4: 
                 st.markdown(f"<span class='official-score-subtle'>{oficjalny_wynik_tekst}</span>", unsafe_allow_html=True)
                 
-            with c_actions:
-                st.markdown("<div style='display:flex; align-items:center; gap:6px; justify-content:flex-end; width:100%; height:32px;'>", unsafe_allow_html=True)
+            with cf5:
+                st.markdown("<div class='flex-action-container' style='display:flex; align-items:center; gap:6px; justify-content:flex-end; width:100%; height:32px;'>", unsafe_allow_html=True)
                 if locked:
                     st.button("🔒", disabled=True, key=f"lock_{m_id}")
                 else:
                     if st.button("Zapisz", key=f"save_{m_id}"):
-                        st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a)
                         save_backup_local_and_github()
+                        st.success("OK!")
                         st.rerun()
                     
                     if has_existing_bet:
@@ -483,7 +529,7 @@ else:
                         st.markdown("<div class='missing-bet-banner-blink' style='animation: pulseAlertCore 1.2s infinite ease-in-out !important;'>⚠️ BRAK</div>", unsafe_allow_html=True)
                 st.markdown("</div>", unsafe_allow_html=True)
                 
-            st.markdown("</div>", unsafe_allow_html=True) # Zamknięcie .match-card-clean
+            st.markdown("</div>", unsafe_allow_html=True)
 
     with tab3:
         st.header("Tabele Grup Turniejowych")
@@ -513,7 +559,6 @@ else:
                 g_rows += f"<tr {row_style}><td><b>{idx}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {rep_clean}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
             st.markdown(f"<div class='match-card-clean'><table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table></div>", unsafe_allow_html=True)
             
-        # --- PRZYWRÓCONA W PEŁNI STRUKTURALNA TABELA DRUŻYN Z 3. MIEJSCA ---
         st.divider(); st.header("🏆 Ranking Drużyn z 3. Miejsc")
         if third_places_list:
             df_third = pd.DataFrame(third_places_list).sort_values(by=["Pkt", "RB", "BZ", "Zwyciestwa"], ascending=False).reset_index(drop=True)
