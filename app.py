@@ -41,7 +41,7 @@ VENUES_LIST = [
     "Gillette, Boston", "BMO Field, Toronto", "BBVA, Monterrey", "Akron, Guadalajara"
 ]
 
-# ZAAWANSOWANA ARCHITEKTURA CSS DLA KONTROLI NATYWNYCH KOMPONENTÓW I KOLORÓW
+# GŁÓWNY SILNIK CSS
 st.markdown("""
     <script>
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
@@ -86,79 +86,37 @@ st.markdown("""
     .bet-winner { background: #064E3B; color: #4ADE80; border: 1px dashed #16A34A; } 
     .bet-wrong { background: #450A0A; color: #FCA5A5; border: 1px dashed #DC2626; } 
     
-    /* ========================================================================= */
-    /* PANCERNY FIX: TŁO FORMULARZY LOGOWANIA (SELECTBOX I INPUT)                */
-    /* ========================================================================= */
-    div[data-testid="stSelectbox"] div[data-baseweb="select"] > div {
-        background-color: #1E293B !important;
-        border: 1px solid #334155 !important;
-    }
-    div[data-testid="stSelectbox"] div[data-baseweb="select"] span {
-        color: #F8FAFC !important;
-    }
-    ul[role="listbox"] {
-        background-color: #1E293B !important;
-    }
-    li[role="option"] {
-        background-color: #1E293B !important;
-        color: #F8FAFC !important;
-    }
-    li[role="option"]:hover, li[role="option"][aria-selected="true"] {
-        background-color: #334155 !important;
-        color: #F97316 !important;
-    }
-    
-    div[data-testid="stTextInput"] div[data-baseweb="input"] {
-        background-color: #1E293B !important;
-        border: 1px solid #334155 !important;
-    }
-    div[data-testid="stTextInput"] input {
-        color: #F8FAFC !important;
-        -webkit-text-fill-color: #F8FAFC !important;
-        background-color: transparent !important;
-    }
+    /* INPUTY I TŁA LOGOWANIA */
+    div[data-testid="stSelectbox"] div[data-baseweb="select"] > div { background-color: #1E293B !important; border: 1px solid #334155 !important; }
+    div[data-testid="stSelectbox"] div[data-baseweb="select"] span { color: #F8FAFC !important; }
+    ul[role="listbox"] { background-color: #1E293B !important; }
+    li[role="option"] { background-color: #1E293B !important; color: #F8FAFC !important; }
+    li[role="option"]:hover, li[role="option"][aria-selected="true"] { background-color: #334155 !important; color: #F97316 !important; }
+    div[data-testid="stTextInput"] div[data-baseweb="input"] { background-color: #1E293B !important; border: 1px solid #334155 !important; }
+    div[data-testid="stTextInput"] input { color: #F8FAFC !important; -webkit-text-fill-color: #F8FAFC !important; background-color: transparent !important; }
 
-    /* ========================================================================= */
-    /* FIX BIAŁYCH TŁA DLA PÓL NUMERYCZNYCH MECZY                                */
-    /* ========================================================================= */
-    div[data-testid="stNumberInput"] div[data-baseweb="input"] {
-        background-color: #0A1128 !important; border: 1px solid #1E3A8A !important; border-radius: 6px !important; height: 38px !important; transition: none !important; overflow: hidden;
-    }
-    div[data-testid="stNumberInput"] input {
-        color: #F8FAFC !important; -webkit-text-fill-color: #F8FAFC !important; background-color: #0A1128 !important; font-size: 1.25rem !important; font-weight: 900 !important; text-align: center !important; padding: 0 !important;
-    }
-    
-    div[data-testid="stNumberInput"] button {
-        background-color: #1E293B !important; border: none !important; border-radius: 4px !important; width: 32px !important; height: 32px !important; margin: 2px !important; transition: transform 0.1s ease !important;
-    }
+    /* INPUTY BRAMEK W MECZACH */
+    div[data-testid="stNumberInput"] div[data-baseweb="input"] { background-color: #0A1128 !important; border: 1px solid #1E3A8A !important; border-radius: 6px !important; height: 38px !important; transition: none !important; overflow: hidden; }
+    div[data-testid="stNumberInput"] input { color: #F8FAFC !important; -webkit-text-fill-color: #F8FAFC !important; background-color: #0A1128 !important; font-size: 1.25rem !important; font-weight: 900 !important; text-align: center !important; padding: 0 !important; }
+    div[data-testid="stNumberInput"] button { background-color: #1E293B !important; border: none !important; border-radius: 4px !important; width: 32px !important; height: 32px !important; margin: 2px !important; transition: transform 0.1s ease !important; }
     div[data-testid="stNumberInput"] button svg { fill: #F97316 !important; color: #F97316 !important; }
-    
-    div[data-testid="stNumberInput"] button:active, div[data-testid="stNumberInput"] button:focus {
-        opacity: 1.0 !important; background-color: #0F172A !important; transform: scale(0.90) !important; outline: none !important; box-shadow: none !important;
-    }
+    div[data-testid="stNumberInput"] button:active, div[data-testid="stNumberInput"] button:focus { opacity: 1.0 !important; background-color: #0F172A !important; transform: scale(0.90) !important; outline: none !important; box-shadow: none !important; }
     div[data-testid="stNumberInput"] button:hover { background-color: #334155 !important; }
     div[data-testid="stNumberInput"] button:hover svg { fill: #FFFFFF !important; }
     
-    /* --- PRZYCISKI AKCJI ZAPISZ I USUŃ --- */
-    div[data-testid="stButton"] button { transition: transform 0.1s ease !important; }
-    div[data-testid="stButton"] button:active, div[data-testid="stButton"] button:focus {
-        opacity: 1.0 !important; transform: scale(0.95) !important; outline: none !important; box-shadow: none !important;
-    }
+    /* GŁÓWNE PRZYCISKI AKCJI (STREAMLIT KINDS) */
+    button[kind="secondary"] { background-color: #1E293B !important; border: 1px solid #334155 !important; border-radius: 4px !important; height: 32px !important; min-height: 32px !important; padding: 0 !important; width: 100% !important; display: block !important; }
+    button[kind="secondary"] * { color: #F97316 !important; font-weight: bold !important; font-size: 1.1rem !important; }
+    button[kind="secondary"]:hover { background-color: #334155 !important; }
+    button[kind="secondary"]:hover * { color: #FFFFFF !important; }
     
-    /* Kolumna 7: Zapisz */
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(7) div[data-testid="stButton"] button {
-        background-color: #F97316 !important; color: #FFFFFF !important; border: 1px solid #EA580C !important; border-radius: 4px !important; height: 38px !important; min-height: 38px !important; width: 100% !important; font-weight: bold !important; font-size: 0.9rem !important; display: block !important; box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
-    }
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(7) div[data-testid="stButton"] button p { color: #FFFFFF !important; font-weight: bold !important; }
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(7) div[data-testid="stButton"] button:hover { background-color: #EA580C !important; border-color: #C2410C !important; }
+    button[kind="primary"] { background-color: #F97316 !important; border: 1px solid #EA580C !important; border-radius: 4px !important; height: 32px !important; min-height: 32px !important; padding: 0 !important; width: 100% !important; display: block !important; box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important; }
+    button[kind="primary"] * { color: #FFFFFF !important; font-size: 0.9rem !important; font-weight: bold !important; }
+    button[kind="primary"]:hover { background-color: #EA580C !important; border-color: #C2410C !important; }
     
-    /* Kolumna 8: Usuń (✖) */
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(8) div[data-testid="stButton"] button {
-        background-color: #1E293B !important; color: #94A3B8 !important; border: 1px solid #334155 !important; border-radius: 4px !important; height: 38px !important; min-height: 38px !important; width: 100% !important; font-weight: bold !important; font-size: 1.1rem !important; display: block !important;
-    }
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(8) div[data-testid="stButton"] button p { color: #94A3B8 !important; font-weight: bold !important; }
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(8) div[data-testid="stButton"] button:hover { background-color: #475569 !important; border-color: #64748B !important; }
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(8) div[data-testid="stButton"] button:hover p { color: #FFFFFF !important; }
+    /* NADPISANIE WYSOKOŚCI DLA RZĘDU MECZU */
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) button[kind="primary"],
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) button[kind="secondary"] { height: 38px !important; min-height: 38px !important; }
     
     /* STATUSY TYPOWANIA NA SAMYM KOŃCU */
     .bet-ok { background: #16A34A; color: white; text-align: center; font-weight: bold; border-radius: 4px; height: 38px; line-height: 38px; font-size: 0.8rem; width: 100%; white-space: nowrap; display:block; }
@@ -168,7 +126,15 @@ st.markdown("""
     .status-badge-ended { color: #94A3B8 !important; font-weight: bold; font-size: 0.65rem !important; }
     .status-badge-live { color: #DC2626 !important; font-weight: bold; font-size: 0.65rem !important; }
     
-    /* PODIUM MEDALOWE W RANKINGU */
+    /* TABELA RANKINGOWA I PODIUM */
+    .kricon-table { width: 100%; border-collapse: collapse; margin: 15px 0 35px 0; background-color: #172554 !important; border-radius: 8px; overflow: hidden; }
+    .kricon-table th { background-color: #F97316 !important; color: #0A1128 !important; padding: 12px; font-weight: 800; }
+    .kricon-table td { padding: 11px 12px; border-bottom: 1px solid #1E3A8A !important; }
+    /* Wymuszenie węższych kolumn w tabeli rankingowej */
+    .col-pos { width: 60px !important; text-align: center !important; }
+    .col-trend { width: 60px !important; text-align: center !important; }
+    .col-missing { width: 100px !important; text-align: center !important; font-weight: bold !important; }
+    
     .gold-medal-row { background-color: rgba(254, 240, 138, 0.95) !important; font-weight: bold; }
     .gold-medal-row td, .gold-medal-row b { color: #0A1128 !important; }
     .silver-medal-row { background-color: rgba(226, 232, 240, 0.95) !important; font-weight: bold; }
@@ -183,13 +149,10 @@ st.markdown("""
     .silver-medal-row .trend-up, .silver-medal-row .trend-down, .silver-medal-row .trend-stable,
     .bronze-medal-row .trend-up, .bronze-medal-row .trend-down, .bronze-medal-row .trend-stable { color: #0A1128 !important; }
     
-    .kricon-table { width: 100%; border-collapse: collapse; margin: 15px 0 35px 0; background-color: #172554 !important; border-radius: 8px; overflow: hidden; }
-    .kricon-table th { background-color: #F97316 !important; color: #0A1128 !important; padding: 12px; font-weight: 800; }
-    .kricon-table td { padding: 11px 12px; border-bottom: 1px solid #1E3A8A !important; }
     .points-legend { background-color: #060B19; border-left: 5px solid #F97316; padding: 12px; margin-bottom: 15px; border-radius: 4px; }
     .flag-img { width: 22px !important; height: 14px !important; object-fit: cover !important; border-radius: 2px !important; display: inline-block; vertical-align: middle; border: 1px solid rgba(255,255,255,0.2); }
     
-    /* DRABINKA I TABELE */
+    /* DRABINKA */
     .bracket-match-card { background: #172554 !important; border: 2px solid #1E3A8A !important; border-radius: 8px; padding: 10px; margin: 6px 0; }
     .bracket-match-title { font-size: 0.75rem !important; color: #F97316 !important; font-weight: bold; margin-bottom: 4px; }
     .bracket-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; font-size: 0.9rem !important; }
@@ -238,7 +201,6 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- BEZPIECZNA SYNCHRONIZACJA (CONCURRENCY) ---
 def save_backup_local_and_github():
     try:
         if os.path.exists("typer_backup.json"):
@@ -268,7 +230,6 @@ def load_backup_local():
         except Exception: return False
     return False
 
-# --- CALLBACKS DO BEZPIECZNEGO ZAPISU I USUWANIA ---
 def btn_save_action(m_id, user, h_key, a_key):
     st.session_state.bets[m_id][user] = (st.session_state[h_key], st.session_state[a_key])
     save_backup_local_and_github()
@@ -282,14 +243,26 @@ def btn_delete_action(m_id, user, h_key, a_key):
 
 def render_leaderboard_html(now_time, new_positions_dict_dest=None):
     scores = {p: 0 for p in players}
+    missing_bets = {p: 0 for p in players}
+    
     if 'results' in st.session_state and 'bets' in st.session_state:
         for m_id, res in st.session_state.results.items():
+            # Zliczamy mecze, których czas typowania minął, a gracz nie dodał wyniku
+            is_past = (res['timestamp'] - now_time).total_seconds() <= 0
+            for p in players:
+                has_bet = m_id in st.session_state.bets and p in st.session_state.bets[m_id]
+                if is_past and not has_bet:
+                    missing_bets[p] += 1
+            
             if res.get('status') == "Zakończony":
                 for p in players:
                     if m_id in st.session_state.bets and p in st.session_state.bets[m_id]:
                         scores[p] += calculate_points(st.session_state.bets[m_id][p][0], st.session_state.bets[m_id][p][1], res.get('score_h'), res.get('score_a'))
                         
-    df = pd.DataFrame(list(scores.items()), columns=["Gracz", "Punkty"]).sort_values(by="Punkty", ascending=False).reset_index(drop=True)
+    df_scores = pd.DataFrame(list(scores.items()), columns=["Gracz", "Punkty"])
+    df_missing = pd.DataFrame(list(missing_bets.items()), columns=["Gracz", "Brak typu"])
+    df = pd.merge(df_scores, df_missing, on="Gracz").sort_values(by="Punkty", ascending=False).reset_index(drop=True)
+    
     legend_html = """<div class="points-legend"><div style="font-weight: bold; color: #F97316; margin-bottom: 6px; font-size: 1.05rem;">ℹ️ System przyznawania punktów:</div><div>🎯 <b style="color: #4ADE80;">3 Punkty</b> — dokładny wynik</div><div>⚖️ <b style="color: #38BDF8;">1 Punkt</b> — poprawny zwycięzca / remis</div></div>"""
     rows = ""
     for idx, row in df.iterrows():
@@ -305,9 +278,12 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
         elif pos == 2: bg_class, medal = 'class="silver-medal-row"', "🥈 "
         elif pos == 3: bg_class, medal = 'class="bronze-medal-row"', "🥉 "
         else: bg_class, medal = "", ""
+        
+        miss_val = row['Brak typu']
+        miss_html = f"<span style='color: #DC2626;'>{miss_val}</span>" if miss_val > 0 else f"<span style='color: #64748B;'>0</span>"
             
-        rows += f"<tr {bg_class}><td style='text-align:center;'><b>{pos}</b></td><td style='text-align:center;'>{trend_html}</td><td>{medal}{p_name}</td><td><b>{row['Punkty']} pkt</b></td></tr>"
-    return legend_html + f"<table class='kricon-table'><tr><th>Miejsce</th><th>Trend</th><th>Gracz</th><th>Punkty</th></tr>{rows}</table>"
+        rows += f"<tr {bg_class}><td class='col-pos'><b>{pos}</b></td><td class='col-trend'>{trend_html}</td><td>{medal}{p_name}</td><td><b>{row['Punkty']} pkt</b></td><td class='col-missing'>{miss_html}</td></tr>"
+    return legend_html + f"<table class='kricon-table'><tr><th class='col-pos'>Miejsce</th><th class='col-trend'>Trend</th><th>Gracz</th><th>Punkty</th><th class='col-missing'>Brak typu</th></tr>{rows}</table>"
 
 def render_bracket_match_html_clean(match_id):
     m = st.session_state.results.get(match_id)
@@ -423,8 +399,6 @@ for m_id, m in st.session_state.results.items():
         time_diff = now - m['timestamp']
         if timedelta(minutes=0) <= time_diff <= timedelta(minutes=120): st.session_state.results[m_id]['status'] = "LIVE"
 
-if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
-
 # LOGOWANIE
 if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
@@ -432,7 +406,7 @@ if st.session_state.logged_in_user is None:
         st.subheader("🔒 Logowanie")
         user = st.selectbox("Wybierz użytkownika:", [""] + list(USER_CREDENTIALS.keys()))
         pw = st.text_input("Wpisz hasło:", type="password")
-        if st.button("Zaloguj się"):
+        if st.button("Zaloguj się", type="primary"):
             if USER_CREDENTIALS.get(user) == pw: 
                 st.session_state.logged_in_user = user
                 st.rerun()
@@ -442,7 +416,7 @@ if st.session_state.logged_in_user is None:
         st.markdown(render_leaderboard_html(now), unsafe_allow_html=True)
 else:
     st.sidebar.write(f"👤 Zalogowany jako: **{st.session_state.logged_in_user}**")
-    if st.sidebar.button("Wyloguj się"): 
+    if st.sidebar.button("Wyloguj się", type="primary"): 
         st.session_state.logged_in_user = None
         st.rerun()
         
@@ -466,6 +440,8 @@ else:
                 status_html = '<span class="status-waiting-blink">🟡 Oczekuje</span>'
                 
             oficjalny_wynik_tekst = f"Wynik: {m.get('score_h') if m.get('score_h') is not None else '?'} : {m.get('score_a') if m.get('score_a') is not None else '?'}"
+            
+            # BLOKADA CZASOWA - dokładnie od godziny rozpoczęcia meczu
             locked = (m['timestamp'] - now).total_seconds() <= 0
             
             has_existing_bet = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user) is not None
@@ -490,13 +466,13 @@ else:
             <div class='match-row-anchor'></div>
             """, unsafe_allow_html=True)
             
-            # --- GŁÓWNA LINIA POZIOMA Z WYRÓWNANIEM DO 9 KOLUMN ---
+            # --- GŁÓWNA LINIA POZIOMA ---
             c_home, c_inph, c_sep, c_inpa, c_away, c_score, c_save, c_del, c_status = st.columns([2.5, 1.8, 0.2, 1.8, 2.5, 1.5, 1.2, 0.6, 1.2])
             
             with c_home:
                 st.markdown(f"<div class='team-align-right'><span>{home_clean}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
                 
-            # Logika podświetlania kolorami trafień dla zakończonych meczów
+            # Logika podświetlania wyników
             box_class_h = "bet-locked"
             box_class_a = "bet-locked"
             
@@ -547,7 +523,7 @@ else:
                 else:
                     st.markdown("<div class='missing-bet-banner-blink'>⚠️ BRAK TYPU</div>", unsafe_allow_html=True)
 
-            # PODGLĄD TYPÓW ZABEZPIECZONY (Tylko po zablokowaniu meczu)
+            # PODGLĄD TYPÓW (Otwiera się dopiero jak upłynie czas meczu)
             if locked or m.get('status') == "Zakończony":
                 with st.expander("👁️ Zobacz typy innych graczy"):
                     other_bets = [{"Gracz": p, "Typowany wynik": f"{st.session_state.bets.get(m_id, {}).get(p)[0]} - {st.session_state.bets.get(m_id, {}).get(p)[1]}" if st.session_state.bets.get(m_id, {}).get(p) else "Brak typu"} for p in players if p != st.session_state.logged_in_user]
