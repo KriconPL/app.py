@@ -41,7 +41,7 @@ VENUES_LIST = [
     "Gillette, Boston", "BMO Field, Toronto", "BBVA, Monterrey", "Akron, Guadalajara"
 ]
 
-# ANTY-COPY GUARD ORAZ WYMUSZONE UKŁADY ANIMACJI DLA KLAS INTERFEJSU
+# ANTY-COPY GUARD ORAZ SYSTEM ANIMACJI STYLÓW DLA STATUSÓW W CHMURZE
 st.markdown("""
     <script>
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
@@ -76,19 +76,19 @@ st.markdown("""
     .stButton>button { background-color: #F97316 !important; color: #FFFFFF !important; border-radius: 4px !important; border: none !important; font-weight: 700 !important; height: 32px !important; line-height: 32px !important; padding: 0 12px !important; width: 100% !important; font-size: 0.85rem !important; }
     .stButton>button:hover { background-color: #EA580C !important; box-shadow: 0 3px 8px rgba(249, 115, 22, 0.4) !important; }
     
-    /* --- DEFINICJE CHMURY DLA SELEKTORÓW ANIMACJI PULSUJĄCEJ --- */
+    /* SYSTEM AGRESYWNEGO PULSOWANIA W WIDOKACH STREAMLIT */
     @keyframes kriconAlertPulse {
         0% { background-color: #DC2626 !important; opacity: 1.0 !important; }
-        50% { background-color: #EF4444 !important; opacity: 0.5 !important; }
+        50% { background-color: #EF4444 !important; opacity: 0.4 !important; }
         100% { background-color: #DC2626 !important; opacity: 1.0 !important; }
     }
     @keyframes kriconWaitingPulse {
         0% { background-color: #D97706 !important; opacity: 1.0 !important; }
-        50% { background-color: #F59E0B !important; opacity: 0.6 !important; }
+        50% { background-color: #F59E0B !important; opacity: 0.5 !important; }
         100% { background-color: #D97706 !important; opacity: 1.0 !important; }
     }
     
-    div[data-testid="stMarkdownContainer"] .missing-bet-banner {
+    .missing-bet-banner {
         animation: kriconAlertPulse 1.2s infinite ease-in-out !important;
         color: #FFFFFF !important;
         font-weight: bold !important;
@@ -102,7 +102,7 @@ st.markdown("""
         white-space: nowrap !important;
     }
     
-    div[data-testid="stMarkdownContainer"] .status-waiting {
+    .status-waiting {
         animation: kriconWaitingPulse 1.5s infinite ease-in-out !important;
         color: #FFFFFF !important;
         padding: 2px 6px !important;
@@ -136,8 +136,8 @@ st.markdown("""
     
     .match-date-badge { color: #CBD5E1 !important; font-weight: bold; background-color: #0F172A; padding: 1px 4px; border-radius: 4px; }
     .match-venue-badge { color: #38BDF8 !important; font-weight: bold; background-color: #0B1329; padding: 1px 4px; border-radius: 4px; }
-    .team-text-align-right { font-size: 1.1rem !important; font-weight: bold !important; text-align: right; display: block; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-    .team-text-align-left { font-size: 1.1rem !important; font-weight: bold !important; text-align: left; display: block; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .team-text-align-right { font-size: 1.1rem !important; font-weight: bold !important; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%; }
+    .team-text-align-left { font-size: 1.1rem !important; font-weight: bold !important; text-align: left; display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; }
     .official-score-badge { font-size: 1.1rem !important; font-weight: 800 !important; color: #0A1128 !important; background-color: #F97316 !important; padding: 2px 10px; border-radius: 4px; display: block; text-align: center; width: 100%; height: 32px; line-height: 28px; }
     div[data-testid="stNumberInput"] { height: 32px !important; margin: 0 !important; padding: 0 !important; }
     div[data-testid="stNumberInput"] button { background-color: #1E3A8A !important; color: #F8FAFC !important; height: 32px !important; }
@@ -153,35 +153,42 @@ st.markdown("""
     .kricon-table th { background-color: #F97316 !important; color: #0A1128 !important; padding: 12px; font-weight: 800; }
     .kricon-table td { padding: 11px 12px; border-bottom: 1px solid #1E3A8A !important; }
     .points-legend { background-color: #060B19; border-left: 5px solid #F97316; padding: 12px; margin-bottom: 15px; border-radius: 4px; }
+    .flag-img { width: 22px !important; height: 15px !important; object-fit: cover !important; border-radius: 2px !important; display: inline-block; vertical-align: middle; border: 1px solid rgba(255,255,255,0.15); }
     </style>
 """, unsafe_allow_html=True)
 
-# --- MAPOWANIE ENCITI HTML (GWARANTUJE NIEZALEŻNE WYŚWIETLANIE FLAG WE WSZYSTKICH ZAKŁADKACH) ---
-HTML_FLAGS_MAP = {
-    "Meksyk": "&#127474;&#127480;", "RPA": "&#127485;&#127462;", "Korea Południowa": "&#127472;&#127479;", "Czechy": "&#127464;&#127487;",
-    "Kanada": "&#127464;&#127462;", "Bośnia i Hercegowina": "&#127463;&#127462;", "Katar": "&#127473;&#127470;", "Szwajcaria": "&#127464;&#127470;",
-    "Brazylia": "&#127463;&#127471;", "Maroko": "&#127474;&#127462;", "Haiti": "&#127469;&#127481;", "Szkocja": "&#127468;&#127463;&#127480;&#127464;&#127481;",
-    "USA": "&#127482;&#127480;", "Paragwaj": "&#127477;&#127481;", "Australia": "&#127462;&#127482;", "Turcja": "&#127481;&#127479;",
-    "Niemcy": "&#127465;&#127466;", "Curaçao": "&#127464;&#127484;", "WKS": "&#127464;&#12747Setting;", "Ekwador": "&#127466;&#127464;",
-    "Holandia": "&#127475;&#127473;", "Japonia": "&#127471;&#127477;", "Szwecja": "&#127480;&#127466;", "Tunezja": "&#127481;&#127475;",
-    "Belgia": "&#127464;&#127466;", "Egipt": "&#127466;&#127474;", "Iran": "&#127470;&#127479;", "Nowa Zelandia": "&#127475;&#127495;",
-    "Hiszpania": "&#127466;&#127480;", "Wyspy Zielonego Przylądka": "&#127464;&#127483;", "Arabia Saudyjska": "&#127480;&#127462;", "Urugwaj": "&#127482;&#127486;",
-    "Francja": "&#127467;&#127479;", "Senegal": "&#127480;&#127475;", "Irak": "&#127470;&#127473;", "Norwegia": "&#127475;&#127476;",
-    "Argentyna": "&#127462;&#127479;", "Algieria": "&#127465;&#127495;", "Austria": "&#127462;&#127481;", "Jordania": "&#127471;&#127476;",
-    "Portugalia": "&#127477;&#127481;", "DR Konga": "&#127464;&#127465;", "Uzbekistan": "&#127482;&#127495;", "Kolumbia": "&#127464;&#127476;",
-    "Anglia": "&#127468;&#127463;&#127480;&#127461;&#127473;", "Chorwacja": "&#127469;&#127485;", "Ghana": "&#127468;&#127469;", "Panama": "&#127477;&#127462;"
+# --- MAPOWANIE KODÓW ISO (SERWER CDN - USUWAMY RYZYKO KODOWANIA ZNAKÓW SYSTEMU) ---
+ISO_FLAGS_MAP = {
+    "Meksyk": "mx", "RPA": "za", "Korea Południowa": "kr", "Czechy": "cz",
+    "Kanada": "ca", "Bośnia i Hercegowina": "ba", "Katar": "qa", "Szwajcaria": "ch",
+    "Brazylia": "br", "Maroko": "ma", "Haiti": "ht", "Szkocja": "gb-sct",
+    "USA": "us", "Paragwaj": "py", "Australia": "au", "Turcja": "tr",
+    "Niemcy": "de", "Curaçao": "cw", "WKS": "ci", "Ekwador": "ec",
+    "Holandia": "nl", "Japonia": "jp", "Szwecja": "se", "Tunezja": "tn",
+    "Belgia": "be", "Egipt": "eg", "Iran": "ir", "Nowa Zelandia": "nz",
+    "Hiszpania": "es", "Wyspy Zielonego Przylądka": "cv", "Arabia Saudyjska": "sa", "Urugwaj": "uy",
+    "Francja": "fr", "Senegal": "sn", "Irak": "iq", "Norwegia": "no",
+    "Argentyna": "ar", "Algieria": "dz", "Austria": "at", "Jordania": "jo",
+    "Portugalia": "pt", "DR Konga": "cd", "Uzbekistan": "uz", "Kolumbia": "co",
+    "Anglia": "gb-eng", "Chorwacja": "hr", "Ghana": "gh", "Panama": "pa"
 }
 
 def clean_and_sanitize_team_string(raw_name):
     if not raw_name or raw_name == "TBD": return "TBD"
     s = str(raw_name).strip()
-    s = re.sub(r'^(MX|ZA|KR|cz|cv|CA|BA|QA|CH|BR|MA|HT|US|PY|AU|TR|DE|WKS|EC|NL|JP|SE|TN|BEL|EGI|IRA|NZ|ESP|SA|URU|FRA|SEN|IRQ|NOR|ARG|ALG|AUT|JOR|POR|DRK|UZB|COL|ANG|CRO|GHA|PAN)\s+', '', s, flags=re.IGNORECASE)
+    # Usuwanie złośliwych i zmiennych dopisków dwuliterowych (MS, XA, KR, cz, CE, EM itd.)
+    s = re.sub(r'^(MS|MX|ZA|XA|KR|cz|cv|CA|BA|QA|CH|BR|MA|HT|US|PY|AU|TR|DE|WKS|EC|NL|JP|SE|TN|BEL|CE|EM|IR|EGI|IRA|NZ|ESP|SA|URU|FRA|SEN|IRQ|NOR|ARG|ALG|AUT|JOR|POR|DRK|UZB|COL|ANG|CRO|GHA|PAN)\s+', '', s, flags=re.IGNORECASE)
     s = re.sub(r'[^\w\s\-ąęćłńóśźżĄĘĆŁŃÓŚŹŻ]', '', s)
     return s.strip()
 
-def get_html_flag(team_name):
+def get_cdn_flag_img_html(team_name):
     c_name = clean_and_sanitize_team_string(team_name)
-    return HTML_FLAGS_MAP.get(c_name, "🌐")
+    if c_name == "TBD":
+        return f'<span style="font-size:1.1rem; margin-right:4px;">🌐</span>'
+    code = ISO_FLAGS_MAP.get(c_name, None)
+    if code:
+        return f'<img src="https://flagcdn.com/w40/{code}.png" class="flag-img" />'
+    return f'<span style="font-size:1.1rem; margin-right:4px;">🌐</span>'
 
 def security_clean_text(val):
     if not isinstance(val, str): return val
@@ -243,14 +250,23 @@ def render_bracket_match_html_clean(match_id):
     st.markdown(f"""
     <div class="bracket-match-card">
         <div class="bracket-match-title">Mecz #{match_id}</div>
-        <div class='bracket-row {"bracket-team-winner" if win_h else ""}'><span>{get_html_flag(h_clean)} {h_clean}</span><span class="bracket-score-cell">{sh}</span></div>
-        <div class='bracket-row {"bracket-team-winner" if win_a else ""}'><span>{get_html_flag(a_clean)} {a_clean}</span><span class="bracket-score-cell">{sa}</span></div>
+        <div class='bracket-row {"bracket-team-winner" if win_h else ""}'>
+            <div class="team-text-align-left">{get_cdn_flag_img_html(h_clean)} <span>{h_clean}</span></div>
+            <span class="bracket-score-cell">{sh}</span>
+        </div>
+        <div class='bracket-row {"bracket-team-winner" if win_a else ""}'>
+            <div class="team-text-align-left">{get_cdn_flag_img_html(a_clean)} <span>{a_clean}</span></div>
+            <span class="bracket-score-cell">{sa}</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
 def get_mini_group_html_string(g_code):
     teams = GROUPS_DICT.get(f"Grupa {g_code}", [])
-    lines = "".join([f"<div style='text-align:left; padding:3px 0; font-size:0.9rem;'>{get_html_flag(t)} {clean_and_sanitize_team_string(t)}</div>" for t in teams])
+    lines = ""
+    for t in teams:
+        t_clean = clean_and_sanitize_team_string(t)
+        lines += f"<div style='text-align:left; padding:3px 0; font-size:0.9rem; display:flex; align-items:center; gap:8px;'>{get_cdn_flag_img_html(t_clean)} <span>{t_clean}</span></div>"
     return f"""<div class="bracket-group-box"><div style="font-weight:bold; color:#F97316; margin-bottom:4px; font-size:0.85rem;">GRUPA {g_code}</div>{lines}</div>"""
 
 def save_backup_local_and_github():
@@ -263,7 +279,7 @@ def save_backup_local_and_github():
             url = f"https://api.github.com/repos/{cfg['repo']}/contents/typer_backup.json"
             headers = {"Authorization": f"token {cfg['token']}", "Accept": "application/vnd.github.v3+json"}
             res_get = requests.get(url, headers=headers)
-            sha = res_get.json().get("sha", None) if res_get.status_code == 200 else None
+            sha = res_get.json().get("sha", None) if res_get.status_code == 2000 else None
             content_b64 = base64.b64encode(json_string.encode("utf-8")).decode("utf-8")
             payload = {"message": f"🤖 Backup: {datetime.now().strftime('%Y-%m-%d %H:%M')}", "content": content_b64}
             if sha: payload["sha"] = sha
@@ -350,11 +366,11 @@ def fetch_official_results_from_api(now_time):
                 if m['home'] == "TBD": m['home'] = "Meksyk"
                 if m['away'] == "TBD": m['away'] = "RPA"
 
-# --- ZASADNICZY SILNIK RESTARTU SKAŻONEGO RAMU ---
+# --- SYSTEM AUTOMATYCZNEJ TRANSMUTACJI USZKODZONEGO STANÓW ---
 force_reset_needed = False
 if 'results' in st.session_state:
     for m in st.session_state.results.values():
-        if "MX " in str(m.get('home')) or "ZA " in str(m.get('away')) or "KR " in str(m.get('home')):
+        if "MX " in str(m.get('home')) or "ZA " in str(m.get('away')) or "KR " in str(m.get('home')) or "MS " in str(m.get('home')):
             force_reset_needed = True
             break
 
@@ -379,7 +395,7 @@ for m_id, m in st.session_state.results.items():
 
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 
-# --- APKA ---
+# --- WIDOK INTERFEJSU GRAFICZNEGO ---
 if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
     with c1:
@@ -413,7 +429,7 @@ else:
             elif m.get('status') == "Zakończony":
                 status_html = '<span class="status-badge status-ended">⚫ Zakończony</span>'
             else:
-                status_html = '<span class="status-badge status-waiting">🟡 Oczekuje</span>'
+                status_html = '<span class="status-waiting">🟡 Oczekuje</span>'
                 
             oficjalny_wynik_tekst = f"{m.get('score_h') if m.get('score_h') is not None else '?'} : {m.get('score_a') if m.get('score_a') is not None else '?'}"
             locked = (m['timestamp'] - now).total_seconds() <= 0
@@ -426,9 +442,9 @@ else:
             st.markdown(f"<div class='match-container'><div class='match-top-meta-row'><span class='match-id-text'>⚽ Mecz #{m_id}</span>{status_html}<span class='match-date-badge'>📅 {m['date']}</span><span class='match-venue-badge'>📍 {m.get('venue', 'Stadion')}</span><span style='color:#64748B;'>({m['stage']})</span></div>", unsafe_allow_html=True)
             c_home, c_score, c_away, c_in_h, c_in_a, c_btn, c_banner = st.columns([2.2, 1.2, 1.2, 1.3, 1.3, 1.6, 2.5])
             
-            with c_home: st.markdown(f"<span class='team-text-align-right'>{get_html_flag(m['home'])} {home_clean}</span>", unsafe_allow_html=True)
+            with c_home: st.markdown(f"<div class='team-text-align-right'><span>{home_clean}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
             with c_score: st.markdown(f"<span class='official-score-badge'>{oficjalny_wynik_tekst}</span>", unsafe_allow_html=True)
-            with c_away: st.markdown(f"<span class='team-text-align-left'>{get_html_flag(m['away'])} {away_clean}</span>", unsafe_allow_html=True)
+            with c_away: st.markdown(f"<div class='team-text-align-left'>{get_cdn_flag_img_html(m['away'])} <span>{away_clean}</span></div>", unsafe_allow_html=True)
             
             with c_in_h: b_h = st.number_input(f"H_{m_id}", 0, 20, int(cur_h), 1, key=f"input_h_{m_id}", disabled=locked, label_visibility="collapsed")
             with c_in_a: b_a = st.number_input(f"A_{m_id}", 0, 20, int(cur_a), 1, key=f"input_a_{m_id}", disabled=locked, label_visibility="collapsed")
@@ -475,7 +491,7 @@ else:
             for idx, r in df_g.iterrows():
                 rep_clean = clean_and_sanitize_team_string(r['Reprezentacja'])
                 row_style = 'style="background-color:#16A34A;"' if idx in [1, 2] else ('style="background-color:#EA580C;"' if idx == 3 else '')
-                g_rows += f"<tr {row_style}><td><b>{idx}</b></td><td>{get_html_flag(r['Reprezentacja'])} {rep_clean}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
+                g_rows += f"<tr {row_style}><td><b>{idx}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {rep_clean}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
             st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table>", unsafe_allow_html=True)
             
         st.divider(); st.header("🏆 Ranking Drużyn z 3. Miejsc")
@@ -484,7 +500,7 @@ else:
             df_third.index += 1; third_rows = ""
             for idx, r in df_third.iterrows(): 
                 rep_clean_third = clean_and_sanitize_team_string(r['Reprezentacja'])
-                third_rows += f"<tr {'style=\"background-color:#16A34A;\"' if idx <= 8 else ''}><td><b>{idx}</b></td><td><b>{r['Grupa']}</b></td><td>{get_html_flag(r['Reprezentacja'])} {rep_clean_third}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
+                third_rows += f"<tr {'style=\"background-color:#16A34A;\"' if idx <= 8 else ''}><td><b>{idx}</b></td><td><b>{r['Grupa']}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {rep_clean_third}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
             st.markdown(f"<table class='kricon-table'><tr><th>Msc.</th><th>Grupa</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{third_rows}</table>", unsafe_allow_html=True)
     with tab4:
         st.header("🏆 Drabinka Fazy Pucharowej"); st.divider()
@@ -503,7 +519,7 @@ else:
             m_104 = st.session_state.results.get(104, {})
             h_f_clean = clean_and_sanitize_team_string(m_104.get('home',''))
             a_f_clean = clean_and_sanitize_team_string(m_104.get('away',''))
-            st.markdown(f"<b>{get_html_flag(m_104.get('home'))} {h_f_clean} vs {get_html_flag(m_104.get('away'))} {a_f_clean}</b><br><span class='official-score-badge' style='display:inline-block; width:auto;'>{m_104.get('score_h','?')} : {m_104.get('score_a','?')}</span>", unsafe_allow_html=True)
+            st.markdown(f"<b>{get_cdn_flag_img_html(m_104.get('home'))} {h_f_clean} vs {get_cdn_flag_img_html(m_104.get('away'))} {a_f_clean}</b><br><span class='official-score-badge' style='display:inline-block; width:auto;'>{m_104.get('score_h','?')} : {m_104.get('score_a','?')}</span>", unsafe_allow_html=True)
             st.markdown("</div></div>", unsafe_allow_html=True)
         with c_8r:
             render_bracket_match_html_clean(102); st.write("---")
