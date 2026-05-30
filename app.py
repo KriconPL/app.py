@@ -41,7 +41,7 @@ VENUES_LIST = [
     "Gillette, Boston", "BMO Field, Toronto", "BBVA, Monterrey", "Akron, Guadalajara"
 ]
 
-# GŁÓWNY SILNIK CSS DLA ULTRA-PŁASKICH WIERSZY (BEZWZGLĘDNE WYRÓWNANIE)
+# MATRYCOWY SYSTEM STYLIZACJI FLEXBOX
 st.markdown("""
     <script>
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
@@ -80,14 +80,13 @@ st.markdown("""
         color: #FFFFFF !important;
         font-weight: bold !important;
         text-align: center !important;
-        height: 34px !important;
-        line-height: 34px !important;
+        height: 28px !important;
+        line-height: 28px !important;
         border-radius: 4px !important;
-        font-size: 0.8rem !important;
-        display: block !important;
-        width: 100% !important;
-        margin: 0 !important;
+        font-size: 0.75rem !important;
+        padding: 0 10px !important;
         white-space: nowrap !important;
+        display: inline-block !important;
     }
     
     .status-waiting-blink {
@@ -105,49 +104,39 @@ st.markdown("""
         color: #FFFFFF !important;
         font-weight: bold !important;
         text-align: center !important;
-        height: 34px !important;
-        line-height: 34px !important;
+        height: 28px !important;
+        line-height: 28px !important;
         border-radius: 4px !important;
-        font-size: 0.8rem !important;
-        display: block !important;
-        width: 100% !important;
-        margin: 0 !important;
+        font-size: 0.75rem !important;
+        display: inline-block !important;
+        padding: 0 10px !important;
         white-space: nowrap;
     }
     
-    .meta-upper-container {
+    .meta-inline-box {
         display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.75rem !important;
+        flex-direction: column;
+        gap: 1px;
+        font-size: 0.65rem !important;
         color: #64748B !important;
-        margin-top: 10px !important;
-        margin-bottom: 2px !important;
-        padding-left: 6px;
+        line-height: 1.2;
+        text-align: left;
+        white-space: nowrap;
     }
-    .meta-id-text-clean { font-weight: bold; color: #F97316 !important; }
-    .meta-badge-clean { color: #94A3B8 !important; background-color: #1E293B; padding: 0px 4px; border-radius: 3px; }
-    .meta-venue-clean { color: #38BDF8 !important; background-color: #0B1329; padding: 0px 4px; border-radius: 3px; }
+    .meta-inline-id { font-weight: bold; color: #F97316 !important; font-size: 0.75rem !important; }
     
-    /* ZŁOTE REGULACJE DLA IDEALNEJ PŁASKIEJ LINII OPARTEJ NA ST.COLUMNS */
-    div[data-testid="stHorizontalBlock"]:has(.match-row-marker) {
-        background: #172554 !important;
-        border: 1px solid #1E3A8A !important;
-        border-radius: 6px;
-        padding: 6px 12px !important;
-        margin-bottom: 4px !important;
+    .match-card-clean {
+        background: #172554 !important; 
+        border: 1px solid #1E3A8A !important; 
+        border-radius: 4px; 
+        padding: 5px 12px !important; 
+        margin-bottom: 2px !important; 
         box-shadow: 0 1px 2px rgba(0,0,0,0.15);
-        align-items: center !important; /* WYMUSZONE PIONOWE CENTROWANIE CAŁEGO RZĘDU */
-    }
-    div[data-testid="stHorizontalBlock"]:has(.match-row-marker) > div[data-testid="column"] {
-        padding: 0 4px !important; /* Zmiksowanie kolumn */
-    }
-    div[data-testid="stHorizontalBlock"]:has(.match-row-marker) p {
-        margin-bottom: 0 !important;
+        width: 100%;
     }
     
-    .team-text-right { font-size: 1.05rem !important; font-weight: bold !important; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%; white-space: nowrap; height: 34px; line-height: 34px; color: #F8FAFC !important;}
-    .team-text-left { font-size: 1.05rem !important; font-weight: bold !important; text-align: left; display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; white-space: nowrap; height: 34px; line-height: 34px; color: #F8FAFC !important;}
+    .team-text-align-right { font-size: 1.05rem !important; font-weight: bold !important; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%; white-space: nowrap; }
+    .team-text-align-left { font-size: 1.05rem !important; font-weight: bold !important; text-align: left; display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; white-space: nowrap; }
     
     .official-score-subtle {
         font-size: 0.8rem !important;
@@ -156,69 +145,53 @@ st.markdown("""
         background-color: #1E293B !important;
         border: 1px solid #334155 !important;
         border-radius: 4px;
-        display: block;
+        display: inline-block;
         text-align: center;
         white-space: nowrap;
-        height: 34px !important;
-        line-height: 32px !important;
-        padding: 0 4px !important;
-        width: 100%;
+        height: 28px !important;
+        line-height: 28px !important;
+        padding: 0 8px !important;
     }
     
+    .inputs-horizontal-align-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: 100%;
+    }
     .score-center-separator {
-        text-align: center;
         font-weight: bold;
-        color: #F97316;
-        font-size: 1.2rem;
-        height: 34px;
-        line-height: 34px;
-        width: 100%;
+        color: #F97316 !important;
+        padding: 0 4px;
+        font-size: 1.1rem;
     }
     
-    /* BEZPOŚREDNIE POWIĘKSZENIE NATYWNYCH SUWAKÓW I ICH PRZYCISKÓW +/- */
-    div.stNumberInput { margin: 0 !important; padding: 0 !important; width: 100% !important; }
-    div.stNumberInput input { 
-        text-align: center !important; 
-        background-color: #0A1128 !important; 
-        color: #F8FAFC !important; 
-        height: 34px !important; 
-        font-size: 1.1rem !important; 
-        font-weight: bold !important; 
-        border: 1px solid #1E3A8A !important; 
-        padding: 0 !important;
-    }
-    div.stNumberInput button { 
-        height: 34px !important; 
-        width: 28px !important; 
-        background-color: #1E293B !important; 
-        color: #F97316 !important; 
-        border: 1px solid #334155 !important; 
-    }
-    div.stNumberInput button:hover { background-color: #334155 !important; color: #FFFFFF !important; }
+    div.stNumberInput { width: 95px !important; margin: 0 !important; padding: 0 !important; display: inline-block !important; }
+    div.stNumberInput input { text-align: center !important; background-color: #0A1128 !important; color: #F8FAFC !important; height: 28px !important; font-size: 1rem !important; font-weight: bold !important; padding: 0 !important; border: 1px solid #1E3A8A !important; }
+    div.stNumberInput button { height: 28px !important; width: 22px !important; background-color: #1E293B !important; color: #F97316 !important; border: 1px solid #334155 !important; }
     
-    /* NAPRAWA WYGLĄDU PRZYCISKU ZAPISZ W STREAMLIT 1.30+ */
-    div[data-testid="stButton"] { margin: 0 !important; padding: 0 !important; }
     div.stButton button, div[data-testid="stBlock"] button {
         background-color: #F97316 !important; 
         color: #FFFFFF !important; 
         border-radius: 4px !important; 
         border: 1px solid #EA580C !important; 
         font-weight: bold !important; 
-        height: 34px !important; 
-        line-height: 32px !important; 
-        padding: 0 10px !important; 
+        height: 28px !important; 
+        line-height: 26px !important; 
+        padding: 0 12px !important; 
         font-size: 0.85rem !important; 
         width: 100% !important;
-        display: block !important;
-        margin: 0 !important;
+        display: inline-block !important;
     }
-    div.stButton button:hover { background-color: #EA580C !important; border-color: #C2410C !important;}
+    div.stButton button:hover { background-color: #EA580C !important; }
     
-    /* KOLOROWE PODIUM MEDALOWE W RANKINGU Z CZARNYM TEKSTEM */
-    .gold-medal-row { background-color: #FEF08A !important; font-weight: bold; }
-    .silver-medal-row { background-color: #E2E8F0 !important; font-weight: bold; }
-    .bronze-medal-row { background-color: #FED7AA !important; font-weight: bold; }
-    .gold-medal-row td, .gold-medal-row b, .silver-medal-row td, .silver-medal-row b, .bronze-medal-row td, .bronze-medal-row b { color: #0A1128 !important; }
+    .gold-medal-row { background-color: rgba(254, 240, 138, 0.95) !important; font-weight: bold; }
+    .gold-medal-row td, .gold-medal-row b { color: #0A1128 !important; }
+    .silver-medal-row { background-color: rgba(226, 232, 240, 0.95) !important; font-weight: bold; }
+    .silver-medal-row td, .silver-medal-row b { color: #0A1128 !important; }
+    .bronze-medal-row { background-color: rgba(254, 215, 170, 0.95) !important; font-weight: bold; }
+    .bronze-medal-row td, .bronze-medal-row b { color: #0A1128 !important; }
     
     .trend-up { color: #16A34A !important; font-weight: bold; }
     .trend-down { color: #DC2626 !important; font-weight: bold; }
@@ -243,6 +216,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# MAPOWANIE KODÓW ISO
 ISO_FLAGS_MAP = {
     "Meksyk": "mx", "RPA": "za", "Korea Południowa": "kr", "Czechy": "cz",
     "Kanada": "ca", "Bośnia i Hercegowina": "ba", "Katar": "qa", "Szwajcaria": "ch",
@@ -269,7 +243,8 @@ def get_cdn_flag_img_html(team_name):
     c_name = clean_and_sanitize_team_string(team_name)
     if c_name == "TBD": return f'🌐'
     code = ISO_FLAGS_MAP.get(c_name, None)
-    if code: return f'<img src="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/{code}.svg" class="flag-img" />'
+    if code:
+        return f'<img src="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/{code}.svg" class="flag-img" />'
     return f'🌐'
 
 def calculate_points(pred_h, pred_a, real_h, real_a):
@@ -279,20 +254,6 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
         if np.sign(int(pred_h) - int(pred_a)) == np.sign(int(real_h) - int(real_a)): return 1
     except (ValueError, TypeError): pass
     return 0
-
-def get_time_to_next_unbet_match(player_name, now_time):
-    try:
-        if 'results' not in st.session_state or 'bets' not in st.session_state: return "..."
-        upcoming = sorted([m for m in st.session_state.results.values() if m["timestamp"] > now_time], key=lambda x: x["timestamp"])
-        for match in upcoming:
-            m_id = [k for k, v in st.session_state.results.items() if v == match][0]
-            if st.session_state.bets.get(m_id, {}).get(player_name, (None, None)) == (None, None):
-                diff = match["timestamp"] - now_time
-                if diff.total_seconds() <= 0: continue
-                h, m = int(diff.total_seconds() // 3600), int((diff.total_seconds() % 3600) // 60)
-                return f'<span class="time-warning">Za {h}h {m}m</span>'
-    except Exception: pass
-    return '<span class="time-ok">✔ Wszystko obstawione</span>'
 
 def render_leaderboard_html(now_time, new_positions_dict_dest=None):
     scores = {p: 0 for p in players}
@@ -318,7 +279,6 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
         else:
             trend_html = '<span class="trend-stable">•</span>'
             
-        # ZŁOTO, SREBRO, BRĄZ W TABELI
         if pos == 1:
             bg_class, medal = 'class="gold-medal-row"', "🥇 "
         elif pos == 2:
@@ -504,7 +464,7 @@ else:
             elif m.get('status') == "Zakończony":
                 status_html = '<span class="status-badge status-ended">⚫ Zakończony</span>'
             else:
-                status_html = '<span class="status-waiting-blink">🟡 Oczekuje</span>'
+                status_html = '<span class="status-waiting-blink" style="animation: pulseAlertCore 2.0s infinite ease-in-out !important;">🟡 Oczekuje</span>'
                 
             oficjalny_wynik_tekst = f"Wynik: {m.get('score_h') if m.get('score_h') is not None else '?'} : {m.get('score_a') if m.get('score_a') is not None else '?'}"
             locked = (m['timestamp'] - now).total_seconds() <= 0
@@ -514,55 +474,55 @@ else:
             home_clean = clean_and_sanitize_team_string(m['home'])
             away_clean = clean_and_sanitize_team_string(m['away'])
             
-            # MAŁE METADANE NAD MECZEM
-            st.markdown(f"""
-            <div class="meta-upper-container">
-                <span class="meta-id-text-clean">⚽ Mecz #{m_id}</span>
-                {status_html}
-                <span class="meta-badge-clean">📅 {m['date']}</span>
-                <span class="meta-venue-clean">📍 {m.get('venue').split(',')[0]}</span>
-                <span style="color:#475569;">({m['stage']})</span>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown("<div class='match-card-clean'>", unsafe_allow_html=True)
             
-            # ZNACZNIK DLA GŁÓWNEGO BOXA
-            st.markdown("<div class='match-row-marker'></div>", unsafe_allow_html=True)
+            # --- ZMINIMALIZOWANY UKŁAD: WSZYSTKO W JEDNEJ LINII RAZEM Z METADANYMI ---
+            # c1: Metadane, c2: Zespół 1, c3: Wyniki [X : X], c4: Zespół 2, c5: Wynik oficjalny, c6: Akcje
+            c1, c2, c3, c4, c5, c6 = st.columns([1.6, 2.0, 2.4, 2.0, 1.2, 1.4])
             
-            # GŁÓWNA POZIOMA LINIA: DRUŻYNA | WYNIKI [ 0 : 0 ] | DRUŻYNA | WYNIK OFICJALNY | AKCJA
-            c_home, c_in_h, c_sep, c_in_a, c_away, c_score, c_save, c_status = st.columns([2.5, 1.2, 0.2, 1.2, 2.5, 1.5, 1.2, 1.2])
-            
-            with c_home:
-                st.markdown(f"<div class='team-text-right'><span>{home_clean}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
+            with c1:
+                st.markdown(f"""
+                <div class="meta-inline-box">
+                    <span class="meta-inline-id">Mecz #{m_id}</span>
+                    <div>{status_html}</div>
+                    <span>📅 {m['date']}</span>
+                    <span>📍 {m.get('venue').split(',')[0]}</span>
+                </div>
+                """, unsafe_allow_html=True)
                 
-            with c_in_h:
-                b_h = st.number_input(f"H_{m_id}", 0, 20, int(cur_h), 1, key=f"h_{m_id}", label_visibility="collapsed", disabled=locked)
+            with c2:
+                st.markdown(f"<div class='team-text-align-right'><span>{home_clean}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
                 
-            with c_sep:
-                st.markdown("<div class='score-center-separator'>:</div>", unsafe_allow_html=True)
+            with c3:
+                st.markdown("<div class='inputs-horizontal-align-container'>", unsafe_allow_html=True)
+                b_h = st.number_input(f"H_{m_id}", 0, 20, int(cur_h), 1, key=f"h_{m_id}", label_visibility="collapsed")
+                st.markdown("<span class='score-center-separator'>:</span>", unsafe_allow_html=True)
+                b_a = st.number_input(f"A_{m_id}", 0, 20, int(cur_a), 1, key=f"a_{m_id}", label_visibility="collapsed")
+                st.markdown("</div>", unsafe_allow_html=True)
                 
-            with c_in_a:
-                b_a = st.number_input(f"A_{m_id}", 0, 20, int(cur_a), 1, key=f"a_{m_id}", label_visibility="collapsed", disabled=locked)
+            with c4:
+                st.markdown(f"<div class='team-text-align-left'>{get_cdn_flag_img_html(m['away'])} <span>{away_clean}</span></div>", unsafe_allow_html=True)
                 
-            with c_away:
-                st.markdown(f"<div class='team-text-left'>{get_cdn_flag_img_html(m['away'])} <span>{away_clean}</span></div>", unsafe_allow_html=True)
-                
-            with c_score:
+            with c5:
                 st.markdown(f"<div class='official-score-subtle'>{oficjalny_wynik_tekst}</div>", unsafe_allow_html=True)
                 
-            with c_save:
+            with c6:
+                st.markdown("<div style='display:flex; align-items:center; gap:6px; justify-content:flex-start; width:100%;'>", unsafe_allow_html=True)
                 if locked:
-                    st.button("🔒", disabled=True, key=f"lock_{m_id}", use_container_width=True)
+                    st.button("🔒", disabled=True, key=f"lock_{m_id}")
                 else:
-                    if st.button("Zapisz", key=f"save_{m_id}", use_container_width=True):
+                    if st.button("Zapisz", key=f"save_{m_id}"):
                         st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a)
                         save_backup_local_and_github()
                         st.rerun()
-                        
-            with c_status:
-                if has_existing_bet:
-                    st.markdown("<div class='success-bet-banner'>✔ OK</div>", unsafe_allow_html=True)
-                else:
-                    st.markdown("<div class='missing-bet-banner-blink'>⚠️ BRAK</div>", unsafe_allow_html=True)
+                    
+                    if has_existing_bet:
+                        st.markdown("<div class='success-bet-banner'>✔ OK</div>", unsafe_allow_html=True)
+                    else:
+                        st.markdown("<div class='missing-bet-banner-blink' style='animation: pulseAlertCore 1.2s infinite ease-in-out !important;'>⚠️ BRAK</div>", unsafe_allow_html=True)
+                st.markdown("</div>", unsafe_allow_html=True)
+                
+            st.markdown("</div>", unsafe_allow_html=True)
 
     with tab3:
         st.header("Tabele Grup Turniejowych")
@@ -592,7 +552,6 @@ else:
                 g_rows += f"<tr {row_style}><td><b>{idx}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {rep_clean}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
             st.markdown(f"<div class='match-card-clean'><table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table></div>", unsafe_allow_html=True)
             
-        # TABELA 3 MIEJSC
         st.divider(); st.header("🏆 Ranking Drużyn z 3. Miejsc")
         if third_places_list:
             df_third = pd.DataFrame(third_places_list).sort_values(by=["Pkt", "RB", "BZ", "Zwyciestwa"], ascending=False).reset_index(drop=True)
