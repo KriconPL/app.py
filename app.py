@@ -76,16 +76,16 @@ st.markdown("""
     .stButton>button { background-color: #F97316 !important; color: #FFFFFF !important; border-radius: 4px !important; border: none !important; font-weight: 700 !important; height: 32px !important; line-height: 32px !important; padding: 0 12px !important; width: 100% !important; font-size: 0.85rem !important; }
     .stButton>button:hover { background-color: #EA580C !important; box-shadow: 0 3px 8px rgba(249, 115, 22, 0.4) !important; }
     
-    /* --- WYMUSZENIE MECHANIKI ANIMACJI PULSOWANIA (AGRESYWNE SELEKTORY CHMURY) --- */
+    /* --- DEFINICJE CHMURY DLA SELEKTORÓW ANIMACJI PULSUJĄCEJ --- */
     @keyframes kriconAlertPulse {
         0% { background-color: #DC2626 !important; opacity: 1.0 !important; }
         50% { background-color: #EF4444 !important; opacity: 0.5 !important; }
         100% { background-color: #DC2626 !important; opacity: 1.0 !important; }
     }
     @keyframes kriconWaitingPulse {
-        0% { background-color: #D97706 !important; transform: scale(1.0); }
-        50% { background-color: #F59E0B !important; transform: scale(1.03); }
-        100% { background-color: #D97706 !important; transform: scale(1.0); }
+        0% { background-color: #D97706 !important; opacity: 1.0 !important; }
+        50% { background-color: #F59E0B !important; opacity: 0.6 !important; }
+        100% { background-color: #D97706 !important; opacity: 1.0 !important; }
     }
     
     div[data-testid="stMarkdownContainer"] .missing-bet-banner {
@@ -103,8 +103,11 @@ st.markdown("""
     }
     
     div[data-testid="stMarkdownContainer"] .status-waiting {
-        animation: kriconWaitingPulse 1.8s infinite ease-in-out !important;
-        display: inline-block !important;
+        animation: kriconWaitingPulse 1.5s infinite ease-in-out !important;
+        color: #FFFFFF !important;
+        padding: 2px 6px !important;
+        border-radius: 4px !important;
+        font-weight: bold !important;
     }
     
     .success-bet-banner {
@@ -130,7 +133,7 @@ st.markdown("""
     .status-badge { padding: 1px 4px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; color: white !important; }
     .status-live { background-color: #DC2626 !important; }
     .status-ended { background-color: #111827 !important; color: #94A3B8 !important; }
-    .status-waiting { background-color: #D97706 !important; }
+    
     .match-date-badge { color: #CBD5E1 !important; font-weight: bold; background-color: #0F172A; padding: 1px 4px; border-radius: 4px; }
     .match-venue-badge { color: #38BDF8 !important; font-weight: bold; background-color: #0B1329; padding: 1px 4px; border-radius: 4px; }
     .team-text-align-right { font-size: 1.1rem !important; font-weight: bold !important; text-align: right; display: block; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
@@ -153,7 +156,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- SŁOWNIK ENCITI HTML (GWARANTUJE NIEZALEŻNE WYŚWIETLENIE FLAG W CHMURZE STREAMLIT) ---
+# --- MAPOWANIE ENCITI HTML (GWARANTUJE NIEZALEŻNE WYŚWIETLANIE FLAG WE WSZYSTKICH ZAKŁADKACH) ---
 HTML_FLAGS_MAP = {
     "Meksyk": "&#127474;&#127480;", "RPA": "&#127485;&#127462;", "Korea Południowa": "&#127472;&#127479;", "Czechy": "&#127464;&#127487;",
     "Kanada": "&#127464;&#127462;", "Bośnia i Hercegowina": "&#127463;&#127462;", "Katar": "&#127473;&#127470;", "Szwajcaria": "&#127464;&#127470;",
@@ -161,9 +164,9 @@ HTML_FLAGS_MAP = {
     "USA": "&#127482;&#127480;", "Paragwaj": "&#127477;&#127481;", "Australia": "&#127462;&#127482;", "Turcja": "&#127481;&#127479;",
     "Niemcy": "&#127465;&#127466;", "Curaçao": "&#127464;&#127484;", "WKS": "&#127464;&#12747Setting;", "Ekwador": "&#127466;&#127464;",
     "Holandia": "&#127475;&#127473;", "Japonia": "&#127471;&#127477;", "Szwecja": "&#127480;&#127466;", "Tunezja": "&#127481;&#127475;",
-    "Belgia": "&#127464;&#127466;", "Egipt": "&#127466;&#1274ec;", "Iran": "&#127470;&#127479;", "Nowa Zelandia": "&#127475;&#127495;",
-    "Hiszpania": "&#127466;&#127480;", "Wyspy Zielonego Przylądka": "&#127464;&#127483;", "Arabia Saudyjska": "&#127480;&#127462;", "Urugwaj": "&#127482;&#1274Wish;",
-    "Francja": "&#127467;&#127479;", "Senegal": "&#127480;&#127475;", "Irak": "&#127470;&#127473;", "Norwegia": Bird = "&#127475;&#127476;",
+    "Belgia": "&#127464;&#127466;", "Egipt": "&#127466;&#127474;", "Iran": "&#127470;&#127479;", "Nowa Zelandia": "&#127475;&#127495;",
+    "Hiszpania": "&#127466;&#127480;", "Wyspy Zielonego Przylądka": "&#127464;&#127483;", "Arabia Saudyjska": "&#127480;&#127462;", "Urugwaj": "&#127482;&#127486;",
+    "Francja": "&#127467;&#127479;", "Senegal": "&#127480;&#127475;", "Irak": "&#127470;&#127473;", "Norwegia": "&#127475;&#127476;",
     "Argentyna": "&#127462;&#127479;", "Algieria": "&#127465;&#127495;", "Austria": "&#127462;&#127481;", "Jordania": "&#127471;&#127476;",
     "Portugalia": "&#127477;&#127481;", "DR Konga": "&#127464;&#127465;", "Uzbekistan": "&#127482;&#127495;", "Kolumbia": "&#127464;&#127476;",
     "Anglia": "&#127468;&#127463;&#127480;&#127461;&#127473;", "Chorwacja": "&#127469;&#127485;", "Ghana": "&#127468;&#127469;", "Panama": "&#127477;&#127462;"
@@ -347,7 +350,7 @@ def fetch_official_results_from_api(now_time):
                 if m['home'] == "TBD": m['home'] = "Meksyk"
                 if m['away'] == "TBD": m['away'] = "RPA"
 
-# --- WYMUSZONE RESETOWANIE STRUKTURY DANYCH W LOCIE ---
+# --- ZASADNICZY SILNIK RESTARTU SKAŻONEGO RAMU ---
 force_reset_needed = False
 if 'results' in st.session_state:
     for m in st.session_state.results.values():
@@ -376,7 +379,7 @@ for m_id, m in st.session_state.results.items():
 
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 
-# --- WIDOKI ---
+# --- APKA ---
 if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
     with c1:
@@ -405,7 +408,6 @@ else:
         for m_id, m in sorted_m:
             if (mode == "Oczekujące" and m.get('status') == "Zakończony") or (mode == "Zakończone" and m.get('status') == "Oczekuje"): continue
             
-            # WTRZYKNIĘCIE PULSUJĄCEJ KLASY DLA STATUSU OCZEKUJE
             if m.get('status') == "LIVE":
                 status_html = '<span class="status-badge status-live">🔴 LIVE</span>'
             elif m.get('status') == "Zakończony":
