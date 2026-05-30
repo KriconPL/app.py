@@ -41,7 +41,7 @@ VENUES_LIST = [
     "Gillette, Boston", "BMO Field, Toronto", "BBVA, Monterrey", "Akron, Guadalajara"
 ]
 
-# ZAAWANSOWANA ARCHITEKTURA CSS DLA KONTROLI NATYWNYCH KOMPONENTÓW
+# GŁÓWNY SILNIK CSS: ZABEZPIECZONY KOLOR TEKSTU, ZWARTY UKŁAD I ANTI-COPY
 st.markdown("""
     <script>
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
@@ -53,90 +53,222 @@ st.markdown("""
     });
     </script>
     <style>
-    * { -webkit-user-select: none !important; -moz-user-select: none !important; -ms-user-select: none !important; user-select: none !important; }
-    input, textarea, div[data-baseweb="input"] { -webkit-user-select: auto !important; -moz-user-select: auto !important; -ms-user-select: auto !important; user-select: auto !important; }
+    /* Blokada selekcji tekstu na całą apkę */
+    * {
+        -webkit-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        user-select: none !important;
+    }
+    input, textarea, div[data-baseweb="input"] {
+        -webkit-user-select: auto !important;
+        -moz-user-select: auto !important;
+        -ms-user-select: auto !important;
+        user-select: auto !important;
+    }
 
-    body, html, [data-testid="stAppViewContainer"], .stApp, [data-testid="stTabContent"], div.stTabs { background-color: #0A1128 !important; }
+    body, html, [data-testid="stAppViewContainer"], .stApp, [data-testid="stTabContent"], div.stTabs {
+        background-color: #0A1128 !important; 
+    }
     [data-testid="stSidebar"] { background-color: #060B19 !important; }
     [data-testid="stHeader"] { background-color: #0A1128 !important; }
     h1, h2, h3, h4, h5, h6, p, span, label, div { color: #F8FAFC !important; }
     
-    @keyframes pulseAlertCore { 0% { opacity: 1.0; } 50% { opacity: 0.2; } 100% { opacity: 1.0; } }
-    
-    .missing-bet-banner-blink {
-        animation: pulseAlertCore 1.2s infinite ease-in-out !important; background-color: #DC2626 !important; color: #FFFFFF !important; font-weight: bold !important; text-align: center !important; height: 32px !important; line-height: 32px !important; border-radius: 4px !important; font-size: 0.8rem !important; display: block !important; width: 100% !important; margin: 0 !important; white-space: nowrap !important;
+    @keyframes pulseAlertCore {
+        0% { opacity: 1.0; }
+        50% { opacity: 0.2; }
+        100% { opacity: 1.0; }
     }
     
-    .status-waiting-blink { animation: pulseAlertCore 2.0s infinite ease-in-out !important; color: #D97706 !important; font-weight: bold !important; font-size: 0.65rem !important; }
+    .missing-bet-banner-blink {
+        animation: pulseAlertCore 1.2s infinite ease-in-out !important;
+        background-color: #DC2626 !important;
+        color: #FFFFFF !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        height: 30px !important;
+        line-height: 30px !important;
+        border-radius: 4px !important;
+        font-size: 0.75rem !important;
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        white-space: nowrap !important;
+    }
+    
+    .status-waiting-blink {
+        animation: pulseAlertCore 2.0s infinite ease-in-out !important;
+        color: #D97706 !important;
+        font-weight: bold !important;
+        font-size: 0.65rem !important;
+    }
+    
     .status-badge-ended { color: #94A3B8 !important; font-weight: bold; font-size: 0.65rem !important; }
     .status-badge-live { color: #DC2626 !important; font-weight: bold; font-size: 0.65rem !important; }
     
-    .success-bet-banner { background-color: #16A34A !important; color: #FFFFFF !important; font-weight: bold !important; text-align: center !important; height: 32px !important; line-height: 32px !important; border-radius: 4px !important; font-size: 0.8rem !important; display: block !important; width: 100% !important; margin: 0 !important; white-space: nowrap; }
+    .success-bet-banner {
+        background-color: #16A34A !important;
+        color: #FFFFFF !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        height: 30px !important;
+        line-height: 30px !important;
+        border-radius: 4px !important;
+        font-size: 0.75rem !important;
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        white-space: nowrap;
+    }
     
-    .meta-upper-bar-container { background-color: #1E293B !important; border: 1px solid #1E3A8A !important; border-bottom: none !important; border-radius: 6px 6px 0 0; display: flex; align-items: center; gap: 12px; font-size: 0.75rem !important; color: #94A3B8 !important; padding: 6px 14px !important; width: 100%; margin-top: 10px !important; }
+    /* --- JASNONIEBIESKI GÓRNY PASEK METADANYCH --- */
+    .meta-upper-bar-container {
+        background-color: #1E293B !important;
+        border: 1px solid #1E3A8A !important;
+        border-bottom: none !important;
+        border-radius: 6px 6px 0 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.75rem !important;
+        color: #94A3B8 !important;
+        padding: 6px 14px !important;
+        width: 100%;
+        margin-top: 10px !important;
+    }
     .meta-id-text-clean { font-weight: bold; color: #F97316 !important; }
     
-    /* CIEMNONIEBIESKI GŁÓWNY WIERSZ MECZU */
+    /* --- CIEMNONIEBIESKI GŁÓWNY WIERSZ MECZU (STEROWANY PRZEZ :HAS) --- */
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) {
-        background: #172554 !important; border: 1px solid #1E3A8A !important; border-radius: 0 0 6px 6px; padding: 6px 10px !important; margin-bottom: 4px !important; align-items: center !important; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        background: #172554 !important;
+        border: 1px solid #1E3A8A !important;
+        border-radius: 0 0 6px 6px;
+        padding: 6px 10px !important;
+        margin-bottom: 4px !important;
+        align-items: center !important; /* Centrowanie w pionie zapobiega rozjechaniu */
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"] { padding: 0 2px !important; }
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) p, div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div[data-testid="stMarkdownContainer"] { margin-bottom: 0 !important; }
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"] {
+        padding: 0 2px !important;
+    }
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) p,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div[data-testid="stMarkdownContainer"] {
+        margin-bottom: 0 !important;
+    }
     
-    .team-align-right { font-size: 1.05rem !important; font-weight: bold !important; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%; white-space: nowrap; height: 32px; line-height: 32px; color: #F8FAFC !important; }
-    .team-align-left { font-size: 1.05rem !important; font-weight: bold !important; text-align: left; display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; white-space: nowrap; height: 32px; line-height: 32px; color: #F8FAFC !important; }
+    .team-align-right { font-size: 1.05rem !important; font-weight: bold !important; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%; white-space: nowrap; height: 30px; line-height: 30px; color: #F8FAFC !important; }
+    .team-align-left { font-size: 1.05rem !important; font-weight: bold !important; text-align: left; display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; white-space: nowrap; height: 30px; line-height: 30px; color: #F8FAFC !important; }
     
-    .off-score { font-size: 0.8rem !important; font-weight: bold !important; color: #94A3B8 !important; background-color: #1E293B !important; border: 1px solid #334155 !important; border-radius: 4px; display: block; text-align: center; white-space: nowrap; height: 32px !important; line-height: 30px !important; width: 100%; }
-    .score-colon { text-align: center; font-weight: bold; color: #F97316 !important; font-size: 1.3rem; height: 32px; line-height: 28px; width: 100%; }
+    .off-score {
+        font-size: 0.8rem !important;
+        font-weight: bold !important;
+        color: #94A3B8 !important;
+        background-color: #1E293B !important;
+        border: 1px solid #334155 !important;
+        border-radius: 4px;
+        display: block;
+        text-align: center;
+        white-space: nowrap;
+        height: 30px !important;
+        line-height: 28px !important;
+        width: 100%;
+    }
     
-    /* INPUTY NUMERYCZNE Z UKRYTYMI PRZYCISKAMI SYSTEMOWYMI */
-    input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-    input[type="number"] { -moz-appearance: textfield; }
+    .score-colon { text-align: center; font-weight: bold; color: #F97316 !important; font-size: 1.3rem; height: 30px; line-height: 26px; width: 100%; }
+    
     div[data-testid="stNumberInput"] { margin: 0 !important; padding: 0 !important; width: 100% !important; min-width: 0 !important; }
-    div[data-testid="stNumberInput"] div[data-baseweb="input"] { background-color: #0A1128 !important; border: 1px solid #1E3A8A !important; border-radius: 4px !important; }
-    div[data-testid="stNumberInput"] input { text-align: center !important; color: #F8FAFC !important; height: 30px !important; font-size: 1.1rem !important; font-weight: bold !important; padding: 0 !important; }
+    div[data-testid="stNumberInput"] div[data-baseweb="input"] { border: none !important; background-color: transparent !important;}
+    div[data-testid="stNumberInput"] input { 
+        text-align: center !important; 
+        background-color: #0A1128 !important; 
+        color: #F8FAFC !important; 
+        height: 30px !important; 
+        font-size: 1.1rem !important; 
+        font-weight: bold !important; 
+        border: 1px solid #1E3A8A !important; 
+        padding: 0 !important;
+        border-radius: 4px !important;
+    }
     
     /* ========================================================================= */
-    /* PANCERNE KOLORY PRZYCISKÓW WG KINDS (BEZWZGLĘDNE NADPISANIE STREAMLITA) */
+    /* PANCERNY FIX BIAŁYCH TŁA W PRZYCISKACH                                    */
     /* ========================================================================= */
     
-    /* PRZYCISKI DRUGORZĘDNE (+, -, USUŃ) */
-    button[kind="secondary"] {
+    /* Wymuszamy dziedziczenie kolorów przez wszystkie wewnętrzne tagi Streamlita */
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) div[data-testid="stButton"] button * {
+        color: inherit !important;
+        background-color: transparent !important;
+    }
+    
+    /* PRZYCISKI PLUS/MINUS (Kolumny: 2, 4, 6, 8) i USUŃ (Kolumna: 12) */
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] button,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] button,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(6) div[data-testid="stButton"] button,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(8) div[data-testid="stButton"] button,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(12) div[data-testid="stButton"] button {
         background-color: #1E293B !important; 
         border: 1px solid #334155 !important; 
         border-radius: 4px !important; 
-        height: 32px !important; 
-        min-height: 32px !important;
+        height: 30px !important; 
+        min-height: 30px !important;
         padding: 0 !important; 
         width: 100% !important;
         display: block !important;
-    }
-    button[kind="secondary"] * {
         color: #F97316 !important;
-        font-weight: bold !important;
-        font-size: 1.1rem !important;
     }
-    button[kind="secondary"]:hover { background-color: #334155 !important; }
-    button[kind="secondary"]:hover * { color: #FFFFFF !important; }
+    /* Tekst (+/-) wewnątrz */
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] button *,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] button *,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(6) div[data-testid="stButton"] button *,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(8) div[data-testid="stButton"] button *,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(12) div[data-testid="stButton"] button * {
+        color: #F97316 !important;
+        font-size: 1.1rem !important;
+        font-weight: bold !important;
+        line-height: 28px !important;
+    }
     
-    /* PRZYCISK GŁÓWNY (ZAPISZ) */
-    button[kind="primary"] {
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] button:hover,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] button:hover,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(6) div[data-testid="stButton"] button:hover,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(8) div[data-testid="stButton"] button:hover,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(12) div[data-testid="stButton"] button:hover { 
+        background-color: #334155 !important; 
+    }
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(2) div[data-testid="stButton"] button:hover *,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(4) div[data-testid="stButton"] button:hover *,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(6) div[data-testid="stButton"] button:hover *,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(8) div[data-testid="stButton"] button:hover *,
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(12) div[data-testid="stButton"] button:hover * { 
+        color: #FFFFFF !important; 
+    }
+    
+    /* PRZYCISK ZAPISZ (Kolumna: 10 lub 11 w zaleznosci od struktury. Tu: Zapisz jest nr 10) */
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(10) div[data-testid="stButton"] button {
         background-color: #F97316 !important;
         border: 1px solid #EA580C !important;
         border-radius: 4px !important;
-        height: 32px !important;
-        min-height: 32px !important;
+        height: 30px !important;
+        min-height: 30px !important;
         padding: 0 !important;
         width: 100% !important;
         display: block !important;
         box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
-    }
-    button[kind="primary"] * {
         color: #FFFFFF !important;
-        font-size: 0.9rem !important;
-        font-weight: bold !important;
     }
-    button[kind="primary"]:hover { background-color: #EA580C !important; border-color: #C2410C !important; }
+    /* Tekst ("Zapisz") na biało */
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(10) div[data-testid="stButton"] button * {
+        color: #FFFFFF !important;
+        font-size: 0.85rem !important;
+        font-weight: bold !important;
+        line-height: 28px !important;
+    }
+    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"]:nth-child(10) div[data-testid="stButton"] button:hover { 
+        background-color: #EA580C !important; 
+        border-color: #C2410C !important; 
+    }
+    
+    /* ========================================================================= */
     
     /* PODIUM MEDALOWE W RANKINGU */
     .gold-medal-row { background-color: rgba(254, 240, 138, 0.95) !important; font-weight: bold; }
@@ -196,7 +328,8 @@ def get_cdn_flag_img_html(team_name):
     c_name = clean_and_sanitize_team_string(team_name)
     if c_name == "TBD": return f'🌐'
     code = ISO_FLAGS_MAP.get(c_name, None)
-    if code: return f'<img src="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/{code}.svg" class="flag-img" />'
+    if code:
+        return f'<img src="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/{code}.svg" class="flag-img" />'
     return f'🌐'
 
 def calculate_points(pred_h, pred_a, real_h, real_a):
@@ -224,14 +357,21 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
         if new_positions_dict_dest is not None: new_positions_dict_dest[p_name] = pos
         
         old_pos = st.session_state.last_positions.get(p_name, pos) if 'last_positions' in st.session_state else pos
-        if old_pos > pos: trend_html = '<span class="trend-up">▲</span>'
-        elif old_pos < pos: trend_html = '<span class="trend-down">▼</span>'
-        else: trend_html = '<span class="trend-stable">•</span>'
+        if old_pos > pos:
+            trend_html = '<span class="trend-up">▲</span>'
+        elif old_pos < pos:
+            trend_html = '<span class="trend-down">▼</span>'
+        else:
+            trend_html = '<span class="trend-stable">•</span>'
             
-        if pos == 1: bg_class, medal = 'class="gold-medal-row"', "🥇 "
-        elif pos == 2: bg_class, medal = 'class="silver-medal-row"', "🥈 "
-        elif pos == 3: bg_class, medal = 'class="bronze-medal-row"', "🥉 "
-        else: bg_class, medal = "", ""
+        if pos == 1:
+            bg_class, medal = 'class="gold-medal-row"', "🥇 "
+        elif pos == 2:
+            bg_class, medal = 'class="silver-medal-row"', "🥈 "
+        elif pos == 3:
+            bg_class, medal = 'class="bronze-medal-row"', "🥉 "
+        else:
+            bg_class, medal = "", ""
             
         rows += f"<tr {bg_class}><td style='text-align:center;'><b>{pos}</b></td><td style='text-align:center;'>{trend_html}</td><td>{medal}{p_name}</td><td><b>{row['Punkty']} pkt</b></td></tr>"
     return legend_html + f"<table class='kricon-table'><tr><th>Miejsce</th><th>Trend</th><th>Gracz</th><th>Punkty</th></tr>{rows}</table>"
@@ -355,6 +495,30 @@ def fetch_official_results_from_api(now_time):
                 if m['home'] == "TBD": m['home'] = "Meksyk"
                 if m['away'] == "TBD": m['away'] = "RPA"
 
+# BEZPIECZNE FUNKCJE CALLBACK DLA PRZYCISKÓW W CELU UNIKNIĘCIA STREAMLIT-API-EXCEPTION
+def btn_minus_h(k):
+    if k in st.session_state: st.session_state[k] = max(0, st.session_state[k] - 1)
+
+def btn_plus_h(k):
+    if k in st.session_state: st.session_state[k] += 1
+
+def btn_minus_a(k):
+    if k in st.session_state: st.session_state[k] = max(0, st.session_state[k] - 1)
+
+def btn_plus_a(k):
+    if k in st.session_state: st.session_state[k] += 1
+
+def btn_save(m, user, hk, ak):
+    st.session_state.bets[m][user] = (st.session_state[hk], st.session_state[ak])
+    save_backup_local_and_github()
+
+def btn_del(m, user, hk, ak):
+    if user in st.session_state.bets.get(m, {}):
+        del st.session_state.bets[m][user]
+    st.session_state[hk] = 0
+    st.session_state[ak] = 0
+    save_backup_local_and_github()
+
 if 'results' not in st.session_state or len(st.session_state.results) != 104: st.session_state.results = generate_schedule()
 if 'bets' not in st.session_state or len(st.session_state.bets) != 104: st.session_state.bets = {m_id: {} for m_id in st.session_state.results.keys()}
 if 'last_positions' not in st.session_state: st.session_state.last_positions = {player: idx + 1 for idx, player in enumerate(players)}
@@ -414,19 +578,18 @@ else:
             oficjalny_wynik_tekst = f"Wynik: {m.get('score_h') if m.get('score_h') is not None else '?'} : {m.get('score_a') if m.get('score_a') is not None else '?'}"
             locked = (m['timestamp'] - now).total_seconds() <= 0
             
-            # --- ZARZĄDZANIE STANEM TYPU I ZMIANĄ PRZYCISKÓW ---
-            h_key = f"h_{m_id}"
-            a_key = f"a_{m_id}"
             has_existing_bet = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user) is not None
             saved_h, saved_a = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user, (0,0))
             
+            h_key = f"h_{m_id}"
+            a_key = f"a_{m_id}"
             if h_key not in st.session_state: st.session_state[h_key] = int(saved_h)
             if a_key not in st.session_state: st.session_state[a_key] = int(saved_a)
             
             home_clean = clean_and_sanitize_team_string(m['home'])
             away_clean = clean_and_sanitize_team_string(m['away'])
             
-            # PASEK METADANYCH
+            # --- JASNONIEBIESKI PASEK DLA METADANYCH ---
             st.markdown(f"""
             <div class="meta-upper-bar-container">
                 <span class="meta-id-text-clean">⚽ Mecz #{m_id}</span>
@@ -435,68 +598,57 @@ else:
                 <span style="color:#38BDF8; font-weight:bold;">📍 {m.get('venue').split(',')[0]}</span>
                 <span style="color:#64748B;">({m['stage']})</span>
             </div>
-            <div class='match-row-anchor'></div>
             """, unsafe_allow_html=True)
             
-            # --- GŁÓWNA LINIA POZIOMA Z WYRÓWNANIEM DO 13 KOLUMN ---
-            c_home, c_mh, c_inph, c_ph, c_sep, c_ma, c_inpa, c_pa, c_away, c_score, c_save, c_del, c_status = st.columns([2.6, 0.6, 0.9, 0.6, 0.2, 0.6, 0.9, 0.6, 2.4, 1.4, 1.0, 0.8, 1.1])
+            # --- ZNACZNIK CSS DLA ZŁOTEJ REGUŁY :has() ---
+            st.markdown("<div class='match-row-anchor'></div>", unsafe_allow_html=True)
+            
+            # --- GŁÓWNA LINIA POZIOMA Z WYRÓWNANIEM (DODANA KOLUMNA KASOWANIA) ---
+            # HOME(2.6) | -(0.6) | INP(0.8) | +(0.6) | :(0.2) | -(0.6) | INP(0.8) | +(0.6) | AWAY(2.6) | ZAPISZ(1.3) | KASUJ(0.6) | WYNIK(1.4) | STATUS(1.1)
+            c_home, c_mh, c_inph, c_ph, c_sep, c_ma, c_inpa, c_pa, c_away, c_save, c_del, c_score, c_status = st.columns([2.6, 0.6, 0.8, 0.6, 0.2, 0.6, 0.8, 0.6, 2.6, 1.3, 0.6, 1.4, 1.1])
             
             with c_home:
                 st.markdown(f"<div class='team-align-right'><span>{home_clean}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
                 
-            # PRZYCISKI PLUS/MINUS ZMIENIAJĄCE WYNIK W ST.SESSION_STATE
             with c_mh:
-                if st.button("—", key=f"mh_{m_id}", disabled=locked, type="secondary"):
-                    st.session_state[h_key] = max(0, st.session_state[h_key] - 1)
-                    st.rerun()
+                st.button("—", key=f"mh_{m_id}", disabled=locked, on_click=btn_minus_h, args=(h_key,))
+                    
             with c_inph:
                 st.number_input("H", min_value=0, max_value=20, key=h_key, label_visibility="collapsed", disabled=locked)
+                
             with c_ph:
-                if st.button("＋", key=f"ph_{m_id}", disabled=locked, type="secondary"):
-                    st.session_state[h_key] += 1
-                    st.rerun()
+                st.button("＋", key=f"ph_{m_id}", disabled=locked, on_click=btn_plus_h, args=(h_key,))
+                    
             with c_sep:
                 st.markdown("<div class='score-colon'>:</div>", unsafe_allow_html=True)
+                
             with c_ma:
-                if st.button("—", key=f"ma_{m_id}", disabled=locked, type="secondary"):
-                    st.session_state[a_key] = max(0, st.session_state[a_key] - 1)
-                    st.rerun()
+                st.button("—", key=f"ma_{m_id}", disabled=locked, on_click=btn_minus_a, args=(a_key,))
+                    
             with c_inpa:
                 st.number_input("A", min_value=0, max_value=20, key=a_key, label_visibility="collapsed", disabled=locked)
+                
             with c_pa:
-                if st.button("＋", key=f"pa_{m_id}", disabled=locked, type="secondary"):
-                    st.session_state[a_key] += 1
-                    st.rerun()
+                st.button("＋", key=f"pa_{m_id}", disabled=locked, on_click=btn_plus_a, args=(a_key,))
                     
             with c_away:
                 st.markdown(f"<div class='team-align-left'>{get_cdn_flag_img_html(m['away'])} <span>{away_clean}</span></div>", unsafe_allow_html=True)
-                
-            with c_score:
-                st.markdown(f"<div class='off-score'>{oficjalny_wynik_tekst}</div>", unsafe_allow_html=True)
                 
             with c_save:
                 if locked:
                     st.button("🔒", disabled=True, key=f"lock_{m_id}")
                 else:
-                    if st.button("Zapisz", key=f"save_{m_id}", type="primary"):
-                        st.session_state.bets[m_id][st.session_state.logged_in_user] = (st.session_state[h_key], st.session_state[a_key])
-                        save_backup_local_and_github()
-                        st.rerun()
+                    st.button("Zapisz", key=f"save_{m_id}", on_click=btn_save, args=(m_id, st.session_state.logged_in_user, h_key, a_key))
             
             with c_del:
-                if locked:
-                    st.empty()
+                if not locked and has_existing_bet:
+                    st.button("✖", key=f"del_{m_id}", on_click=btn_del, args=(m_id, st.session_state.logged_in_user, h_key, a_key))
                 else:
-                    if has_existing_bet:
-                        if st.button("✖", key=f"del_{m_id}", type="secondary"):
-                            del st.session_state.bets[m_id][st.session_state.logged_in_user]
-                            st.session_state[h_key] = 0
-                            st.session_state[a_key] = 0
-                            save_backup_local_and_github()
-                            st.rerun()
-                    else:
-                        st.empty()
+                    st.empty()
                         
+            with c_score:
+                st.markdown(f"<div class='off-score'>{oficjalny_wynik_tekst}</div>", unsafe_allow_html=True)
+                
             with c_status:
                 if has_existing_bet:
                     st.markdown("<div class='success-bet-banner'>✔ OK</div>", unsafe_allow_html=True)
