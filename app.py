@@ -12,8 +12,8 @@ st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", lay
 
 # --- BEZPIECZNE WGRYWANIE LOGO BASE64 ---
 logo_css = ""
-if os.path.exists("typer_wizu.png"):
-    with open("typer_wizu.png", 'rb') as f:
+if os.path.exists("logo.png"):
+    with open("logo.png", 'rb') as f:
         bin_str = base64.b64encode(f.read()).decode()
     logo_css = f"""
     .kricon-logo-container {{
@@ -26,7 +26,7 @@ if os.path.exists("typer_wizu.png"):
     }}
     """
 else:
-    st.warning("⚠️ Brak pliku 'typer_wizu.png' w folderze aplikacji! Wgraj go, aby zobaczyć logo.")
+    st.warning("⚠️ Brak pliku 'logo.png' w folderze aplikacji! Wgraj go, aby zobaczyć logo.")
 
 # GŁÓWNY SILNIK CSS DLA CAŁEJ APLIKACJI (Bez pustych linii, by zablokować błąd Markdown)
 st.markdown(f"""
