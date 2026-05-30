@@ -41,7 +41,7 @@ VENUES_LIST = [
     "Gillette, Boston", "BMO Field, Toronto", "BBVA, Monterrey", "Akron, Guadalajara"
 ]
 
-# ANTY-COPY GUARD ORAZ BAZOWE STYLE LAYOUTU
+# ANTY-COPY GUARD ORAZ ZAAWANSOWANY MATRYCOWY UKŁAD STRONY
 st.markdown("""
     <script>
     document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
@@ -73,8 +73,36 @@ st.markdown("""
     div[role="listbox"], ul[role="listbox"], div[data-baseweb="popover"] { background-color: #060B19 !important; border: 2px solid #F97316 !important; }
     div[role="option"], li[role="option"] { color: #F97316 !important; background-color: #060B19 !important; font-weight: bold; }
     
-    .stButton>button { background-color: #F97316 !important; color: #FFFFFF !important; border-radius: 4px !important; border: none !important; font-weight: 700 !important; height: 32px !important; line-height: 32px !important; padding: 0 12px !important; width: 100% !important; font-size: 0.85rem !important; }
-    .stButton>button:hover { background-color: #EA580C !important; box-shadow: 0 3px 8px rgba(249, 115, 22, 0.4) !important; }
+    /* SYSTEM AGRESYWNEGO MRUGANIA OPACITY (GPU RENDERED) */
+    @keyframes pulseAlertCore {
+        0% { opacity: 1.0; }
+        50% { opacity: 0.1; }
+        100% { opacity: 1.0; }
+    }
+    
+    .missing-bet-banner-blink {
+        animation: pulseAlertCore 1.2s infinite ease-in-out !important;
+        background-color: #DC2626 !important;
+        color: #FFFFFF !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        height: 32px !important;
+        line-height: 32px !important;
+        border-radius: 4px !important;
+        font-size: 0.85rem !important;
+        display: block !important;
+        width: 100% !important;
+        white-space: nowrap !important;
+    }
+    
+    .status-waiting-blink {
+        animation: pulseAlertCore 2.0s infinite ease-in-out !important;
+        background-color: #D97706 !important;
+        color: #FFFFFF !important;
+        padding: 2px 6px !important;
+        border-radius: 4px !important;
+        font-weight: bold !important;
+    }
     
     .success-bet-banner {
         background-color: #16A34A !important;
@@ -91,23 +119,45 @@ st.markdown("""
         white-space: nowrap;
     }
     
-    .match-container { background: #172554 !important; border: 1px solid #1E3A8A !important; border-radius: 4px; padding: 4px 12px !important; margin-bottom: 2px !important; margin-top: 0px !important; box-shadow: 0 1px 2px rgba(0,0,0,0.15); }
-    div[data-testid="stVerticalBlock"] { gap: 0px !important; }
-    div[data-testid="stVerticalBlock"] > div { padding-bottom: 0px !important; padding-top: 0px !important; margin-bottom: 0px !important; margin-top: 0px !important; }
+    /* --- PANCERNY FLEXBOX ROW DLA IDEALNEGO WYRÓWNANIA LINII --- */
+    .match-container-flex {
+        background: #172554 !important; 
+        border: 1px solid #1E3A8A !important; 
+        border-radius: 4px; 
+        padding: 6px 14px !important; 
+        margin-bottom: 4px !important; 
+        box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .match-grid-row {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        gap: 12px;
+    }
+    
+    .flex-team-home { flex: 2; text-align: right; font-size: 1.05rem !important; font-weight: bold !important; display: flex; align-items: center; justify-content: flex-end; gap: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .flex-score-center { flex: 0 0 70px; text-align: center; }
+    .flex-team-away { flex: 2; text-align: left; font-size: 1.05rem !important; font-weight: bold !important; display: flex; align-items: center; justify-content: flex-start; gap: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .flex-input-box { flex: 0 0 90px; }
+    .flex-btn-box { flex: 0 0 90px; }
+    .flex-banner-box { flex: 0 0 150px; }
+    
+    /* STYLIZACJA PRZYCISKÓW PLUS/MINUS W POLACH INPUTU */
+    div[data-testid="stNumberInput"] { width: 100% !important; }
+    div[data-testid="stNumberInput"] input { text-align: center !important; background-color: #0A1128 !important; color: #F8FAFC !important; height: 32px !important; font-size: 0.95rem !important; }
+    
     .match-top-meta-row { display: flex; align-items: center; gap: 10px; font-size: 0.75rem !important; color: #94A3B8 !important; margin-bottom: 6px; border-bottom: 1px dashed #1E3A8A; padding-bottom: 4px; }
     .match-id-text { font-weight: bold; color: #F97316 !important; }
     .status-badge { padding: 1px 4px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; color: white !important; }
     .status-live { background-color: #DC2626 !important; }
     .status-ended { background-color: #111827 !important; color: #94A3B8 !important; }
-    
     .match-date-badge { color: #CBD5E1 !important; font-weight: bold; background-color: #0F172A; padding: 1px 4px; border-radius: 4px; }
     .match-venue-badge { color: #38BDF8 !important; font-weight: bold; background-color: #0B1329; padding: 1px 4px; border-radius: 4px; }
-    .team-text-align-right { font-size: 1.1rem !important; font-weight: bold !important; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%; }
-    .team-text-align-left { font-size: 1.1rem !important; font-weight: bold !important; text-align: left; display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; }
-    .official-score-badge { font-size: 1.1rem !important; font-weight: 800 !important; color: #0A1128 !important; background-color: #F97316 !important; padding: 2px 10px; border-radius: 4px; display: block; text-align: center; width: 100%; height: 32px; line-height: 28px; }
-    div[data-testid="stNumberInput"] { height: 32px !important; margin: 0 !important; padding: 0 !important; }
-    div[data-testid="stNumberInput"] button { background-color: #1E3A8A !important; color: #F8FAFC !important; height: 32px !important; }
-    div[data-testid="stNumberInput"] input { color: #F8FAFC !important; background-color: #0A1128 !important; font-size: 0.9rem !important; height: 32px !important; }
+    
     .bracket-match-card { background: #172554 !important; border: 2px solid #1E3A8A !important; border-radius: 8px; padding: 10px; margin: 8px 0; }
     .bracket-match-title { font-size: 0.75rem !important; color: #F97316 !important; font-weight: bold; margin-bottom: 4px; }
     .bracket-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; font-size: 0.9rem !important; }
@@ -115,6 +165,7 @@ st.markdown("""
     .bracket-team-winner { color: #4ADE80 !important; font-weight: bold; }
     .bracket-group-box { background: #0D1B3E !important; border: 1px solid #F97316 !important; border-radius: 8px; padding: 8px; }
     .center-final-card { background: #23153C !important; border: 3px solid #FF6B00 !important; border-radius: 10px; padding: 20px; text-align: center; }
+    
     .kricon-table { width: 100%; border-collapse: collapse; margin: 15px 0 35px 0; background-color: #172554 !important; border-radius: 8px; overflow: hidden; }
     .kricon-table th { background-color: #F97316 !important; color: #0A1128 !important; padding: 12px; font-weight: 800; }
     .kricon-table td { padding: 11px 12px; border-bottom: 1px solid #1E3A8A !important; }
@@ -216,11 +267,11 @@ def render_bracket_match_html_clean(match_id):
     <div class="bracket-match-card">
         <div class="bracket-match-title">Mecz #{match_id}</div>
         <div class='bracket-row {"bracket-team-winner" if win_h else ""}'>
-            <div class="team-text-align-left">{get_cdn_flag_img_html(h_clean)} <span>{h_clean}</span></div>
+            <div style="display:flex; align-items:center; gap:8px;">{get_cdn_flag_img_html(h_clean)} <span>{h_clean}</span></div>
             <span class="bracket-score-cell">{sh}</span>
         </div>
         <div class='bracket-row {"bracket-team-winner" if win_a else ""}'>
-            <div class="team-text-align-left">{get_cdn_flag_img_html(a_clean)} <span>{a_clean}</span></div>
+            <div style="display:flex; align-items:center; gap:8px;">{get_cdn_flag_img_html(a_clean)} <span>{a_clean}</span></div>
             <span class="bracket-score-cell">{sa}</span>
         </div>
     </div>
@@ -331,7 +382,7 @@ def fetch_official_results_from_api(now_time):
                 if m['home'] == "TBD": m['home'] = "Meksyk"
                 if m['away'] == "TBD": m['away'] = "RPA"
 
-# --- SILNIK ROZRUCHU ---
+# --- WYMUSZONE RESETOWANIE STRUKTURY STANÓW ---
 force_reset_needed = False
 if 'results' in st.session_state:
     for m in st.session_state.results.values():
@@ -360,7 +411,7 @@ for m_id, m in st.session_state.results.items():
 
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 
-# --- STRUKTURA GRAFICZNA ---
+# --- WIDOK INTERFEJSU GRAFICZNEGO ---
 if st.session_state.logged_in_user is None:
     c1, c2 = st.columns([2, 3], gap="large")
     with c1:
@@ -389,13 +440,13 @@ else:
         for m_id, m in sorted_m:
             if (mode == "Oczekujące" and m.get('status') == "Zakończony") or (mode == "Zakończone" and m.get('status') == "Oczekuje"): continue
             
-            # WTRZYKNIĘCIE IN-LINE ANIMACJI DLA STATUSÓW (OMINIĘCIE FILTRÓW PLATFORMY)
+            # WTRZYKNIĘCIE IN-LINE ZABEZPIECZONEJ ANIMACJI DLA STATUSU OCZEKUJE
             if m.get('status') == "LIVE":
                 status_html = '<span class="status-badge status-live">🔴 LIVE</span>'
             elif m.get('status') == "Zakończony":
                 status_html = '<span class="status-badge status-ended">⚫ Zakończony</span>'
             else:
-                status_html = '<span class="status-waiting" style="animation: kriconWaitingPulse 1.6s infinite ease-in-out !important;">🟡 Oczekuje</span>'
+                status_html = '<span class="status-waiting-blink">🟡 Oczekuje</span>'
                 
             oficjalny_wynik_tekst = f"{m.get('score_h') if m.get('score_h') is not None else '?'} : {m.get('score_a') if m.get('score_a') is not None else '?'}"
             locked = (m['timestamp'] - now).total_seconds() <= 0
@@ -405,34 +456,59 @@ else:
             home_clean = clean_and_sanitize_team_string(m['home'])
             away_clean = clean_and_sanitize_team_string(m['away'])
             
-            st.markdown(f"<div class='match-container'><div class='match-top-meta-row'><span class='match-id-text'>⚽ Mecz #{m_id}</span>{status_html}<span class='match-date-badge'>📅 {m['date']}</span><span class='match-venue-badge'>📍 {m.get('venue', 'Stadion')}</span><span style='color:#64748B;'>({m['stage']})</span></div>", unsafe_allow_html=True)
-            c_home, c_score, c_away, c_in_h, c_in_a, c_btn, c_banner = st.columns([2.2, 1.2, 1.2, 1.3, 1.3, 1.6, 2.5])
+            # --- START STRUKTURY FLEXBOX DLA CAŁEGO WIERSZA MECZOWEGO (ROZWIĄZANIE LINII) ---
+            st.markdown(f"""
+            <div class='match-container-flex'>
+                <div class='match-top-meta-row'>
+                    <span class='match-id-text'>⚽ Mecz #{m_id}</span>
+                    {status_html}
+                    <span class='match-date-badge'>📅 {m['date']}</span>
+                    <span class='match-venue-badge'>📍 {m.get('venue', 'Stadion')}</span>
+                    <span style='color:#64748B;'>({m['stage']})</span>
+                </div>
+            """, unsafe_allow_html=True)
             
-            with c_home: st.markdown(f"<div class='team-text-align-right'><span>{home_clean}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
-            with c_score: st.markdown(f"<span class='official-score-badge'>{oficjalny_wynik_tekst}</span>", unsafe_allow_html=True)
-            with c_away: st.markdown(f"<div class='team-text-align-left'>{get_cdn_flag_img_html(m['away'])} <span>{away_clean}</span></div>", unsafe_allow_html=True)
+            # Elastyczne rozmieszczenie elementów front-endu
+            cf1, cf2, cf3, cf4, cf5, cf6 = st.columns([2.5, 0.8, 2.5, 1.3, 1.1, 1.8])
             
-            with c_in_h: b_h = st.number_input(f"H_{m_id}", 0, 20, int(cur_h), 1, key=f"input_h_{m_id}", disabled=locked, label_visibility="collapsed")
-            with c_in_a: b_a = st.number_input(f"A_{m_id}", 0, 20, int(cur_a), 1, key=f"input_a_{m_id}", disabled=locked, label_visibility="collapsed")
-            with c_btn:
-                if locked: st.button("Zablokowane", disabled=True, key=f"lock_btn_{m_id}")
+            with cf1: 
+                st.markdown(f"<div class='team-text-align-right'><span>{home_clean}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
+            with cf2: 
+                st.markdown(f"<span class='official-score-badge'>{oficjalny_wynik_tekst}</span>", unsafe_allow_html=True)
+            with cf3: 
+                st.markdown(f"<div class='team-text-align-left'>{get_cdn_flag_img_html(m['away'])} <span>{away_clean}</span></div>", unsafe_allow_html=True)
+                
+            # WIDGETY Z PRZYCISKAMI PLUS / MINUS DO PŁYNNEJ ZMIANY WYNIKU
+            with cf4: 
+                b_h = st.number_input(f"H_{m_id}", 0, 20, int(cur_h), 1, key=f"input_h_{m_id}", disabled=locked, label_visibility="collapsed")
+            with cf5: 
+                b_a = st.number_input(f"A_{m_id}", 0, 20, int(cur_a), 1, key=f"input_a_{m_id}", disabled=locked, label_visibility="collapsed")
+                
+            with cf6:
+                if locked: 
+                    st.button("Zablokowane", disabled=True, key=f"lock_btn_{m_id}")
                 else:
-                    if st.button("Zapisz", key=f"btn_{m_id}"):
-                        if m_id not in st.session_state.bets: st.session_state.bets[m_id] = {}
-                        st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a)
-                        save_backup_local_and_github()
-                        st.success("OK!")
-                        st.rerun()
-            with c_banner:
-                if not locked:
-                    if has_existing_bet: st.markdown("<div class='success-bet-banner'>✔ ZAPISANY</div>", unsafe_allow_html=True)
-                    # WSTRZYKNIĘCIE IN-LINE ZABEZPIECZONEJ ANIMACJI DLA BANERU NIEODDANEGO TYPU
-                    else: st.markdown("<div class='missing-bet-banner' style='animation: kriconAlertPulse 1.1s infinite ease-in-out !important;'>⚠️ NIEODDANY TYP</div>", unsafe_allow_html=True)
+                    # Kontener trzyma przycisk zapisu oraz mrugający baner na tym samym poziomie siatki
+                    c_b1, c_b2 = st.columns([1.1, 1.4])
+                    with c_b1:
+                        if st.button("Zapisz", key=f"btn_{m_id}"):
+                            if m_id not in st.session_state.bets: st.session_state.bets[m_id] = {}
+                            st.session_state.bets[m_id][st.session_state.logged_in_user] = (b_h, b_a)
+                            save_backup_local_and_github()
+                            st.success("OK!")
+                            st.rerun()
+                    with c_b2:
+                        if has_existing_bet: 
+                            st.markdown("<div class='success-bet-banner'>✔ ZAPISANY</div>", unsafe_allow_html=True)
+                        else: 
+                            st.markdown("<div class='missing-bet-banner-blink'>⚠️ NIEODDANY TYP</div>", unsafe_allow_html=True)
+                            
             if locked or m.get('status') == "Zakończony":
                 with st.expander("👁️ Zobacz typy innych graczy"):
                     other_bets = [{"Gracz": p, "Typowany wynik": f"{st.session_state.bets.get(m_id, {}).get(p)[0]} - {st.session_state.bets.get(m_id, {}).get(p)[1]}" if st.session_state.bets.get(m_id, {}).get(p) else "Brak typu"} for p in players if p != st.session_state.logged_in_user]
                     st.dataframe(pd.DataFrame(other_bets), use_container_width=True)
             st.markdown("</div>", unsafe_allow_html=True)
+            
     with tab3:
         st.header("Tabele Grup Turniejowych")
         third_places_list = []
