@@ -53,7 +53,6 @@ st.markdown("""
     });
     </script>
     <style>
-    /* Ochrona przed zaznaczaniem tekstu */
     * { -webkit-user-select: none !important; -moz-user-select: none !important; -ms-user-select: none !important; user-select: none !important; }
     input, textarea, div[data-baseweb="input"] { -webkit-user-select: auto !important; -moz-user-select: auto !important; -ms-user-select: auto !important; user-select: auto !important; }
 
@@ -70,7 +69,7 @@ st.markdown("""
     }
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"] { padding: 0 4px !important; }
     
-    .meta-upper-bar-container { background-color: #1E293B !important; border: 1px solid #1E3A8A !important; border-bottom: none !important; border-radius: 6px 6px 0 0; display: flex; align-items: center; gap: 12px; font-size: 0.75rem !important; color: #94A3B8 !important; padding: 6px 14px !important; width: 100%; margin-top: 10px !important; }
+    .meta-upper-bar-container { background-color: #1E293B !important; border: 1px solid #1E3A8A !important; border-bottom: none !important; border-radius: 6px 6px 0 0; display: flex; align-items: center; gap: 12px; font-size: 0.75rem !important; color: #94A3B8 !important; padding: 4px 14px !important; width: 100%; margin-top: 10px !important; }
     .meta-id-text-clean { font-weight: bold; color: #F97316 !important; }
     
     .team-align-right { font-size: 1.15rem !important; font-weight: bold !important; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%; white-space: nowrap; height: 38px; line-height: 38px; color: #F8FAFC !important; }
@@ -104,18 +103,15 @@ st.markdown("""
     div[data-testid="stNumberInput"] button:hover { background-color: #334155 !important; }
     div[data-testid="stNumberInput"] button:hover svg { fill: #FFFFFF !important; }
     
-    /* GŁÓWNE PRZYCISKI AKCJI */
-    button[kind="secondary"] { background-color: #1E293B !important; border: 1px solid #334155 !important; border-radius: 4px !important; height: 32px !important; min-height: 32px !important; padding: 0 !important; width: 100% !important; display: block !important; }
+    /* GŁÓWNE PRZYCISKI AKCJI (STREAMLIT KINDS) */
+    button[kind="secondary"] { background-color: #1E293B !important; border: 1px solid #334155 !important; border-radius: 4px !important; height: 38px !important; min-height: 38px !important; padding: 0 !important; width: 100% !important; display: block !important; }
     button[kind="secondary"] * { color: #F97316 !important; font-weight: bold !important; font-size: 1.1rem !important; }
     button[kind="secondary"]:hover { background-color: #334155 !important; }
     button[kind="secondary"]:hover * { color: #FFFFFF !important; }
     
-    button[kind="primary"] { background-color: #F97316 !important; border: 1px solid #EA580C !important; border-radius: 4px !important; height: 32px !important; min-height: 32px !important; padding: 0 !important; width: 100% !important; display: block !important; box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important; }
+    button[kind="primary"] { background-color: #F97316 !important; border: 1px solid #EA580C !important; border-radius: 4px !important; height: 38px !important; min-height: 38px !important; padding: 0 !important; width: 100% !important; display: block !important; box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important; }
     button[kind="primary"] * { color: #FFFFFF !important; font-size: 0.9rem !important; font-weight: bold !important; }
     button[kind="primary"]:hover { background-color: #EA580C !important; border-color: #C2410C !important; }
-    
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) button[kind="primary"],
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) button[kind="secondary"] { height: 38px !important; min-height: 38px !important; }
     
     /* STATUSY TYPOWANIA NA SAMYM KOŃCU */
     .bet-ok { background: #16A34A; color: white; text-align: center; font-weight: bold; border-radius: 4px; height: 38px; line-height: 38px; font-size: 0.8rem; width: 100%; white-space: nowrap; display:block; }
@@ -125,7 +121,7 @@ st.markdown("""
     .status-badge-ended { color: #94A3B8 !important; font-weight: bold; font-size: 0.65rem !important; }
     .status-badge-live { color: #DC2626 !important; font-weight: bold; font-size: 0.65rem !important; }
     
-    /* TABELA RANKINGOWA I PODIUM */
+    /* TABELE */
     .kricon-table { width: 100%; border-collapse: collapse; margin: 15px 0 35px 0; background-color: #172554 !important; border-radius: 8px; overflow: hidden; }
     .kricon-table th { background-color: #F97316 !important; color: #0A1128 !important; padding: 12px; font-weight: 800; }
     .kricon-table td { padding: 11px 12px; border-bottom: 1px solid #1E3A8A !important; }
@@ -150,24 +146,22 @@ st.markdown("""
     .points-legend { background-color: #060B19; border-left: 5px solid #F97316; padding: 12px; margin-bottom: 15px; border-radius: 4px; }
     .flag-img { width: 22px !important; height: 14px !important; object-fit: cover !important; border-radius: 2px !important; display: inline-block; vertical-align: middle; border: 1px solid rgba(255,255,255,0.2); }
     
-    /* ========================================================================= */
-    /* ZAAWANSOWANA DRABINKA TURNIEJOWA (Z PÓŁFINAŁAMI I ĆWIERĆFINAŁAMI)         */
-    /* ========================================================================= */
-    .bracket-match-card { background: #172554 !important; border: 2px solid #1E3A8A !important; border-radius: 8px; padding: 6px; font-size: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-    .bracket-match-title { font-size: 0.70rem !important; color: #F97316 !important; font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid #1E3A8A; padding-bottom: 2px; }
-    .bracket-row { display: flex; justify-content: space-between; align-items: center; padding: 2px 0; }
-    .bracket-score-cell { background: #0A1128; color: #F97316; font-weight: bold; padding: 1px 6px; border-radius: 4px; min-width: 20px; text-align: center; border: 1px solid #1E3A8A; }
+    /* DRABINKA I TABELE */
+    .bracket-match-card { background: #172554 !important; border: 2px solid #1E3A8A !important; border-radius: 8px; padding: 8px; margin: 5px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .bracket-match-title { font-size: 0.70rem !important; color: #F97316 !important; font-weight: bold; margin-bottom: 3px; border-bottom: 1px solid #1E3A8A; padding-bottom: 2px; }
+    .bracket-row { display: flex; justify-content: space-between; align-items: center; padding: 2px 0; font-size: 0.85rem !important; }
+    .bracket-score-cell { background: #0A1128; color: #F97316; font-weight: bold; padding: 1px 6px; border-radius: 4px; min-width: 22px; text-align: center; border: 1px solid #1E3A8A; }
     .bracket-team-winner { color: #4ADE80 !important; font-weight: bold; }
-    .bracket-team-name { max-width: 68px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; vertical-align: middle; }
+    .bracket-team-name { max-width: 60px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; vertical-align: middle; }
     
-    .bracket-group-box { background: #0D1B3E !important; border: 1px solid #F97316 !important; border-radius: 8px; padding: 6px; margin-bottom: 8px; }
+    .bracket-group-box { background: #0D1B3E !important; border: 1px solid #F97316 !important; border-radius: 8px; padding: 8px; margin-bottom: 8px; }
     
-    /* WYŚRODKOWANY FINAŁ W DRABINCE */
+    .center-final-card-wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 250px; }
     .center-final-card { background: linear-gradient(145deg, #1E3A8A, #0A1128) !important; border: 2px solid #F97316 !important; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 0 20px rgba(249,115,22,0.3); width: 100%; }
     .final-title { color: #F97316; font-size: 1.1rem; font-weight: 900; margin-bottom: 10px; letter-spacing: 1px; text-transform: uppercase; }
     .final-teams { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
-    .final-team { font-size: 1rem; font-weight: bold; color: #F8FAFC; display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center; overflow: hidden; }
-    .final-score { font-size: 1.4rem; font-weight: 900; color: #F97316; background: #060B19; padding: 4px 12px; border-radius: 8px; border: 1px solid #334155; }
+    .final-team { font-size: 1.05rem; font-weight: bold; color: #F8FAFC; display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center; overflow: hidden; }
+    .final-score { font-size: 1.5rem; font-weight: 900; color: #F97316; background: #060B19; padding: 4px 12px; border-radius: 8px; border: 1px solid #334155; }
     .final-venue { font-size: 0.75rem; color: #94A3B8; }
     </style>
 """, unsafe_allow_html=True)
@@ -354,43 +348,25 @@ def get_mini_group_html_string(g_code):
 def generate_schedule():
     schedule = {}
     months_pl = {6: "Czerwca", 7: "Lipca"}
-    raw_fixtures = [
-        (2026, 6, 11, 21, 0, "Grupa A", "Meksyk", "RPA"), (2026, 6, 12, 4, 0, "Grupa A", "Korea Południowa", "Czechy"),
-        (2026, 6, 12, 21, 0, "Grupa B", "Kanada", "Bośnia i Hercegowina"), (2026, 6, 13, 3, 0, "Grupa D", "USA", "Paragwaj"),
-        (2026, 6, 13, 21, 0, "Grupa B", "Katar", "Szwajcaria"), (2026, 6, 14, 0, 0, "Grupa C", "Brazylia", "Maroko"),
-        (2026, 6, 14, 3, 0, "Grupa C", "Szkocja", "Haiti"), (2026, 6, 14, 6, 0, "Grupa D", "Australia", "Turcja"),
-        (2026, 6, 14, 19, 0, "Grupa E", "Niemcy", "Curaçao"), (2026, 6, 14, 22, 0, "Grupa F", "Holandia", "Japonia"),
-        (2026, 6, 15, 1, 0, "Grupa E", "WKS", "Ekwador"), (2026, 6, 15, 4, 0, "Grupa F", "Szwecja", "Tunezja"),
-        (2026, 6, 15, 18, 0, "Grupa H", "Hiszpania", "Wyspy Zielonego Przylądka"), (2026, 6, 15, 21, 0, "Grupa G", "Belgia", "Egipt"),
-        (2026, 6, 16, 0, 0, "Grupa H", "Arabia Saudyjska", "Urugwaj"), (2026, 6, 16, 3, 0, "Grupa G", "Iran", "Nowa Zelandia"),
-        (2026, 6, 16, 21, 0, "Grupa I", "Francja", "Senegal"), (2026, 6, 16, 21, 0, "Grupa I", "Irak", "Norwegia"),
-        (2026, 6, 17, 3, 0, "Grupa J", "Argentyna", "Algieria"), (2026, 6, 17, 6, 0, "Grupa J", "Austria", "Jordania"),
-        (2026, 6, 17, 19, 0, "Grupa K", "Portugalia", "DR Konga"), (2026, 6, 17, 22, 0, "Grupa L", "Anglia", "Chorwacja"),
-        (2026, 6, 18, 1, 0, "Grupa L", "Ghana", "Panama"), (2026, 6, 18, 4, 0, "Grupa K", "Uzbekistan", "Kolumbia"),
-        (2026, 6, 18, 18, 0, "Grupa A", "Czechy", "RPA"), (2026, 6, 18, 21, 0, "Grupa B", "Szwajcaria", "Bośnia i Hercegowina"),
-        (2026, 6, 19, 0, 0, "Grupa B", "Kanada", "Katar"), (2026, 6, 19, 3, 0, "Grupa A", "Meksyk", "Korea Południowa"),
-        (2026, 6, 19, 21, 0, "Grupa D", "USA", "Australia"), (2026, 6, 20, 0, 0, "Grupa C", "Szkocja", "Maroko"),
-        (2026, 6, 20, 3, 0, "Grupa C", "Brazylia", "Haiti"), (2026, 6, 20, 5, 0, "Grupa D", "Turcja", "Paragwaj"),
-        (2026, 6, 20, 19, 0, "Grupa F", "Holandia", "Szwecja"), (2026, 6, 20, 22, 0, "Grupa E", "Niemcy", "WKS"),
-        (2026, 6, 21, 2, 0, "Grupa E", "Ekwador", "Curaçao"), (2026, 6, 21, 6, 0, "Grupa F", "Tunezja", "Japonia"),
-        (2026, 6, 21, 18, 0, "Grupa H", "Hiszpania", "Arabia Saudyjska"), (2026, 6, 21, 21, 0, "Grupa G", "Belgia", "Iran"),
-        (2026, 6, 22, 0, 0, "Grupa H", "Urugwaj", "Wyspy Zielonego Przylądka"), (2026, 6, 22, 3, 0, "Grupa G", "Nowa Zelandia", "Egipt")
-    ]
     match_id = 1
-    for yr, mo, dy, hr, mn, stage, home, away in raw_fixtures:
-        dt = datetime(yr, mo, dy, hr, mn)
-        schedule[match_id] = {
-            "timestamp": dt, "date": f"{dt.day} {months_pl[dt.month]} {dt.strftime('%H:%M')}",
-            "stage": stage, "home": home, "away": away, "score_h": None, "score_a": None, "status": "Oczekuje",
-            "venue": VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]
-        }
-        match_id += 1
-    sim_day = datetime(2026, 6, 22, 18, 0)
-    for g_name, teams in GROUPS_DICT.items():
-        for pair in [(teams[0], teams[2]), (teams[1], teams[3])]:
-            schedule[match_id] = {"timestamp": sim_day, "date": f"{sim_day.day} {months_pl[sim_day.month]} {sim_day.strftime('%H:%M')}", "stage": g_name, "home": pair[0], "away": pair[1], "score_h": None, "score_a": None, "status": "Oczekuje", "venue": VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]}
-            match_id += 1
-        sim_day += timedelta(hours=4)
+    start_dt = datetime(2026, 6, 11, 21, 0)
+    
+    # Precyzyjne 72 mecze grupowe (12 grup * 6 meczów)
+    for matchday in range(3):
+        for g_name, teams in GROUPS_DICT.items():
+            if matchday == 0: pairs = [(teams[0], teams[1]), (teams[2], teams[3])]
+            elif matchday == 1: pairs = [(teams[0], teams[2]), (teams[3], teams[1])]
+            else: pairs = [(teams[0], teams[3]), (teams[1], teams[2])]
+                
+            for t_home, t_away in pairs:
+                dt = start_dt + timedelta(days=(match_id-1)//4, hours=((match_id-1)%4)*3)
+                schedule[match_id] = {
+                    "timestamp": dt, "date": f"{dt.day} {months_pl.get(dt.month, 'Czerwca')} {dt.strftime('%H:%M')}",
+                    "stage": g_name, "home": t_home, "away": t_away, "score_h": None, "score_a": None, "status": "Oczekuje",
+                    "venue": VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]
+                }
+                match_id += 1
+                
     ko_stages = [("1/16 Finału", 16, [(29,6), (30,6), (1,7), (2,7)]), ("1/8 Finału", 8, [(4,7), (5,7), (6,7), (7,7)]), ("Ćwierćfinały", 4, [(9,7), (10,7)]), ("Półfinały", 2, [(14,7), (15,7)]), ("Mecz o 3. miejsce", 1, [(18,7)]), ("Finał", 1, [(19,7)])]
     for stage_name, count, stage_dates in ko_stages:
         date_idx = 0
@@ -400,12 +376,13 @@ def generate_schedule():
             hour = 18 if i % 2 == 0 else 22
             match_dt = datetime(2026, m_num, d, hour, 0, 0)
             schedule[match_id] = {
-                "timestamp": match_dt, "date": f"{d} {months_pl[m_num]} {match_dt.strftime('%H:%M')}",
+                "timestamp": match_dt, "date": f"{d} {months_pl.get(m_num, 'Lipca')} {match_dt.strftime('%H:%M')}",
                 "stage": stage_name, "home": "TBD", "away": "TBD", "score_h": None, "score_a": None, "status": "Oczekuje",
                 "venue": "MetLife, Nowy Jork" if stage_name == "Finał" else VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]
             }
             match_id += 1
             if (i + 1) % matches_per_date == 0: date_idx += 1
+            
     return schedule
 
 def fetch_official_results_from_api(now_time):
@@ -454,7 +431,7 @@ else:
         st.session_state.logged_in_user = None
         st.rerun()
         
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 Ranking", "📅 Terminarz", "📈 Tabele", "🏆 Drabinka Turniejowa"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 Ranking", "📅 Terminarz", "🕵️ Typy graczy", "📈 Tabele", "🏆 Drabinka Turniejowa"])
     
     with tab1: 
         current_positions_map = {}
@@ -555,6 +532,33 @@ else:
                     st.markdown("<div class='missing-bet-banner-blink'>⚠️ BRAK TYPU</div>", unsafe_allow_html=True)
 
     with tab3:
+        st.header("🕵️ Podgląd wszystkich typów")
+        st.markdown("Tutaj możesz śledzić, jak rywale obstawili spotkania. Tabela odblokowuje się wraz z pierwszym gwizdkiem w danym meczu.")
+        
+        locked_matches = [m_id for m_id, m in st.session_state.results.items() if (m['timestamp'] - now).total_seconds() <= 0]
+        
+        if not locked_matches:
+            st.info("Żaden mecz jeszcze się nie rozpoczął. Wszelkie typy są objęte tajemnicą! 🔒")
+        else:
+            table_html = "<div class='match-card-clean'><table class='kricon-table' style='margin: 0;'><tr><th style='text-align:left; padding-left:15px;'>Mecz</th>"
+            for p in players: table_html += f"<th>{p}</th>"
+            table_html += "</tr>"
+            
+            for m_id in sorted(locked_matches, reverse=True):
+                m = st.session_state.results[m_id]
+                h_c = clean_and_sanitize_team_string(m['home'])
+                a_c = clean_and_sanitize_team_string(m['away'])
+                table_html += f"<tr><td style='white-space:nowrap; text-align:left; padding-left:15px;'><b style='color:#F97316;'>#{m_id}</b>&nbsp;&nbsp; {get_cdn_flag_img_html(h_c)} {h_c} <b>-</b> {a_c} {get_cdn_flag_img_html(a_c)}</td>"
+                
+                for p in players:
+                    bet = st.session_state.bets.get(m_id, {}).get(p)
+                    if bet: table_html += f"<td style='text-align:center; font-weight:bold; font-size:1.05rem;'>{bet[0]} : {bet[1]}</td>"
+                    else: table_html += "<td style='text-align:center; color:#64748B;'>-</td>"
+                table_html += "</tr>"
+            table_html += "</table></div>"
+            st.markdown(table_html, unsafe_allow_html=True)
+
+    with tab4:
         st.header("Tabele Grup Turniejowych")
         third_places_list = []
         for g_name in list(GROUPS_DICT.keys()):
@@ -591,7 +595,7 @@ else:
                 third_rows += f"<tr {'style=\"background-color:#16A34A;\"' if idx <= 8 else ''}><td><b>{idx}</b></td><td><b>{r['Grupa']}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {rep_clean_third}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
             st.markdown(f"<table class='kricon-table'><tr><th>Msc.</th><th>Grupa</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{third_rows}</table>", unsafe_allow_html=True)
 
-    with tab4:
+    with tab5:
         st.header("🏆 Drabinka Fazy Pucharowej")
         st.divider()
         
