@@ -21,90 +21,7 @@ else:
     st.warning("⚠️ Brak pliku 'logo.png' w folderze aplikacji! Wgraj go, aby zobaczyć logo.")
 
 # GŁÓWNY SILNIK CSS DLA CAŁEJ APLIKACJI
-st.markdown(f"""
-    <style>
-    {logo_css}
-    * {{ -webkit-user-select: none !important; -moz-user-select: none !important; -ms-user-select: none !important; user-select: none !important; }}
-    input, textarea, div[data-baseweb="input"] {{ -webkit-user-select: auto !important; -moz-user-select: auto !important; -ms-user-select: auto !important; user-select: auto !important; }}
-    body, html, [data-testid="stAppViewContainer"], .stApp, [data-testid="stTabContent"], div.stTabs {{ background-color: #0A1128 !important; }}
-    [data-testid="stSidebar"] {{ background-color: #060B19 !important; }}
-    [data-testid="stHeader"] {{ background-color: #0A1128 !important; }}
-    h1, h2, h3, h4, h5, h6, p, span, label, div {{ color: #F8FAFC !important; }}
-    .stAppHeader {{ position: sticky !important; top: 0 !important; width: 100% !important; height: auto !important; background-color: #0A1128 !important; z-index: 9999 !important; padding-left: 25px !important; padding-right: 25px !important; padding-top: 18px !important; padding-bottom: 18px !important; border-bottom: 1px solid #1E3A8A; }}
-    [data-testid="stAppViewContainer"] > section:nth-child(2) {{ padding-top: 100px !important; }}
-    @keyframes pulseAlertCore {{ 0% {{ opacity: 1.0; }} 50% {{ opacity: 0.3; }} 100% {{ opacity: 1.0; }} }}
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) {{ background: #172554 !important; border: 1px solid #1E3A8A !important; border-radius: 0 0 6px 6px; padding: 6px 10px !important; margin-bottom: 6px !important; align-items: center !important; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }}
-    div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"] {{ padding: 0 4px !important; }}
-    .meta-upper-bar-container {{ background-color: #1E293B !important; border: 1px solid #1E3A8A !important; border-bottom: none !important; border-radius: 6px 6px 0 0; display: flex; align-items: center; gap: 12px; font-size: 0.75rem !important; color: #94A3B8 !important; padding: 4px 14px !important; width: 100%; margin-top: 10px !important; }}
-    .meta-id-text-clean {{ font-weight: bold; color: #F97316 !important; }}
-    .team-align-right {{ font-size: 1.15rem !important; font-weight: bold !important; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%; white-space: nowrap; height: 38px; line-height: 38px; color: #F8FAFC !important; }}
-    .team-align-left {{ font-size: 1.15rem !important; font-weight: bold !important; text-align: left; display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; white-space: nowrap; height: 38px; line-height: 38px; color: #F8FAFC !important; }}
-    .off-score {{ font-size: 0.85rem !important; font-weight: bold !important; color: #94A3B8 !important; background-color: #1E293B !important; border: 1px solid #334155 !important; border-radius: 4px; display: block; text-align: center; white-space: nowrap; height: 38px !important; line-height: 36px !important; width: 100%; }}
-    .score-colon {{ text-align: center; font-weight: bold; color: #F97316 !important; font-size: 1.4rem; height: 38px; line-height: 34px; width: 100%; }}
-    .result-box {{ display: flex; align-items: center; justify-content: center; height: 38px; width: 100%; border-radius: 6px; font-weight: 900; font-size: 1.3rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }}
-    .bet-locked {{ background: #0F172A; color: #64748B; border: 1px solid #1E293B; }}
-    .bet-exact {{ background: #16A34A; color: #FFFFFF; border: 2px solid #4ADE80; box-shadow: 0 0 10px rgba(74, 222, 128, 0.4); }} 
-    .bet-winner {{ background: #064E3B; color: #4ADE80; border: 1px dashed #16A34A; }} 
-    .bet-wrong {{ background: #450A0A; color: #FCA5A5; border: 1px dashed #DC2626; }} 
-    div[data-testid="stSelectbox"] div[data-baseweb="select"] > div {{ background-color: #1E293B !important; border: 1px solid #334155 !important; }}
-    div[data-testid="stSelectbox"] div[data-baseweb="select"] span {{ color: #F8FAFC !important; }}
-    ul[role="listbox"] {{ background-color: #1E293B !important; }}
-    li[role="option"] {{ background-color: #1E293B !important; color: #F8FAFC !important; }}
-    li[role="option"]:hover, li[role="option"][aria-selected="true"] {{ background-color: #334155 !important; color: #F97316 !important; }}
-    div[data-testid="stTextInput"] div[data-baseweb="input"] {{ background-color: #1E293B !important; border: 1px solid #334155 !important; }}
-    div[data-testid="stTextInput"] input {{ color: #F8FAFC !important; -webkit-text-fill-color: #F8FAFC !important; background-color: transparent !important; }}
-    div[data-testid="stNumberInput"] div[data-baseweb="input"] {{ background-color: #0A1128 !important; border: 1px solid #1E3A8A !important; border-radius: 6px !important; height: 38px !important; transition: none !important; overflow: hidden; }}
-    div[data-testid="stNumberInput"] input {{ color: #F8FAFC !important; -webkit-text-fill-color: #F8FAFC !important; background-color: #0A1128 !important; font-size: 1.25rem !important; font-weight: 900 !important; text-align: center !important; padding: 0 !important; }}
-    div[data-testid="stNumberInput"] button {{ background-color: #1E293B !important; border: none !important; border-radius: 4px !important; width: 32px !important; height: 32px !important; margin: 2px !important; transition: transform 0.1s ease !important; }}
-    div[data-testid="stNumberInput"] button svg {{ fill: #F97316 !important; color: #F97316 !important; }}
-    div[data-testid="stNumberInput"] button:active, div[data-testid="stNumberInput"] button:focus {{ opacity: 1.0 !important; background-color: #0F172A !important; transform: scale(0.90) !important; outline: none !important; box-shadow: none !important; }}
-    div[data-testid="stNumberInput"] button:hover {{ background-color: #334155 !important; }}
-    div[data-testid="stNumberInput"] button:hover svg {{ fill: #FFFFFF !important; }}
-    button[kind="secondary"] {{ background-color: #1E293B !important; border: 1px solid #334155 !important; border-radius: 4px !important; height: 38px !important; min-height: 38px !important; padding: 0 !important; width: 100% !important; display: block !important; }}
-    button[kind="secondary"] * {{ color: #F97316 !important; font-weight: bold !important; font-size: 1.1rem !important; }}
-    button[kind="secondary"]:hover {{ background-color: #334155 !important; }}
-    button[kind="secondary"]:hover * {{ color: #FFFFFF !important; }}
-    button[kind="primary"] {{ background-color: #F97316 !important; border: 1px solid #EA580C !important; border-radius: 4px !important; height: 38px !important; min-height: 38px !important; padding: 0 !important; width: 100% !important; display: block !important; box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important; }}
-    button[kind="primary"] * {{ color: #FFFFFF !important; font-size: 0.9rem !important; font-weight: bold !important; }}
-    button[kind="primary"]:hover {{ background-color: #EA580C !important; border-color: #C2410C !important; }}
-    .success-bet-banner {{ background: #16A34A; color: white; text-align: center; font-weight: bold; border-radius: 4px; height: 38px; line-height: 38px; font-size: 0.8rem; width: 100%; white-space: nowrap; display:block; }}
-    .missing-bet-banner-blink {{ animation: pulseAlertCore 1.2s infinite ease-in-out !important; background-color: #DC2626 !important; color: #FFFFFF !important; font-weight: bold !important; text-align: center !important; height: 38px !important; line-height: 38px !important; border-radius: 4px !important; font-size: 0.7rem !important; display: block !important; width: 100% !important; margin: 0 !important; white-space: nowrap !important; }}
-    .status-waiting-blink {{ animation: pulseAlertCore 2.0s infinite ease-in-out !important; color: #D97706 !important; font-weight: bold !important; font-size: 0.65rem !important; }}
-    .status-badge-ended {{ color: #94A3B8 !important; font-weight: bold; font-size: 0.65rem !important; }}
-    .status-badge-live {{ color: #DC2626 !important; font-weight: bold; font-size: 0.65rem !important; }}
-    .kricon-table {{ width: 100%; border-collapse: collapse; margin: 15px 0 35px 0; background-color: #172554 !important; border-radius: 8px; overflow: hidden; }}
-    .kricon-table th {{ background-color: #F97316 !important; color: #0A1128 !important; padding: 12px; font-weight: 800; }}
-    .kricon-table td {{ padding: 11px 12px; border-bottom: 1px solid #1E3A8A !important; color: #F8FAFC; }}
-    .col-pos {{ width: 60px !important; text-align: center !important; }}
-    .col-trend {{ width: 60px !important; text-align: center !important; }}
-    .col-missing {{ width: 100px !important; text-align: center !important; font-weight: bold !important; }}
-    .gold-medal-row {{ background-color: rgba(254, 240, 138, 0.95) !important; font-weight: bold; }}
-    .gold-medal-row td, .gold-medal-row b {{ color: #0A1128 !important; }}
-    .silver-medal-row {{ background-color: rgba(226, 232, 240, 0.95) !important; font-weight: bold; }}
-    .silver-medal-row td, .silver-medal-row b {{ color: #0A1128 !important; }}
-    .bronze-medal-row {{ background-color: rgba(254, 215, 170, 0.95) !important; font-weight: bold; }}
-    .bronze-medal-row td, .bronze-medal-row b {{ color: #0A1128 !important; }}
-    .trend-up {{ color: #16A34A !important; font-weight: bold; }}
-    .trend-down {{ color: #DC2626 !important; font-weight: bold; }}
-    .trend-stable {{ color: #64748B !important; }}
-    .points-legend {{ background-color: #060B19; border-left: 5px solid #F97316; padding: 12px; margin-bottom: 15px; border-radius: 4px; }}
-    .flag-img {{ width: 22px !important; height: 14px !important; object-fit: cover !important; border-radius: 2px !important; display: inline-block; vertical-align: middle; border: 1px solid rgba(255,255,255,0.2); }}
-    .bracket-match-card {{ background: #172554 !important; border: 2px solid #1E3A8A !important; border-radius: 8px; padding: 6px; font-size: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }}
-    .bracket-match-title {{ font-size: 0.70rem !important; color: #F97316 !important; font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid #1E3A8A; padding-bottom: 2px; }}
-    .bracket-row {{ display: flex; justify-content: space-between; align-items: center; padding: 2px 0; font-size: 0.85rem !important; }}
-    .bracket-score-cell {{ background: #0A1128; color: #F97316; font-weight: bold; padding: 1px 6px; border-radius: 4px; min-width: 22px; text-align: center; border: 1px solid #1E3A8A; }}
-    .bracket-team-winner {{ color: #4ADE80 !important; font-weight: bold; }}
-    .bracket-team-name {{ max-width: 60px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; vertical-align: middle; }}
-    .bracket-group-box {{ background: #0D1B3E !important; border: 1px solid #F97316 !important; border-radius: 8px; padding: 8px; margin-bottom: 8px; }}
-    .center-final-card-wrapper {{ display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 250px; }}
-    .center-final-card {{ background: linear-gradient(145deg, #1E3A8A, #0A1128) !important; border: 2px solid #F97316 !important; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 0 20px rgba(249,115,22,0.3); width: 100%; }}
-    .final-title {{ color: #F97316; font-size: 1.1rem; font-weight: 900; margin-bottom: 10px; letter-spacing: 1px; text-transform: uppercase; }}
-    .final-teams {{ display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }}
-    .final-team {{ font-size: 1.05rem; font-weight: bold; color: #F8FAFC; display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center; overflow: hidden; }}
-    .final-score {{ font-size: 1.5rem; font-weight: 900; color: #F97316; background: #060B19; padding: 4px 12px; border-radius: 8px; border: 1px solid #334155; }}
-    .final-venue {{ font-size: 0.75rem; color: #94A3B8; }}
-    </style>
-""", unsafe_allow_html=True)
+st.markdown(f"<style>{logo_css}</style>", unsafe_allow_html=True)
 
 # GLOBALNE PROFILE I CONFIG
 USER_CREDENTIALS = {
@@ -122,7 +39,7 @@ GROUPS_DICT = {
     "Grupa E": ["Niemcy", "Curaçao", "WKS", "Ekwador"], 
     "Grupa F": ["Holandia", "Japonia", "Szwecja", "Tunezja"],
     "Grupa G": ["Belgia", "Egipt", "Iran", "Nowa Zelandia"], 
-    "Grupa H": ["Hiszpania", "Wyspy Zielonego Przylajtka", "Arabia Saudyjska", "Urugwaj"],
+    "Grupa H": ["Hiszpania", "Wyspy Zielonego Przylądka", "Arabia Saudyjska", "Urugwaj"],
     "Grupa I": ["Francja", "Senegal", "Irak", "Norwegia"], 
     "Grupa J": ["Argentyna", "Algieria", "Austria", "Jordania"],
     "Grupa K": ["Portugalia", "DR Konga", "Uzbekistan", "Kolumbia"], 
@@ -144,7 +61,7 @@ ISO_FLAGS_MAP = {
     "Niemcy": "de", "Curaçao": "cw", "WKS": "ci", "Ekwador": "ec",
     "Holandia": "nl", "Japonia": "jp", "Szwecja": "se", "Tunezja": "tn",
     "Belgia": "be", "Egipt": "eg", "Iran": "ir", "Nowa Zelandia": "nz",
-    "Hiszpania": "es", "Wyspy Zielonego Przylajtka": "cv", "Arabia Saudyjska": "sa", "Urugwaj": "uy",
+    "Hiszpania": "es", "Wyspy Zielonego Przylądka": "cv", "Arabia Saudyjska": "sa", "Urugwaj": "uy",
     "Francja": "fr", "Senegal": "sn", "Irak": "iq", "Norwegia": "no",
     "Argentyna": "ar", "Algieria": "dz", "Austria": "at", "Jordania": "jo",
     "Portugalia": "pt", "DR Konga": "cd", "Uzbekistan": "uz", "Kolumbia": "co",
@@ -170,12 +87,13 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- SILNIK GOOGLE SHEETS W PEŁNI ODPORNY NA ARTEFAKTY ---
+# --- SILNIK GENEROWANIA KLIENTA GOOGLE ---
 def get_gspread_client():
     creds = dict(st.secrets["gcp_service_account"])
     if "private_key" in creds:
         k = creds["private_key"]
-        k = k.replace(chr(92) + "n", chr(10))
+        k = k.replace("\\\\n", "\\n")
+        k = k.replace("\\n", chr(10))
         k = k.replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "")
         lines = [line.strip() for line in k.split(chr(10)) if line.strip()]
         creds["private_key"] = "-----BEGIN PRIVATE KEY-----" + chr(10) + chr(10).join(lines) + chr(10) + "-----END PRIVATE KEY-----" + chr(10)
@@ -240,7 +158,6 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
         return False
 
-# --- FUNKCJE INTERFEJSU UŻYTKOWNIKA ---
 @st.dialog("👁️ Typy graczy dla tego meczu")
 def show_other_bets(m_id, current_user):
     st.markdown(f"<h4 style='text-align: center; color: #F97316 !important;'>Mecz #{m_id}</h4>", unsafe_allow_html=True)
@@ -283,23 +200,25 @@ def render_bracket_match_html_clean(match_id, mt="0px", mb="6px"):
     sh, sa = (str(m.get("score_h")), str(m.get("score_a"))) if status in ["Zakończony", "LIVE"] and m.get("score_h") is not None else ("?", "?")
     win_h = status == "Zakończony" and m.get("score_h", 0) > m.get("score_a", 0)
     win_a = status == "Zakończony" and m.get("score_a", 0) > m.get("score_h", 0)
-    st.markdown(f\"\"\"
-    <div class="bracket-match-card" style="margin-top: {mt}; margin-bottom: {mb};">
-        <div class="bracket-match-title">Mecz #{match_id}</div>
-        <div class='bracket-row {"bracket-team-winner" if win_h else ""}'>
-            <div style="display:flex; align-items:center; gap:6px; overflow: hidden;">{get_cdn_flag_img_html(m['home'])}<span class="bracket-team-name">{m['home']}</span></div>
-            <span class="bracket-score-cell">{sh}</span>
-        </div>
-        <div class='bracket-row {"bracket-team-winner" if win_a else ""}'>
-            <div style="display:flex; align-items:center; gap:6px; overflow: hidden;">{get_cdn_flag_img_html(m['away'])}<span class="bracket-team-name">{m['away']}</span></div>
-            <span class="bracket-score-cell">{sa}</span>
-        </div>
-    </div>
-    \"\"\", unsafe_allow_html=True)
+    
+    html_card = f"<div class='bracket-match-card' style='margin-top: {mt}; margin-bottom: {mb};'>"
+    html_card += f"<div class='bracket-match-title'>Mecz #{match_id}</div>"
+    
+    class_h = "bracket-team-winner" if win_h else ""
+    html_card += f"<div class='bracket-row {class_h}'>"
+    html_card += f"<div style='display:flex; align-items:center; gap:6px; overflow: hidden;'>{get_cdn_flag_img_html(m['home'])}<span class='bracket-team-name'>{m['home']}</span></div>"
+    html_card += f"<span class='bracket-score-cell'>{sh}</span></div>"
+    
+    class_a = "bracket-team-winner" if win_a else ""
+    html_card += f"<div class='bracket-row {class_a}'>"
+    html_card += f"<div style='display:flex; align-items:center; gap:6px; overflow: hidden;'>{get_cdn_flag_img_html(m['away'])}<span class='bracket-team-name'>{m['away']}</span></div>"
+    html_card += f"<span class='bracket-score-cell'>{sa}</span></div></div>"
+    
+    st.markdown(html_card, unsafe_allow_html=True)
 
 def get_mini_group_html_string(g_code):
     lines = "".join([f"<div style='text-align:left; padding:2px 0; font-size:0.85rem; display:flex; align-items:center; gap:6px;'>{get_cdn_flag_img_html(t)} <span style='max-width: 75px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>{t}</span></div>" for t in GROUPS_DICT.get(f"Grupa {g_code}", [])])
-    return f\"\"\"<div class="bracket-group-box"><div style="font-weight:bold; color:#F97316; margin-bottom:4px; font-size:0.85rem;">GRUPA {g_code}</div>{lines}</div>\"\"\"
+    return f"<div class='bracket-group-box'><div style='font-weight:bold; color:#F97316; margin-bottom:4px; font-size:0.85rem;'>GRUPA {g_code}</div>{lines}</div>"
 
 def generate_schedule():
     schedule = {}
@@ -394,10 +313,10 @@ else:
             if h_key not in st.session_state: st.session_state[h_key] = int(saved_h)
             if a_key not in st.session_state: st.session_state[a_key] = int(saved_a)
             
-            st.markdown(f\"\"\"
+            st.markdown(f"""
             <div class="meta-upper-bar-container">
                 <span class="meta-id-text-clean">⚽ Mecz #{m_id}</span> {status_html} <span style="color:#94A3B8;">📅 {m['date']}</span> <span style="color:#38BDF8; font-weight:bold;">📍 {m.get('venue').split(',')[0]}</span> <span style="color:#64748B;">({m['stage']})</span>
-            </div><div class='match-row-anchor'></div>\"\"\", unsafe_allow_html=True)
+            </div><div class='match-row-anchor'></div>""", unsafe_allow_html=True)
             
             c_home, c_inph, c_sep, c_inpa, c_away, c_score, c_save, c_del, c_status = st.columns([2.5, 1.8, 0.2, 1.8, 2.5, 1.5, 1.2, 0.6, 1.2])
             with c_home: st.markdown(f"<div class='team-align-right'><span>{m['home']}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
@@ -503,16 +422,18 @@ else:
         with c_fin:
             m_104 = st.session_state.results.get(104, {})
             sh_f, sa_f = (str(m_104.get('score_h')), str(m_104.get('score_a'))) if m_104.get('score_h') is not None else ("?", "?")
-            st.markdown(f\"\"\"
-            <div class='center-final-card-wrapper' style='margin-top: 195px;'>
-                <div class='center-final-card'>
-                    <div class='final-title'>🏆 WIELKI FINAŁ</div>
-                    <div class='final-teams'>
-                        <div class='final-team'>{get_cdn_flag_img_html(m_104.get('home'))}<span class="bracket-team-name">{m_104.get('home','TBD')}</span></div>
-                        <div class='final-score'>{sh_f} : {sa_f}</div>
-                        <div class='final-team'>{get_cdn_flag_img_html(m_104.get('away'))}<span class="bracket-team-name">{m_104.get('away','TBD')}</span></div>
-                    </div><div class='final-venue'>📍 {m_104.get('venue')} | 📅 {m_104.get('date')}</div>
-                </div></div>\"\"\", unsafe_allow_html=True)
+            
+            html_final = f"<div class='center-final-card-wrapper' style='margin-top: 195px;'>"
+            html_final += f"<div class='center-final-card'>"
+            html_final += f"<div class='final-title'>🏆 WIELKI FINAŁ</div>"
+            html_final += f"<div class='final-teams'>"
+            html_final += f"<div class='final-team'>{get_cdn_flag_img_html(m_104.get('home'))}<span class='bracket-team-name'>{m_104.get('home','TBD')}</span></div>"
+            html_final += f"<div class='final-score'>{sh_f} : {sa_f}</div>"
+            html_final += f"<div class='final-team'>{get_cdn_flag_img_html(m_104.get('away'))}<span class='bracket-team-name'>{m_104.get('away','TBD')}</span></div>"
+            html_final += f"</div><div class='final-venue'>📍 {m_104.get('venue', 'TBD')} | 📅 {m_104.get('date', 'TBD')}</div>"
+            html_final += f"</div></div>"
+            
+            st.markdown(html_final, unsafe_allow_html=True)
             st.markdown("<div style='text-align:center; margin-top:20px; font-weight:bold; color:#94A3B8; font-size: 0.8rem;'>🥉 Mecz o 3. miejsce</div>", unsafe_allow_html=True)
             render_bracket_match_html_clean(103)
         with c_2r:
@@ -526,4 +447,5 @@ else:
         with c_g2:
             for g in ["G","H","I","J","K","L"]: st.markdown(get_mini_group_html_string(g), unsafe_allow_html=True)
 """
-print("BULLETPROOF_COMPILED")}
+}
+print("Simulation completed.")}
