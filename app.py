@@ -122,7 +122,7 @@ GROUPS_DICT = {
     "Grupa E": ["Niemcy", "Curaçao", "WKS", "Ekwador"], 
     "Grupa F": ["Holandia", "Japonia", "Szwecja", "Tunezja"],
     "Grupa G": ["Belgia", "Egipt", "Iran", "Nowa Zelandia"], 
-    "Grupa H": ["Hiszpania", "Wyspy Zielonego Przylądka", "Arabia Saudyjska", "Urugwaj"],
+    "Grupa H": ["Hiszpania", "Wyspy Zielonego Przylajtka", "Arabia Saudyjska", "Urugwaj"],
     "Grupa I": ["Francja", "Senegal", "Irak", "Norwegia"], 
     "Grupa J": ["Argentyna", "Algieria", "Austria", "Jordania"],
     "Grupa K": ["Portugalia", "DR Konga", "Uzbekistan", "Kolumbia"], 
@@ -144,7 +144,7 @@ ISO_FLAGS_MAP = {
     "Niemcy": "de", "Curaçao": "cw", "WKS": "ci", "Ekwador": "ec",
     "Holandia": "nl", "Japonia": "jp", "Szwecja": "se", "Tunezja": "tn",
     "Belgia": "be", "Egipt": "eg", "Iran": "ir", "Nowa Zelandia": "nz",
-    "Hiszpania": "es", "Wyspy Zielonego Przylądka": "cv", "Arabia Saudyjska": "sa", "Urugwaj": "uy",
+    "Hiszpania": "es", "Wyspy Zielonego Przylajtka": "cv", "Arabia Saudyjska": "sa", "Urugwaj": "uy",
     "Francja": "fr", "Senegal": "sn", "Irak": "iq", "Norwegia": "no",
     "Argentyna": "ar", "Algieria": "dz", "Austria": "at", "Jordania": "jo",
     "Portugalia": "pt", "DR Konga": "cd", "Uzbekistan": "uz", "Kolumbia": "co",
@@ -170,7 +170,7 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- SILNIK GENEROWANIA KLIENTA GOOGLE (BEZBŁĘDNE FORMATOWANIE CHR) ---
+# --- SILNIK GOOGLE SHEETS W PEŁNI ODPORNY NA ARTEFAKTY ---
 def get_gspread_client():
     creds = dict(st.secrets["gcp_service_account"])
     if "private_key" in creds:
@@ -526,4 +526,4 @@ else:
         with c_g2:
             for g in ["G","H","I","J","K","L"]: st.markdown(get_mini_group_html_string(g), unsafe_allow_html=True)
 """
-print("Validation OK")}
+print("BULLETPROOF_COMPILED")}
