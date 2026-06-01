@@ -29,7 +29,7 @@ if os.path.exists("logo.png"):
 else:
     st.warning("⚠️ Brak pliku 'logo.png' w folderze aplikacji! Wgraj go, aby zobaczyć logo.")
 
-# GŁÓWNY SILNIK CSS DLA CAŁEJ APLIKACJI (Bez pustych linii, by zablokować błąd Markdown)
+# GŁÓWNY SILNIK CSS DLA CAŁEJ APLIKACJI
 st.markdown(f"""
     <style>
     {logo_css}
@@ -39,7 +39,6 @@ st.markdown(f"""
     [data-testid="stSidebar"] {{ background-color: #060B19 !important; }}
     [data-testid="stHeader"] {{ background-color: #0A1128 !important; }}
     h1, h2, h3, h4, h5, h6, p, span, label, div {{ color: #F8FAFC !important; }}
-    /* PANCERNY FIX NAGŁÓWKA: STICKY ZAMIAST FIXED ZABEZPIECZA PRZED UCINANIEM K */
     .stAppHeader {{ position: sticky !important; top: 0 !important; width: 100% !important; height: auto !important; background-color: #0A1128 !important; z-index: 9999 !important; padding-left: 25px !important; padding-right: 25px !important; padding-top: 18px !important; padding-bottom: 18px !important; border-bottom: 1px solid #1E3A8A; }}
     [data-testid="stAppViewContainer"] > section:nth-child(2) {{ padding-top: 100px !important; }}
     @keyframes pulseAlertCore {{ 0% {{ opacity: 1.0; }} 50% {{ opacity: 0.3; }} 100% {{ opacity: 1.0; }} }}
@@ -180,10 +179,12 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- SILNIK GOOGLE SHEETS VIA GSPREAD ---
+# --- SILNIK GOOGLE SHEETS VIA GSPREAD (Z POPRAWKĄ PROSTOWANIA ZNAKÓW \n) ---
 def get_gspread_client():
-    credentials = st.secrets["gcp_service_account"]
-    return gspread.service_account_from_dict(credentials)
+    creds = dict(st.secrets["gcp_service_account"])
+    if "private_key" in creds:
+        creds["private_key"] = creds["private_key"].replace("\\n", "\n")
+    return gspread.service_account_from_dict(creds)
 
 def load_from_google_sheets():
     try:
@@ -230,7 +231,6 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
         sh.clear()
         sh.update(range_name='A1', values=rows)
         
-        # SYSTEMOWY WARUNEK: Pamięć lokalna odświeża się TYLKO po udanym zapisie w arkuszu!
         if action == "save":
             if m_id not in st.session_state.bets: st.session_state.bets[m_id] = {}
             st.session_state.bets[m_id][user] = (h_val, a_val)
@@ -349,7 +349,6 @@ if 'bets' not in st.session_state or len(st.session_state.bets) != 104: st.sessi
 if 'last_positions' not in st.session_state: st.session_state.last_positions = {player: idx + 1 for idx, player in enumerate(players)}
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 
-# Pobranie danych z Google Sheets tylko raz na uruchomienie sesji użytkownika
 if 'gs_initialized' not in st.session_state:
     load_from_google_sheets()
     st.session_state.gs_initialized = True
@@ -376,10 +375,8 @@ if st.session_state.logged_in_user is None:
         st.markdown(render_leaderboard_html(now), unsafe_allow_html=True)
 else:
     st.markdown("<div class='stAppHeader'><div class='kricon-logo-container'></div></div>", unsafe_allow_html=True)
-    
     st.sidebar.write(f"👤 Gracz: **{st.session_state.logged_in_user}**")
     
-    # Przycisk do ręcznego pobierania nowych typów z chmury
     if st.sidebar.button("🔄 Odśwież dane chmury", type="secondary"):
         load_from_google_sheets()
         st.toast("Pomyślnie zaktualizowano typy z Google Sheets! 📈")
@@ -468,7 +465,6 @@ else:
             g_rows = "".join([f"<tr {'style=\"background-color:#16A34A;\"' if idx in [1, 2] else 'style=\"background-color:#EA580C;\"' if idx==3 else ''}><td><b>{idx}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>" for idx, r in df_g.iterrows()])
             st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table>", unsafe_allow_html=True)
 
-        # --- SEKCJA NAPRAWIONA: WYŚWIETLANIE TABELI 3. MIEJSC (BEZ BŁĘDNYCH WCIĘĆ) ---
         st.divider()
         st.header("📊 Zbiorcza Tabela 3. Miejsc")
         st.write("Do Fazy Pucharowej (1/16 Finału) awansuje **8 najlepszych reprezentacji** z trzecich miejsc.")
