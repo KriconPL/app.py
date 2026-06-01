@@ -21,7 +21,7 @@ if os.path.exists("logo.png"):
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
-        height: 110px;
+        height: 160px; 
         width: 100%;
     }}
     """
@@ -39,8 +39,8 @@ st.markdown(f"""
     [data-testid="stHeader"] {{ background-color: #0A1128 !important; }}
     h1, h2, h3, h4, h5, h6, p, span, label, div {{ color: #F8FAFC !important; }}
     /* PANCERNY FIX NAGŁÓWKA: STICKY ZAMIAST FIXED ZABEZPIECZA PRZED UCINANIEM K */
-    .stAppHeader {{ position: sticky !important; top: 0 !important; width: 100% !important; height: auto !important; background-color: #0A1128 !important; z-index: 9999 !important; padding-left: 25px !important; padding-right: 25px !important; padding-top: 8px !important; padding-bottom: 8px !important; border-bottom: 1px solid #1E3A8A; }}
-    [data-testid="stAppViewContainer"] > section:nth-child(2) {{ padding-top: 15px !important; }}
+    .stAppHeader {{ position: sticky !important; top: 0 !important; width: 100% !important; height: auto !important; background-color: #0A1128 !important; z-index: 9999 !important; padding-left: 25px !important; padding-right: 25px !important; padding-top: 12px !important; padding-bottom: 12px !important; border-bottom: 1px solid #1E3A8A; }}
+    [data-testid="stAppViewContainer"] > section:nth-child(2) {{ padding-top: 30px !important; }}
     @keyframes pulseAlertCore {{ 0% {{ opacity: 1.0; }} 50% {{ opacity: 0.3; }} 100% {{ opacity: 1.0; }} }}
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) {{ background: #172554 !important; border: 1px solid #1E3A8A !important; border-radius: 0 0 6px 6px; padding: 6px 10px !important; margin-bottom: 6px !important; align-items: center !important; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }}
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) > div[data-testid="column"] {{ padding: 0 4px !important; }}
