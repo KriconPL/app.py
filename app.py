@@ -121,29 +121,24 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
         gc = get_gspread_client()
         sh = gc.open("Kricon_Typer_2026").sheet1
         all_records = sh.get_all_records()
-        
         current_cloud_bets = {}
         for row in all_records:
             m = int(row["Mecz"])
             p = str(row["Gracz"])
             if m not in current_cloud_bets: current_cloud_bets[m] = {}
             current_cloud_bets[m][p] = (int(row["Typ_H"]), int(row["Typ_A"]))
-            
         if action == "save":
             if m_id not in current_cloud_bets: current_cloud_bets[m_id] = {}
             current_cloud_bets[m_id][user] = (h_val, a_val)
         elif action == "delete":
             if m_id in current_cloud_bets and user in current_cloud_bets[m_id]:
                 del current_cloud_bets[m_id][user]
-                
         rows = [["Mecz", "Gracz", "Typ_H", "Typ_A"]]
         for m, p_bets in current_cloud_bets.items():
             for p, tpl in p_bets.items():
                 rows.append([m, p, tpl[0], tpl[1]])
-                
         sh.clear()
         sh.update(range_name='A1', values=rows)
-        
         if action == "save":
             if m_id not in st.session_state.bets: st.session_state.bets[m_id] = {}
             st.session_state.bets[m_id][user] = (h_val, a_val)
@@ -200,20 +195,16 @@ def render_bracket_match_html_clean(match_id, mt="0px", mb="6px"):
     sh, sa = (str(m.get("score_h")), str(m.get("score_a"))) if status in ["Zakończony", "LIVE"] and m.get("score_h") is not None else ("?", "?")
     win_h = status == "Zakończony" and m.get("score_h", 0) > m.get("score_a", 0)
     win_a = status == "Zakończony" and m.get("score_a", 0) > m.get("score_h", 0)
-    
     html_card = f"<div class='bracket-match-card' style='margin-top: {mt}; margin-bottom: {mb};'>"
     html_card += f"<div class='bracket-match-title'>Mecz #{match_id}</div>"
-    
     class_h = "bracket-team-winner" if win_h else ""
     html_card += f"<div class='bracket-row {class_h}'>"
     html_card += f"<div style='display:flex; align-items:center; gap:6px; overflow: hidden;'>{get_cdn_flag_img_html(m['home'])}<span class='bracket-team-name'>{m['home']}</span></div>"
     html_card += f"<span class='bracket-score-cell'>{sh}</span></div>"
-    
     class_a = "bracket-team-winner" if win_a else ""
     html_card += f"<div class='bracket-row {class_a}'>"
     html_card += f"<div style='display:flex; align-items:center; gap:6px; overflow: hidden;'>{get_cdn_flag_img_html(m['away'])}<span class='bracket-team-name'>{m['away']}</span></div>"
     html_card += f"<span class='bracket-score-cell'>{sa}</span></div></div>"
-    
     st.markdown(html_card, unsafe_allow_html=True)
 
 def get_mini_group_html_string(g_code):
@@ -422,17 +413,7 @@ else:
         with c_fin:
             m_104 = st.session_state.results.get(104, {})
             sh_f, sa_f = (str(m_104.get('score_h')), str(m_104.get('score_a'))) if m_104.get('score_h') is not None else ("?", "?")
-            
-            html_final = f"<div class='center-final-card-wrapper' style='margin-top: 195px;'>"
-            html_final += f"<div class='center-final-card'>"
-            html_final += f"<div class='final-title'>🏆 WIELKI FINAŁ</div>"
-            html_final += f"<div class='final-teams'>"
-            html_final += f"<div class='final-team'>{get_cdn_flag_img_html(m_104.get('home'))}<span class='bracket-team-name'>{m_104.get('home','TBD')}</span></div>"
-            html_final += f"<div class='final-score'>{sh_f} : {sa_f}</div>"
-            html_final += f"<div class='final-team'>{get_cdn_flag_img_html(m_104.get('away'))}<span class='bracket-team-name'>{m_104.get('away','TBD')}</span></div>"
-            html_final += f"</div><div class='final-venue'>📍 {m_104.get('venue', 'TBD')} | 📅 {m_104.get('date', 'TBD')}</div>"
-            html_final += f"</div></div>"
-            
+            html_final = f"<div class='center-final-card-wrapper' style='margin-top: 195px;'><div class='center-final-card'><div class='final-title'>🏆 WIELKI FINAŁ</div><div class='final-teams'><div class='final-team'>{get_cdn_flag_img_html(m_104.get('home'))}<span class='bracket-team-name'>{m_104.get('home','TBD')}</span></div><div class='final-score'>{sh_f} : {sa_f}</div><div class='final-team'>{get_cdn_flag_img_html(m_104.get('away'))}<span class='bracket-team-name'>{m_104.get('away','TBD')}</span></div></div><div class='final-venue'>📍 {m_104.get('venue','TBD')} | 📅 {m_104.get('date','TBD')}</div></div></div>"
             st.markdown(html_final, unsafe_allow_html=True)
             st.markdown("<div style='text-align:center; margin-top:20px; font-weight:bold; color:#94A3B8; font-size: 0.8rem;'>🥉 Mecz o 3. miejsce</div>", unsafe_allow_html=True)
             render_bracket_match_html_clean(103)
@@ -447,5 +428,5 @@ else:
         with c_g2:
             for g in ["G","H","I","J","K","L"]: st.markdown(get_mini_group_html_string(g), unsafe_allow_html=True)
 """
+print("Verification of pure final string complete.")}
 }
-print("Simulation completed.")}
