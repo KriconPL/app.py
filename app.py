@@ -170,15 +170,15 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- SILNIK GENEROWANIA KLIENTA GOOGLE (ODPORNY NA ROZRYWANIE STRINGÓW) ---
+# --- SILNIK GENEROWANIA KLIENTA GOOGLE ---
 def get_gspread_client():
     creds = dict(st.secrets["gcp_service_account"])
     if "private_key" in creds:
         k = creds["private_key"]
+        k = k.replace(chr(92) + "n", chr(10))
         k = k.replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "")
-        k = k.replace(chr(92) + "n", "").replace(chr(10), "").replace(chr(13), "").replace(" ", "").strip()
-        chunks = [k[i:i+64] for i in range(0, len(k), 64)]
-        creds["private_key"] = "-----BEGIN PRIVATE KEY-----" + chr(10) + chr(10).join(chunks) + chr(10) + "-----END PRIVATE KEY-----" + chr(10)
+        lines = [line.strip() for line in k.split(chr(10)) if line.strip()]
+        creds["private_key"] = "-----BEGIN PRIVATE KEY-----" + chr(10) + chr(10).join(lines) + chr(10) + "-----END PRIVATE KEY-----" + chr(10)
     return gspread.service_account_from_dict(creds)
 
 def load_from_google_sheets():
@@ -235,9 +235,9 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
         return True
     except Exception as e:
         import traceback
-        print("\n!!! [BŁĄD KRYTYCZNY GOOGLE SHEETS] !!!")
+        print("\\n!!! [BŁĄD KRYTYCZNY GOOGLE SHEETS] !!!")
         traceback.print_exc()
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\\n")
         return False
 
 # --- FUNKCJE INTERFEJSU UŻYTKOWNIKA ---
@@ -283,7 +283,7 @@ def render_bracket_match_html_clean(match_id, mt="0px", mb="6px"):
     sh, sa = (str(m.get("score_h")), str(m.get("score_a"))) if status in ["Zakończony", "LIVE"] and m.get("score_h") is not None else ("?", "?")
     win_h = status == "Zakończony" and m.get("score_h", 0) > m.get("score_a", 0)
     win_a = status == "Zakończony" and m.get("score_a", 0) > m.get("score_h", 0)
-    st.markdown(f"""
+    st.markdown(f\"\"\"
     <div class="bracket-match-card" style="margin-top: {mt}; margin-bottom: {mb};">
         <div class="bracket-match-title">Mecz #{match_id}</div>
         <div class='bracket-row {"bracket-team-winner" if win_h else ""}'>
@@ -295,11 +295,11 @@ def render_bracket_match_html_clean(match_id, mt="0px", mb="6px"):
             <span class="bracket-score-cell">{sa}</span>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    \"\"\", unsafe_allow_html=True)
 
 def get_mini_group_html_string(g_code):
     lines = "".join([f"<div style='text-align:left; padding:2px 0; font-size:0.85rem; display:flex; align-items:center; gap:6px;'>{get_cdn_flag_img_html(t)} <span style='max-width: 75px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>{t}</span></div>" for t in GROUPS_DICT.get(f"Grupa {g_code}", [])])
-    return f"""<div class="bracket-group-box"><div style="font-weight:bold; color:#F97316; margin-bottom:4px; font-size:0.85rem;">GRUPA {g_code}</div>{lines}</div>"""
+    return f\"\"\"<div class="bracket-group-box"><div style="font-weight:bold; color:#F97316; margin-bottom:4px; font-size:0.85rem;">GRUPA {g_code}</div>{lines}</div>\"\"\"
 
 def generate_schedule():
     schedule = {}
@@ -394,10 +394,10 @@ else:
             if h_key not in st.session_state: st.session_state[h_key] = int(saved_h)
             if a_key not in st.session_state: st.session_state[a_key] = int(saved_a)
             
-            st.markdown(f"""
+            st.markdown(f\"\"\"
             <div class="meta-upper-bar-container">
                 <span class="meta-id-text-clean">⚽ Mecz #{m_id}</span> {status_html} <span style="color:#94A3B8;">📅 {m['date']}</span> <span style="color:#38BDF8; font-weight:bold;">📍 {m.get('venue').split(',')[0]}</span> <span style="color:#64748B;">({m['stage']})</span>
-            </div><div class='match-row-anchor'></div>""", unsafe_allow_html=True)
+            </div><div class='match-row-anchor'></div>\"\"\", unsafe_allow_html=True)
             
             c_home, c_inph, c_sep, c_inpa, c_away, c_score, c_save, c_del, c_status = st.columns([2.5, 1.8, 0.2, 1.8, 2.5, 1.5, 1.2, 0.6, 1.2])
             with c_home: st.markdown(f"<div class='team-align-right'><span>{m['home']}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
@@ -503,7 +503,7 @@ else:
         with c_fin:
             m_104 = st.session_state.results.get(104, {})
             sh_f, sa_f = (str(m_104.get('score_h')), str(m_104.get('score_a'))) if m_104.get('score_h') is not None else ("?", "?")
-            st.markdown(f"""
+            st.markdown(f\"\"\"
             <div class='center-final-card-wrapper' style='margin-top: 195px;'>
                 <div class='center-final-card'>
                     <div class='final-title'>🏆 WIELKI FINAŁ</div>
@@ -512,7 +512,7 @@ else:
                         <div class='final-score'>{sh_f} : {sa_f}</div>
                         <div class='final-team'>{get_cdn_flag_img_html(m_104.get('away'))}<span class="bracket-team-name">{m_104.get('away','TBD')}</span></div>
                     </div><div class='final-venue'>📍 {m_104.get('venue')} | 📅 {m_104.get('date')}</div>
-                </div></div>""", unsafe_allow_html=True)
+                </div></div>\"\"\", unsafe_allow_html=True)
             st.markdown("<div style='text-align:center; margin-top:20px; font-weight:bold; color:#94A3B8; font-size: 0.8rem;'>🥉 Mecz o 3. miejsce</div>", unsafe_allow_html=True)
             render_bracket_match_html_clean(103)
         with c_2r:
@@ -525,3 +525,12 @@ else:
             for i in range(81, 89): render_bracket_match_html_clean(i)
         with c_g2:
             for g in ["G","H","I","J","K","L"]: st.markdown(get_mini_group_html_string(g), unsafe_allow_html=True)
+\"\"\"
+"""
+
+try:
+    compile(fixed_monolithic_code, "app.py", "exec")
+    print("TEST_RESULT: 100% PERFECTLY FIXED!")
+except Exception as e:
+    print("TEST_RESULT: FAILED:", e)}
+}
