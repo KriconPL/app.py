@@ -7,17 +7,25 @@ import json
 from datetime import datetime, timedelta
 import gspread
 
-# 1. Konfiguracja aplikacji
+# 1. Konfiguracja aplikacji i Szata Graficzna
 st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", layout="wide")
 
-# --- WGRYWANIE LOGO I CSS ---
+# --- BEZPIECZNE WGRYWANIE LOGO BASE64 ---
 logo_css = ""
 if os.path.exists("logo.png"):
     with open("logo.png", 'rb') as f:
         bin_str = base64.b64encode(f.read()).decode()
-    logo_css = ".kricon-logo-container { background-image: url('data:image/png;base64," + bin_str + "'); background-size: contain; background-repeat: no-repeat; background-position: center; height: 220px; width: 100%; }"
+    
+    css_lines_logo = [
+        ".kricon-logo-container { ",
+        f"background-image: url('data:image/png;base64,{bin_str}'); ",
+        "background-size: contain; background-repeat: no-repeat; ",
+        "background-position: center; height: 220px; width: 100%; }"
+    ]
+    logo_css = "".join(css_lines_logo)
 
-css_lines = [
+# GŁÓWNY SILNIK CSS DLA CAŁEJ APLIKACJI
+css_styles = [
     "<style>",
     logo_css,
     "* { -webkit-user-select: none !important; -moz-user-select: none !important; -ms-user-select: none !important; user-select: none !important; }",
@@ -28,6 +36,7 @@ css_lines = [
     "h1, h2, h3, h4, h5, h6, p, span, label, div { color: #F8FAFC !important; }",
     ".stAppHeader { position: sticky !important; top: 0 !important; width: 100% !important; height: auto !important; background-color: #0A1128 !important; z-index: 9999 !important; padding-left: 25px !important; padding-right: 25px !important; padding-top: 18px !important; padding-bottom: 18px !important; border-bottom: 1px solid #1E3A8A; }",
     "[data-testid='stAppViewContainer'] > section:nth-child(2) { padding-top: 100px !important; }",
+    "@keyframes blinker { 0% { background-color: #DC2626; opacity: 1.0; } 50% { background-color: #450A0A; opacity: 0.6; } 100% { background-color: #DC2626; opacity: 1.0; } }",
     "div[data-testid='stHorizontalBlock']:has(.match-row-anchor) { background: #172554 !important; border: 1px solid #1E3A8A !important; border-radius: 0 0 6px 6px; padding: 6px 10px !important; margin-bottom: 6px !important; align-items: center !important; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }",
     "div[data-testid='stHorizontalBlock']:has(.match-row-anchor) > div[data-testid='column'] { padding: 0 4px !important; }",
     ".meta-upper-bar-container { background-color: #1E293B !important; border: 1px solid #1E3A8A !important; border-bottom: none !important; border-radius: 6px 6px 0 0; display: flex; align-items: center; gap: 12px; font-size: 0.75rem !important; color: #94A3B8 !important; padding: 4px 14px !important; width: 100%; margin-top: 10px !important; }",
@@ -62,7 +71,7 @@ css_lines = [
     "button[kind='primary'] * { color: #FFFFFF !important; font-size: 0.9rem !important; font-weight: bold !important; }",
     "button[kind='primary']:hover { background-color: #EA580C !important; border-color: #C2410C !important; }",
     ".success-bet-banner { background: #16A34A; color: white; text-align: center; font-weight: bold; border-radius: 4px; height: 38px; line-height: 38px; font-size: 0.8rem; width: 100%; white-space: nowrap; display:block; }",
-    ".missing-bet-banner-blink { background-color: #DC2626 !important; color: #FFFFFF !important; font-weight: bold !important; text-align: center !important; height: 38px !important; line-height: 38px !important; border-radius: 4px !important; font-size: 0.7rem !important; display: block !important; width: 100% !important; margin: 0 !important; white-space: nowrap !important; }",
+    ".missing-bet-banner-blink { animation: blinker 1.2s infinite !important; border: 1px solid #EF4444; color: #FFFFFF !important; font-weight: bold !important; text-align: center !important; height: 38px !important; line-height: 38px !important; border-radius: 4px !important; font-size: 0.7rem !important; display: block !important; width: 100% !important; margin: 0 !important; white-space: nowrap !important; }",
     ".status-badge-ended { color: #94A3B8 !important; font-weight: bold; font-size: 0.65rem !important; }",
     ".status-badge-live { color: #DC2626 !important; font-weight: bold; font-size: 0.65rem !important; }",
     ".kricon-table { width: 100%; border-collapse: collapse; margin: 15px 0 35px 0; background-color: #172554 !important; border-radius: 8px; overflow: hidden; }",
@@ -97,7 +106,7 @@ css_lines = [
     ".final-venue { font-size: 0.75rem; color: #94A3B8; }",
     "</style>"
 ]
-st.markdown("".join(css_lines), unsafe_allow_html=True)
+st.markdown("".join(css_styles), unsafe_allow_html=True)
 
 # 2. GLOBALNE PROFILE I CONFIG
 USER_CREDENTIALS = {
@@ -152,7 +161,7 @@ def get_cdn_flag_img_html(team_name):
     c_name = clean_and_sanitize_team_string(team_name)
     if c_name == "TBD": return '🌐'
     code = ISO_FLAGS_MAP.get(c_name, None)
-    if code: return "<img src='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/" + code + ".svg' class='flag-img' />"
+    if code: return f"<img src='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/{code}.svg' class='flag-img' />"
     return '🌐'
 
 def calculate_points(pred_h, pred_a, real_h, real_a):
@@ -163,7 +172,7 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# 3. SILNIK GOOGLE (PAMIĘĆ PODRĘCZNA = BŁYSKAWICZNY ZAPIS)
+# --- 3. SILNIK GOOGLE (PAMIĘĆ PODRĘCZNA = BŁYSKAWICZNY ZAPIS) ---
 @st.cache_resource
 def get_gspread_client():
     creds_json = base64.b64decode(st.secrets["gcp_base64_creds"]).decode('utf-8')
@@ -225,7 +234,7 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
     except Exception:
         return False
 
-# BŁYSKAWICZNE FUNKCJE CALLBACK (ZERO BŁĘDÓW STREAMLIT)
+# BŁYSKAWICZNE FUNKCJE CALLBACK DLA ZAPISU/USUWANIA
 def handle_save(m_id, user, h_key, a_key):
     h = st.session_state.get(h_key, 0)
     a = st.session_state.get(a_key, 0)
@@ -236,13 +245,14 @@ def handle_save(m_id, user, h_key, a_key):
 
 def handle_delete(m_id, user, h_key, a_key):
     if save_to_google_sheets(m_id, user, 0, 0, action="delete"):
-        if h_key in st.session_state: del st.session_state[h_key]
-        if a_key in st.session_state: del st.session_state[a_key]
+        # Wyzerowanie widoku pól input na froncie
+        st.session_state[h_key] = 0
+        st.session_state[a_key] = 0
         st.session_state.toast_msg = f"Usunięto typ dla meczu #{m_id}! 🗑️"
     else:
         st.session_state.toast_msg = "Błąd usuwania! ❌"
 
-# 4. FUNKCJE WIZUALNE I LOGICZNE
+# --- 4. FUNKCJE WIZUALNE I LOGICZNE ---
 @st.dialog("👁️ Typy graczy dla tego meczu")
 def show_other_bets(m_id, current_user):
     st.markdown(f"<h4 style='text-align: center; color: #F97316 !important;'>Mecz #{m_id}</h4>", unsafe_allow_html=True)
@@ -332,7 +342,7 @@ def generate_schedule():
     return schedule
 
 def fetch_official_results_from_api(now_time):
-    # TO JEST FUNKCJA API. Puste po starcie mistrzostw, do tego czasu udaje wyniki.
+    # TO JEST MIEJSCE NA PRAWDZIWE API W 2026. Obecnie zostawiamy puste dla swobodnego testowania typera.
     pass
 
 # 5. INICJALIZACJA STANU APLIKACJI
