@@ -21,7 +21,7 @@ if os.path.exists("logo.png"):
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
-        height: 220px; /* POWIĘKSZONO: Zwiększono ze 160px dla dużo większego logo */
+        height: 220px; 
         width: 100%;
     }}
     """
@@ -39,9 +39,7 @@ st.markdown(f"""
     [data-testid="stHeader"] {{ background-color: #0A1128 !important; }}
     h1, h2, h3, h4, h5, h6, p, span, label, div {{ color: #F8FAFC !important; }}
     /* PANCERNY FIX NAGŁÓWKA: STICKY ZAMIAST FIXED ZABEZPIECZA PRZED UCINANIEM K */
-    /* Zwiększono padding góra/dół z 12px na 18px dla estetyki przy dużym logo */
     .stAppHeader {{ position: sticky !important; top: 0 !important; width: 100% !important; height: auto !important; background-color: #0A1128 !important; z-index: 9999 !important; padding-left: 25px !important; padding-right: 25px !important; padding-top: 18px !important; padding-bottom: 18px !important; border-bottom: 1px solid #1E3A8A; }}
-    /* FIX FORMATU: Zwiększono padding-top z 30px do 100px, aby wysoki nagłówek nie zasłaniał contentu */
     [data-testid="stAppViewContainer"] > section:nth-child(2) {{ padding-top: 100px !important; }}
     @keyframes pulseAlertCore {{ 0% {{ opacity: 1.0; }} 50% {{ opacity: 0.3; }} 100% {{ opacity: 1.0; }} }}
     div[data-testid="stHorizontalBlock"]:has(.match-row-anchor) {{ background: #172554 !important; border: 1px solid #1E3A8A !important; border-radius: 0 0 6px 6px; padding: 6px 10px !important; margin-bottom: 6px !important; align-items: center !important; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }}
@@ -418,6 +416,45 @@ else:
             if len(df_g) >= 3: third_places_list.append(df_g.iloc[2].to_dict())
             g_rows = "".join([f"<tr {'style=\"background-color:#16A34A;\"' if idx in [1, 2] else 'style=\"background-color:#EA580C;\"' if idx==3 else ''}><td><b>{idx}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>" for idx, r in df_g.iterrows()])
             st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table>", unsafe_allow_html=True)
+
+        # --- NOWA SEKCJA: GENEROWANIE I WYŚWIETLANIE TABELI 3. MIEJSC ---
+        st.divider()
+        st.header("📊 Zbiorcza Tabela 3. Miejsc")
+        st.write("Do Fazy Pucharowej (1/16 Finału) awansuje **8 najlepszych reprezentacji** z trzecich miejsc.")
+        
+        if third_places_list:
+            df_3rd = pd.DataFrame(third_places_list).sort_values(by=["Pkt", "RB", "BZ"], ascending=False).reset_index(drop=True)
+            df_3rd.index += 1
+            
+            t3_rows = ""
+            for idx, r in df_3rd.iterrows():
+                # Pierwsze 8 miejsc awansuje (zielone tło), reszta odpada (ciemnoczerwone/standardowe)
+                bg_style = 'style="background-color:#16A34A;"' if idx <= 8 else 'style="background-color:#450A0A; opacity:0.8;"'
+                t3_rows += f"""
+                <tr {bg_style}>
+                    <td><b>{idx}</b></td>
+                    <td><small style='color:#94A3B8;'>{r['Grupa']}</small></td>
+                    <td>{get_cdn_flag_img_html(r['Reprezentacja'])} {r['Reprezentacja']}</td>
+                    <td><b>{r['Pkt']}</b></td>
+                    <td>{r['BZ']}</td>
+                    <td>{r['BS']}</td>
+                    <td>{r['RB']}</td>
+                </tr>
+                """
+            st.markdown(f"""
+            <table class='kricon-table'>
+                <tr>
+                    <th>Poz.</th>
+                    <th>Grupa</th>
+                    <th>Kraj</th>
+                    <th>Pkt</th>
+                    <th>BZ</th>
+                    <th>BS</th>
+                    <th>Bilans</th>
+                </tr>
+                {t3_rows}
+            </table>
+            """, unsafe_allow_html=True)
 
     with tab5:
         st.header("🏆 Drabinka Fazy Pucharowej")
