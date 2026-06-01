@@ -6,6 +6,7 @@ import base64
 import json 
 import re
 from datetime import datetime, timedelta
+import gspread
 
 # 1. Konfiguracja aplikacji i Szata Graficzna Dark Navy & Orange
 st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", layout="wide")
@@ -179,40 +180,78 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-def save_backup_local_and_github():
-    try:
-        if os.path.exists("typer_backup.json"):
-            with open("typer_backup.json", "r", encoding="utf-8") as f: loaded_bets = json.load(f)
-            for m_id_str, bets_data in loaded_bets.items():
-                m_id = int(m_id_str)
-                if m_id not in st.session_state.bets: st.session_state.bets[m_id] = {}
-                for player, bet_tuple in bets_data.items():
-                    if player != st.session_state.logged_in_user: st.session_state.bets[m_id][player] = tuple(bet_tuple)
-        serializable_bets = {str(m_id): bets for m_id, bets in st.session_state.bets.items()}
-        with open("typer_backup.json", "w", encoding="utf-8") as f: f.write(json.dumps(serializable_bets, ensure_ascii=False, indent=4))
-    except Exception: pass
+# --- SILNIK GOOGLE SHEETS VIA GSPREAD ---
+def get_gspread_client():
+    credentials = st.secrets["gcp_service_account"]
+    return gspread.service_account_from_dict(credentials)
 
-def load_backup_local():
-    if os.path.exists("typer_backup.json"):
-        try:
-            with open("typer_backup.json", "r", encoding="utf-8") as f: loaded_bets = json.load(f)
-            for m_id_str, bets_data in loaded_bets.items():
-                m_id = int(m_id_str)
-                if m_id not in st.session_state.bets: st.session_state.bets[m_id] = {}
-                for player, bet_tuple in bets_data.items(): st.session_state.bets[m_id][player] = tuple(bet_tuple)
-            return True
-        except Exception: return False
-    return False
+def load_from_google_sheets():
+    try:
+        gc = get_gspread_client()
+        sh = gc.open("Kricon_Typer_2026").sheet1
+        all_records = sh.get_all_records()
+        for row in all_records:
+            m_id = int(row["Mecz"])
+            player = str(row["Gracz"])
+            h = int(row["Typ_H"])
+            a = int(row["Typ_A"])
+            if m_id not in st.session_state.bets:
+                st.session_state.bets[m_id] = {}
+            st.session_state.bets[m_id][player] = (h, a)
+        return True
+    except Exception:
+        return False
+
+def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
+    try:
+        gc = get_gspread_client()
+        sh = gc.open("Kricon_Typer_2026").sheet1
+        all_records = sh.get_all_records()
+        
+        current_cloud_bets = {}
+        for row in all_records:
+            m = int(row["Mecz"])
+            p = str(row["Gracz"])
+            if m not in current_cloud_bets: current_cloud_bets[m] = {}
+            current_cloud_bets[m][p] = (int(row["Typ_H"]), int(row["Typ_A"]))
+            
+        if action == "save":
+            if m_id not in current_cloud_bets: current_cloud_bets[m_id] = {}
+            current_cloud_bets[m_id][user] = (h_val, a_val)
+        elif action == "delete":
+            if m_id in current_cloud_bets and user in current_cloud_bets[m_id]:
+                del current_cloud_bets[m_id][user]
+                
+        rows = [["Mecz", "Gracz", "Typ_H", "Typ_A"]]
+        for m, p_bets in current_cloud_bets.items():
+            for p, tpl in p_bets.items():
+                rows.append([m, p, tpl[0], tpl[1]])
+                
+        sh.clear()
+        sh.update(range_name='A1', values=rows)
+        
+        # SYSTEMOWY WARUNEK: Pamięć lokalna odświeża się TYLKO po udanym zapisie w arkuszu!
+        if action == "save":
+            if m_id not in st.session_state.bets: st.session_state.bets[m_id] = {}
+            st.session_state.bets[m_id][user] = (h_val, a_val)
+        elif action == "delete":
+            if user in st.session_state.bets.get(m_id, {}):
+                del st.session_state.bets[m_id][user]
+        return True
+    except Exception as e:
+        import traceback
+        print("\n!!! [BŁĄD KRYTYCZNY GOOGLE SHEETS] !!!")
+        traceback.print_exc()
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+        return False
 
 def btn_save_action(m_id, user, h_key, a_key):
-    st.session_state.bets[m_id][user] = (st.session_state[h_key], st.session_state[a_key])
-    save_backup_local_and_github()
+    save_to_google_sheets(m_id, user, st.session_state[h_key], st.session_state[a_key], action="save")
 
 def btn_delete_action(m_id, user, h_key, a_key):
-    if user in st.session_state.bets.get(m_id, {}): del st.session_state.bets[m_id][user]
-    st.session_state[h_key] = 0
-    st.session_state[a_key] = 0
-    save_backup_local_and_github()
+    if save_to_google_sheets(m_id, user, 0, 0, action="delete"):
+        st.session_state[h_key] = 0
+        st.session_state[a_key] = 0
 
 @st.dialog("👁️ Typy graczy dla tego meczu")
 def show_other_bets(m_id, current_user):
@@ -310,7 +349,11 @@ if 'bets' not in st.session_state or len(st.session_state.bets) != 104: st.sessi
 if 'last_positions' not in st.session_state: st.session_state.last_positions = {player: idx + 1 for idx, player in enumerate(players)}
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 
-load_backup_local()
+# Pobranie danych z Google Sheets tylko raz na uruchomienie sesji użytkownika
+if 'gs_initialized' not in st.session_state:
+    load_from_google_sheets()
+    st.session_state.gs_initialized = True
+
 now = datetime.now()
 fetch_official_results_from_api(now)
 
@@ -335,8 +378,16 @@ else:
     st.markdown("<div class='stAppHeader'><div class='kricon-logo-container'></div></div>", unsafe_allow_html=True)
     
     st.sidebar.write(f"👤 Gracz: **{st.session_state.logged_in_user}**")
+    
+    # Przycisk do ręcznego pobierania nowych typów z chmury
+    if st.sidebar.button("🔄 Odśwież dane chmury", type="secondary"):
+        load_from_google_sheets()
+        st.toast("Pomyślnie zaktualizowano typy z Google Sheets! 📈")
+        st.rerun()
+        
     if st.sidebar.button("Wyloguj się", type="primary"):
         st.session_state.logged_in_user = None
+        st.session_state.pop('gs_initialized', None)
         st.rerun()
         
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 Ranking", "📅 Terminarz", "🕵️ Typy graczy", "📈 Tabele", "🏆 Drabinka Turniejowa"])
