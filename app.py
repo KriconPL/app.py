@@ -7,7 +7,7 @@ import json
 from datetime import datetime, timedelta
 import gspread
 
-# 1. Konfiguracja aplikacji i Szata Graficzna
+# 1. Konfiguracja aplikacji i Szata Graficzna Dark Navy & Orange
 st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", layout="wide")
 
 # --- BEZPIECZNE WGRYWANIE LOGO BASE64 ---
@@ -23,6 +23,8 @@ if os.path.exists("logo.png"):
         "background-position: center; height: 220px; width: 100%; }"
     ]
     logo_css = "".join(css_lines_logo)
+else:
+    st.warning("⚠️ Brak pliku 'logo.png' w folderze aplikacji! Wgraj go, aby zobaczyć logo.")
 
 # GŁÓWNY SILNIK CSS DLA CAŁEJ APLIKACJI
 css_styles = [
@@ -89,6 +91,7 @@ css_styles = [
     ".trend-up { color: #16A34A !important; font-weight: bold; }",
     ".trend-down { color: #DC2626 !important; font-weight: bold; }",
     ".trend-stable { color: #64748B !important; }",
+    ".points-legend { background-color: #060B19; border-left: 5px solid #F97316; padding: 12px; margin-bottom: 15px; border-radius: 4px; }",
     ".flag-img { width: 22px !important; height: 14px !important; object-fit: cover !important; border-radius: 2px !important; display: inline-block; vertical-align: middle; border: 1px solid rgba(255,255,255,0.2); }",
     ".bracket-match-card { background: #172554 !important; border: 2px solid #1E3A8A !important; border-radius: 8px; padding: 6px; font-size: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }",
     ".bracket-match-title { font-size: 0.70rem !important; color: #F97316 !important; font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid #1E3A8A; padding-bottom: 2px; }",
@@ -108,11 +111,11 @@ css_styles = [
 ]
 st.markdown("".join(css_styles), unsafe_allow_html=True)
 
-# 2. GLOBALNE PROFILE I CONFIG
+# 2. GLOBALNE PROFILE I CONFIG (Marcin usunięty)
 USER_CREDENTIALS = {
-    "Adam": "adam2026", "Maciej": "maciej2026", "Marcin": "marcin2026",
-    "Kamil": "kamil2026", "Kuba M": "kubam2026", "Tomek": "tomek2026",
-    "Kuba K": "kubak2026", "Rafał": "rafal2026", "admin": "kriconadmin"
+    "Adam": "adam2026", "Maciej": "maciej2026", "Kamil": "kamil2026", 
+    "Kuba M": "kubam2026", "Tomek": "tomek2026", "Kuba K": "kubak2026", 
+    "Rafał": "rafal2026", "admin": "kriconadmin"
 }
 players = [k for k in USER_CREDENTIALS.keys() if k != "admin"]
 
@@ -172,7 +175,7 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- 3. SILNIK GOOGLE (PAMIĘĆ PODRĘCZNA = BŁYSKAWICZNY ZAPIS) ---
+# --- 3. SILNIK GOOGLE CACHED ---
 @st.cache_resource
 def get_gspread_client():
     creds_json = base64.b64decode(st.secrets["gcp_base64_creds"]).decode('utf-8')
@@ -245,7 +248,6 @@ def handle_save(m_id, user, h_key, a_key):
 
 def handle_delete(m_id, user, h_key, a_key):
     if save_to_google_sheets(m_id, user, 0, 0, action="delete"):
-        # Wyzerowanie widoku pól input na froncie
         st.session_state[h_key] = 0
         st.session_state[a_key] = 0
         st.session_state.toast_msg = f"Usunięto typ dla meczu #{m_id}! 🗑️"
@@ -342,7 +344,6 @@ def generate_schedule():
     return schedule
 
 def fetch_official_results_from_api(now_time):
-    # TO JEST MIEJSCE NA PRAWDZIWE API W 2026. Obecnie zostawiamy puste dla swobodnego testowania typera.
     pass
 
 # 5. INICJALIZACJA STANU APLIKACJI
