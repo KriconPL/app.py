@@ -4,7 +4,6 @@ import numpy as np
 import os
 import base64
 import json 
-import re
 from datetime import datetime, timedelta
 import gspread
 
@@ -16,19 +15,96 @@ logo_css = ""
 if os.path.exists("logo.png"):
     with open("logo.png", 'rb') as f:
         bin_str = base64.b64encode(f.read()).decode()
-    
-    css_lines = [
-        ".kricon-logo-container { ",
-        f"background-image: url('data:image/png;base64,{bin_str}'); ",
-        "background-size: contain; background-repeat: no-repeat; ",
-        "background-position: center; height: 220px; width: 100%; }"
-    ]
-    logo_css = "".join(css_lines)
+    logo_css = ".kricon-logo-container { background-image: url('data:image/png;base64," + bin_str + "'); background-size: contain; background-repeat: no-repeat; background-position: center; height: 220px; width: 100%; }"
 else:
     st.warning("⚠️ Brak pliku 'logo.png' w folderze aplikacji! Wgraj go, aby zobaczyć logo.")
 
-# GŁÓWNY SILNIK CSS DLA CAŁEJ APLIKACJI
-st.markdown(f"<style>{logo_css}</style>", unsafe_allow_html=True)
+# GŁÓWNY SILNIK CSS DLA CAŁEJ APLIKACJI (Bezpieczne, jednowierszowe formatowanie)
+css_lines = [
+    "<style>",
+    logo_css,
+    "* { -webkit-user-select: none !important; -moz-user-select: none !important; -ms-user-select: none !important; user-select: none !important; }",
+    "input, textarea, div[data-baseweb='input'] { -webkit-user-select: auto !important; -moz-user-select: auto !important; -ms-user-select: auto !important; user-select: auto !important; }",
+    "body, html, [data-testid='stAppViewContainer'], .stApp, [data-testid='stTabContent'], div.stTabs { background-color: #0A1128 !important; }",
+    "[data-testid='stSidebar'] { background-color: #060B19 !important; }",
+    "[data-testid='stHeader'] { background-color: #0A1128 !important; }",
+    "h1, h2, h3, h4, h5, h6, p, span, label, div { color: #F8FAFC !important; }",
+    ".stAppHeader { position: sticky !important; top: 0 !important; width: 100% !important; height: auto !important; background-color: #0A1128 !important; z-index: 9999 !important; padding-left: 25px !important; padding-right: 25px !important; padding-top: 18px !important; padding-bottom: 18px !important; border-bottom: 1px solid #1E3A8A; }",
+    "[data-testid='stAppViewContainer'] > section:nth-child(2) { padding-top: 100px !important; }",
+    "@keyframes pulseAlertCore { 0% { opacity: 1.0; } 50% { opacity: 0.3; } 100% { opacity: 1.0; } }",
+    "div[data-testid='stHorizontalBlock']:has(.match-row-anchor) { background: #172554 !important; border: 1px solid #1E3A8A !important; border-radius: 0 0 6px 6px; padding: 6px 10px !important; margin-bottom: 6px !important; align-items: center !important; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }",
+    "div[data-testid='stHorizontalBlock']:has(.match-row-anchor) > div[data-testid='column'] { padding: 0 4px !important; }",
+    ".meta-upper-bar-container { background-color: #1E293B !important; border: 1px solid #1E3A8A !important; border-bottom: none !important; border-radius: 6px 6px 0 0; display: flex; align-items: center; gap: 12px; font-size: 0.75rem !important; color: #94A3B8 !important; padding: 4px 14px !important; width: 100%; margin-top: 10px !important; }",
+    ".meta-id-text-clean { font-weight: bold; color: #F97316 !important; }",
+    ".team-align-right { font-size: 1.15rem !important; font-weight: bold !important; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%; white-space: nowrap; height: 38px; line-height: 38px; color: #F8FAFC !important; }",
+    ".team-align-left { font-size: 1.15rem !important; font-weight: bold !important; text-align: left; display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; white-space: nowrap; height: 38px; line-height: 38px; color: #F8FAFC !important; }",
+    ".off-score { font-size: 0.85rem !important; font-weight: bold !important; color: #94A3B8 !important; background-color: #1E293B !important; border: 1px solid #334155 !important; border-radius: 4px; display: block; text-align: center; white-space: nowrap; height: 38px !important; line-height: 36px !important; width: 100%; }",
+    ".score-colon { text-align: center; font-weight: bold; color: #F97316 !important; font-size: 1.4rem; height: 38px; line-height: 34px; width: 100%; }",
+    ".result-box { display: flex; align-items: center; justify-content: center; height: 38px; width: 100%; border-radius: 6px; font-weight: 900; font-size: 1.3rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }",
+    ".bet-locked { background: #0F172A; color: #64748B; border: 1px solid #1E293B; }",
+    ".bet-exact { background: #16A34A; color: #FFFFFF; border: 2px solid #4ADE80; box-shadow: 0 0 10px rgba(74, 222, 128, 0.4); } ",
+    ".bet-winner { background: #064E3B; color: #4ADE80; border: 1px dashed #16A34A; } ",
+    ".bet-wrong { background: #450A0A; color: #FCA5A5; border: 1px dashed #DC2626; } ",
+    "div[data-testid='stSelectbox'] div[data-baseweb='select'] > div { background-color: #1E293B !important; border: 1px solid #334155 !important; }",
+    "div[data-testid='stSelectbox'] div[data-baseweb='select'] span { color: #F8FAFC !important; }",
+    "ul[role='listbox'] { background-color: #1E293B !important; }",
+    "li[role='option'] { background-color: #1E293B !important; color: #F8FAFC !important; }",
+    "li[role='option']:hover, li[role='option'][aria-selected='true'] { background-color: #334155 !important; color: #F97316 !important; }",
+    "div[data-testid='stTextInput'] div[data-baseweb='input'] { background-color: #1E293B !important; border: 1px solid #334155 !important; }",
+    "div[data-testid='stTextInput'] input { color: #F8FAFC !important; -webkit-text-fill-color: #F8FAFC !important; background-color: transparent !important; }",
+    "div[data-testid='stNumberInput'] div[data-baseweb='input'] { background-color: #0A1128 !important; border: 1px solid #1E3A8A !important; border-radius: 6px !important; height: 38px !important; transition: none !important; overflow: hidden; }",
+    "div[data-testid='stNumberInput'] input { color: #F8FAFC !important; -webkit-text-fill-color: #F8FAFC !important; background-color: #0A1128 !important; font-size: 1.25rem !important; font-weight: 900 !important; text-align: center !important; padding: 0 !important; }",
+    "div[data-testid='stNumberInput'] button { background-color: #1E293B !important; border: none !important; border-radius: 4px !important; width: 32px !important; height: 32px !important; margin: 2px !important; transition: transform 0.1s ease !important; }",
+    "div[data-testid='stNumberInput'] button svg { fill: #F97316 !important; color: #F97316 !important; }",
+    "div[data-testid='stNumberInput'] button:active, div[data-testid='stNumberInput'] button:focus { opacity: 1.0 !important; background-color: #0F172A !important; transform: scale(0.90) !important; outline: none !important; box-shadow: none !important; }",
+    "div[data-testid='stNumberInput'] button:hover { background-color: #334155 !important; }",
+    "div[data-testid='stNumberInput'] button:hover svg { fill: #FFFFFF !important; }",
+    "button[kind='secondary'] { background-color: #1E293B !important; border: 1px solid #334155 !important; border-radius: 4px !important; height: 38px !important; min-height: 38px !important; padding: 0 !important; width: 100% !important; display: block !important; }",
+    "button[kind='secondary'] * { color: #F97316 !important; font-weight: bold !important; font-size: 1.1rem !important; }",
+    "button[kind='secondary']:hover { background-color: #334155 !important; }",
+    "button[kind='secondary']:hover * { color: #FFFFFF !important; }",
+    "button[kind='primary'] { background-color: #F97316 !important; border: 1px solid #EA580C !important; border-radius: 4px !important; height: 38px !important; min-height: 38px !important; padding: 0 !important; width: 100% !important; display: block !important; box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important; }",
+    "button[kind='primary'] * { color: #FFFFFF !important; font-size: 0.9rem !important; font-weight: bold !important; }",
+    "button[kind='primary']:hover { background-color: #EA580C !important; border-color: #C2410C !important; }",
+    ".success-bet-banner { background: #16A34A; color: white; text-align: center; font-weight: bold; border-radius: 4px; height: 38px; line-height: 38px; font-size: 0.8rem; width: 100%; white-space: nowrap; display:block; }",
+    ".missing-bet-banner-blink { animation: pulseAlertCore 1.2s infinite ease-in-out !important; background-color: #DC2626 !important; color: #FFFFFF !important; font-weight: bold !important; text-align: center !important; height: 38px !important; line-height: 38px !important; border-radius: 4px !important; font-size: 0.7rem !important; display: block !important; width: 100% !important; margin: 0 !important; white-space: nowrap !important; }",
+    ".status-waiting-blink { animation: pulseAlertCore 2.0s infinite ease-in-out !important; color: #D97706 !important; font-weight: bold !important; font-size: 0.65rem !important; }",
+    ".status-badge-ended { color: #94A3B8 !important; font-weight: bold; font-size: 0.65rem !important; }",
+    ".status-badge-live { color: #DC2626 !important; font-weight: bold; font-size: 0.65rem !important; }",
+    ".kricon-table { width: 100%; border-collapse: collapse; margin: 15px 0 35px 0; background-color: #172554 !important; border-radius: 8px; overflow: hidden; }",
+    ".kricon-table th { background-color: #F97316 !important; color: #0A1128 !important; padding: 12px; font-weight: 800; }",
+    ".kricon-table td { padding: 11px 12px; border-bottom: 1px solid #1E3A8A !important; color: #F8FAFC; }",
+    ".col-pos { width: 60px !important; text-align: center !important; }",
+    ".col-trend { width: 60px !important; text-align: center !important; }",
+    ".col-missing { width: 100px !important; text-align: center !important; font-weight: bold !important; }",
+    ".gold-medal-row { background-color: rgba(254, 240, 138, 0.95) !important; font-weight: bold; }",
+    ".gold-medal-row td, .gold-medal-row b { color: #0A1128 !important; }",
+    ".silver-medal-row { background-color: rgba(226, 232, 240, 0.95) !important; font-weight: bold; }",
+    ".silver-medal-row td, .silver-medal-row b { color: #0A1128 !important; }",
+    ".bronze-medal-row { background-color: rgba(254, 215, 170, 0.95) !important; font-weight: bold; }",
+    ".bronze-medal-row td, .bronze-medal-row b { color: #0A1128 !important; }",
+    ".trend-up { color: #16A34A !important; font-weight: bold; }",
+    ".trend-down { color: #DC2626 !important; font-weight: bold; }",
+    ".trend-stable { color: #64748B !important; }",
+    ".points-legend { background-color: #060B19; border-left: 5px solid #F97316; padding: 12px; margin-bottom: 15px; border-radius: 4px; }",
+    ".flag-img { width: 22px !important; height: 14px !important; object-fit: cover !important; border-radius: 2px !important; display: inline-block; vertical-align: middle; border: 1px solid rgba(255,255,255,0.2); }",
+    ".bracket-match-card { background: #172554 !important; border: 2px solid #1E3A8A !important; border-radius: 8px; padding: 6px; font-size: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }",
+    ".bracket-match-title { font-size: 0.70rem !important; color: #F97316 !important; font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid #1E3A8A; padding-bottom: 2px; }",
+    ".bracket-row { display: flex; justify-content: space-between; align-items: center; padding: 2px 0; font-size: 0.85rem !important; }",
+    ".bracket-score-cell { background: #0A1128; color: #F97316; font-weight: bold; padding: 1px 6px; border-radius: 4px; min-width: 22px; text-align: center; border: 1px solid #1E3A8A; }",
+    ".bracket-team-winner { color: #4ADE80 !important; font-weight: bold; }",
+    ".bracket-team-name { max-width: 60px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; vertical-align: middle; }",
+    ".bracket-group-box { background: #0D1B3E !important; border: 1px solid #F97316 !important; border-radius: 8px; padding: 8px; margin-bottom: 8px; }",
+    ".center-final-card-wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 250px; }",
+    ".center-final-card { background: linear-gradient(145deg, #1E3A8A, #0A1128) !important; border: 2px solid #F97316 !important; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 0 20px rgba(249,115,22,0.3); width: 100%; }",
+    ".final-title { color: #F97316; font-size: 1.1rem; font-weight: 900; margin-bottom: 10px; letter-spacing: 1px; text-transform: uppercase; }",
+    ".final-teams { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }",
+    ".final-team { font-size: 1.05rem; font-weight: bold; color: #F8FAFC; display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center; overflow: hidden; }",
+    ".final-score { font-size: 1.5rem; font-weight: 900; color: #F97316; background: #060B19; padding: 4px 12px; border-radius: 8px; border: 1px solid #334155; }",
+    ".final-venue { font-size: 0.75rem; color: #94A3B8; }",
+    "</style>"
+]
+st.markdown("".join(css_lines), unsafe_allow_html=True)
 
 # GLOBALNE PROFILE I CONFIG
 USER_CREDENTIALS = {
@@ -81,10 +157,10 @@ def clean_and_sanitize_team_string(raw_name):
 
 def get_cdn_flag_img_html(team_name):
     c_name = clean_and_sanitize_team_string(team_name)
-    if c_name == "TBD": return '🌐'
+    if c_name == "TBD": return "🌐"
     code = ISO_FLAGS_MAP.get(c_name, None)
-    if code: return f"<img src='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/{code}.svg' class='flag-img' />"
-    return '🌐'
+    if code: return f"<img src='[https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/](https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/){code}.svg' class='flag-img' />"
+    return "🌐"
 
 def calculate_points(pred_h, pred_a, real_h, real_a):
     try:
@@ -94,16 +170,11 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- SILNIK GENEROWANIA KLIENTA GOOGLE (Z PAMIĘCIĄ PODRĘCZNĄ) ---
+# --- SILNIK GOOGLE (ODKODOWUJĄCY BASE64) ---
 @st.cache_resource
 def get_gspread_client():
-    creds = dict(st.secrets["gcp_service_account"])
-    if "private_key" in creds:
-        k = creds["private_key"]
-        k = k.replace(chr(92) + "n", chr(10))
-        k = k.replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "")
-        lines = [line.strip() for line in k.split(chr(10)) if line.strip()]
-        creds["private_key"] = "-----BEGIN PRIVATE KEY-----" + chr(10) + chr(10).join(lines) + chr(10) + "-----END PRIVATE KEY-----" + chr(10)
+    creds_json = base64.b64decode(st.secrets["gcp_base64_creds"]).decode('utf-8')
+    creds = json.loads(creds_json)
     return gspread.service_account_from_dict(creds)
 
 def load_from_google_sheets():
@@ -165,7 +236,6 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
         return False
 
-# --- FUNKCJE INTERFEJSU UŻYTKOWNIKA ---
 @st.dialog("👁️ Typy graczy dla tego meczu")
 def show_other_bets(m_id, current_user):
     st.markdown(f"<h4 style='text-align: center; color: #F97316 !important;'>Mecz #{m_id}</h4>", unsafe_allow_html=True)
@@ -196,7 +266,7 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
         pos, p_name = idx + 1, row['Gracz']
         if new_positions_dict_dest is not None: new_positions_dict_dest[p_name] = pos
         old_pos = st.session_state.last_positions.get(p_name, pos) if 'last_positions' in st.session_state else pos
-        trend_html = '<span class="trend-up">▲</span>' if old_pos > pos else '<span class="trend-down">▼</span>' if old_pos < pos else '<span class="trend-stable">•</span>'
+        trend_html = "<span class='trend-up'>▲</span>" if old_pos > pos else "<span class='trend-down'>▼</span>" if old_pos < pos else "<span class='trend-stable'>•</span>"
         bg_class = "class='gold-medal-row'" if pos == 1 else "class='silver-medal-row'" if pos == 2 else "class='bronze-medal-row'" if pos == 3 else ""
         miss_html = f"<span style='color: #DC2626;'>{row['Brak typu']}</span>" if row['Brak typu'] > 0 else "<span style='color: #64748B;'>0</span>"
         html_lines.append(f"<tr {bg_class}><td class='col-pos'><b>{pos}</b></td><td class='col-trend'>{trend_html}</td><td>{p_name}</td><td><b>{row['Punkty']} pkt</b></td><td class='col-missing'>{miss_html}</td></tr>")
@@ -211,7 +281,7 @@ def render_bracket_match_html_clean(match_id, mt="0px", mb="6px"):
     win_h = status == "Zakończony" and m.get("score_h", 0) > m.get("score_a", 0)
     win_a = status == "Zakończony" and m.get("score_a", 0) > m.get("score_h", 0)
     
-    html_card_lines = [
+    html_lines = [
         f"<div class='bracket-match-card' style='margin-top: {mt}; margin-bottom: {mb};'>",
         f"<div class='bracket-match-title'>Mecz #{match_id}</div>",
         f"<div class='bracket-row {'bracket-team-winner' if win_h else ''}'>",
@@ -221,7 +291,7 @@ def render_bracket_match_html_clean(match_id, mt="0px", mb="6px"):
         f"<div style='display:flex; align-items:center; gap:6px; overflow: hidden;'>{get_cdn_flag_img_html(m['away'])}<span class='bracket-team-name'>{m['away']}</span></div>",
         f"<span class='bracket-score-cell'>{sa}</span></div></div>"
     ]
-    st.markdown("".join(html_card_lines), unsafe_allow_html=True)
+    st.markdown("".join(html_lines), unsafe_allow_html=True)
 
 def get_mini_group_html_string(g_code):
     html_lines = [f"<div class='bracket-group-box'><div style='font-weight:bold; color:#F97316; margin-bottom:4px; font-size:0.85rem;'>GRUPA {g_code}</div>"]
@@ -276,7 +346,6 @@ fetch_official_results_from_api(now)
 for m_id, m in st.session_state.results.items():
     if m.get('status') != "Zakończony" and timedelta(minutes=0) <= (now - m['timestamp']) <= timedelta(minutes=120): m['status'] = "LIVE"
 
-# --- RENDEROWANIE INTERFEJSU ---
 if st.session_state.logged_in_user is None:
     st.markdown("<div class='stAppHeader'><div class='kricon-logo-container'></div></div>", unsafe_allow_html=True)
     c1, c2 = st.columns([2, 3], gap="large")
@@ -293,29 +362,24 @@ if st.session_state.logged_in_user is None:
 else:
     st.markdown("<div class='stAppHeader'><div class='kricon-logo-container'></div></div>", unsafe_allow_html=True)
     st.sidebar.write(f"👤 Gracz: **{st.session_state.logged_in_user}**")
-    
     if st.sidebar.button("🔄 Odśwież dane chmury", type="secondary"):
         load_from_google_sheets()
         st.toast("Pomyślnie zaktualizowano typy z Google Sheets! 📈")
         st.rerun()
-        
     if st.sidebar.button("Wyloguj się", type="primary"):
         st.session_state.logged_in_user = None
         st.session_state.pop('gs_initialized', None)
         st.rerun()
-        
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 Ranking", "📅 Terminarz", "🕵️ Typy graczy", "📈 Tabele", "🏆 Drabinka Turniejowa"])
-    
     with tab1:
         current_positions_map = {}
         st.markdown(render_leaderboard_html(now, current_positions_map), unsafe_allow_html=True)
         if current_positions_map: st.session_state.last_positions = current_positions_map
-        
     with tab2:
         mode = st.radio("Filtruj mecze:", ["Oczekujące", "Wszystkie", "Zakończone"], horizontal=True)
         for m_id, m in sorted(st.session_state.results.items()):
             if (mode == "Oczekujące" and m.get('status') == "Zakończony") or (mode == "Zakończone" and m.get('status') == "Oczekuje"): continue
-            status_html = '<span class="status-badge-live">🔴 LIVE</span>' if m.get('status') == "LIVE" else '<span class="status-badge-ended">⚫ Zakończony</span>' if m.get('status') == "Zakończony" else '<span class="status-waiting-blink">🟡 Oczekuje</span>'
+            status_html = "<span class='status-badge-live'>🔴 LIVE</span>" if m.get('status') == "LIVE" else "<span class='status-badge-ended'>⚫ Zakończony</span>" if m.get('status') == "Zakończony" else "<span class='status-waiting-blink'>🟡 Oczekuje</span>"
             locked = (m['timestamp'] - now).total_seconds() <= 0
             has_bet = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user) is not None
             saved_h, saved_a = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user, (0,0))
@@ -336,13 +400,15 @@ else:
             with c_inph:
                 if locked:
                     pts = calculate_points(saved_h, saved_a, m.get('score_h'), m.get('score_a')) if m.get('status') == "Zakończony" else 0
-                    st.markdown(f"<div class='result-box {'bet-exact' if pts==3 else 'bet-winner' if pts==1 else 'bet-wrong' if m.get('status') == 'Zakończony' else 'bet-locked'}'>{saved_h if has_bet else '-'}</div>", unsafe_allow_html=True)
+                    class_res = "bet-exact" if pts==3 else "bet-winner" if pts==1 else "bet-wrong" if m.get('status') == "Zakończony" else "bet-locked"
+                    st.markdown(f"<div class='result-box {class_res}'>{saved_h if has_bet else '-'}</div>", unsafe_allow_html=True)
                 else: st.number_input("H", min_value=0, max_value=20, key=h_key, label_visibility="collapsed")
             with c_sep: st.markdown("<div class='score-colon'>:</div>", unsafe_allow_html=True)
             with c_inpa:
                 if locked:
                     pts = calculate_points(saved_h, saved_a, m.get('score_h'), m.get('score_a')) if m.get('status') == "Zakończony" else 0
-                    st.markdown(f"<div class='result-box {'bet-exact' if pts==3 else 'bet-winner' if pts==1 else 'bet-wrong' if m.get('status') == 'Zakończony' else 'bet-locked'}'>{saved_a if has_bet else '-'}</div>", unsafe_allow_html=True)
+                    class_res = "bet-exact" if pts==3 else "bet-winner" if pts==1 else "bet-wrong" if m.get('status') == "Zakończony" else "bet-locked"
+                    st.markdown(f"<div class='result-box {class_res}'>{saved_a if has_bet else '-'}</div>", unsafe_allow_html=True)
                 else: st.number_input("A", min_value=0, max_value=20, key=a_key, label_visibility="collapsed")
             with c_away: st.markdown(f"<div class='team-align-left'>{get_cdn_flag_img_html(m['away'])} <span>{m['away']}</span></div>", unsafe_allow_html=True)
             with c_score: st.markdown(f"<div class='off-score'>Wynik: {m.get('score_h') if m.get('score_h') is not None else '?'} : {m.get('score_a') if m.get('score_a') is not None else '?'}</div>", unsafe_allow_html=True)
@@ -365,7 +431,10 @@ else:
                             st.session_state[h_key] = 0
                             st.session_state[a_key] = 0
                             st.rerun()
-            with c_status: st.markdown(f"<div class='{'success-bet-banner' if has_bet else 'missing-bet-banner-blink'}'>{'✔ OK' if has_bet else '⚠️ BRAK TYPU'}</div>", unsafe_allow_html=True)
+            with c_status:
+                class_banner = "success-bet-banner" if has_bet else "missing-bet-banner-blink"
+                txt_banner = "✔ OK" if has_bet else "⚠️ BRAK TYPU"
+                st.markdown(f"<div class='{class_banner}'>{txt_banner}</div>", unsafe_allow_html=True)
 
     with tab3:
         st.header("🕵️ Podgląd typów wszystkich graczy")
