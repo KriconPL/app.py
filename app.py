@@ -166,10 +166,10 @@ def clean_and_sanitize_team_string(raw_name):
 
 def get_cdn_flag_img_html(team_name):
     c_name = clean_and_sanitize_team_string(team_name)
-    if c_name == "TBD": return f'🌐'
+    if c_name == "TBD": return '🌐'
     code = ISO_FLAGS_MAP.get(c_name, None)
     if code: return f'<img src="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/{code}.svg" class="flag-img" />'
-    return f'🌐'
+    return '🌐'
 
 def calculate_points(pred_h, pred_a, real_h, real_a):
     try:
@@ -248,7 +248,7 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
         return False
 
-# --- FUNKCJE INTERFEJSU UŻYTKOWNIKA (PRZYWRÓCONE I SPRAWDZONE) ---
+# --- FUNKCJE INTERFEJSU UŻYTKOWNIKA ---
 @st.dialog("👁️ Typy graczy dla tego meczu")
 def show_other_bets(m_id, current_user):
     st.markdown(f"<h4 style='text-align: center; color: #F97316 !important;'>Mecz #{m_id}</h4>", unsafe_allow_html=True)
@@ -471,7 +471,11 @@ else:
             df_g = pd.DataFrame.from_dict(stats, orient='index').reset_index().rename(columns={'index': 'Reprezentacja'}).sort_values(by=["Pkt", "RB", "BZ"], ascending=False).reset_index(drop=True)
             df_g.index += 1
             if len(df_g) >= 3: third_places_list.append(df_g.iloc[2].to_dict())
-            g_rows = "".join([f"<tr {'style=\"background-color:#16A34A;\"' if idx in [1, 2] else 'style=\"background-color:#EA580C;\"' if idx==3 else ''}><td><b>{idx}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BZ']}</td><td>{r['RB']}</td></tr>" for idx, r in df_g.iterrows()])
+            
+            g_rows = ""
+            for idx, r in df_g.iterrows():
+                bg_style = 'style="background-color:#16A34A;"' if idx in [1, 2] else 'style="background-color:#EA580C;"' if idx==3 else ''
+                g_rows += f"<tr {bg_style}><td><b>{idx}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BZ']}</td><td>{r['RB']}</td></tr>"
             st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table>", unsafe_allow_html=True)
 
         st.divider()
@@ -512,9 +516,9 @@ else:
                 <div class='center-final-card'>
                     <div class='final-title'>🏆 WIELKI FINAŁ</div>
                     <div class='final-teams'>
-                        <div class='final-team'>{get_cdn_flag_img_html(m_104.get('home'))} <span class="bracket-team-name">{m_104.get('home','TBD')}</span></div>
+                        <div class='final-team'>{get_cdn_flag_img_html(m_104.get('home'))}<span class="bracket-team-name">{m_104.get('home','TBD')}</span></div>
                         <div class='final-score'>{sh_f} : {sa_f}</div>
-                        <div class='final-team'>{get_cdn_flag_img_html(m_104.get('away'))} <span class="bracket-team-name">{m_104.get('away','TBD')}</span></div>
+                        <div class='final-team'>{get_cdn_flag_img_html(m_104.get('away'))}<span class="bracket-team-name">{m_104.get('away','TBD')}</span></div>
                     </div><div class='final-venue'>📍 {m_104.get('venue')} | 📅 {m_104.get('date')}</div>
                 </div></div>""", unsafe_allow_html=True)
             st.markdown("<div style='text-align:center; margin-top:20px; font-weight:bold; color:#94A3B8; font-size: 0.8rem;'>🥉 Mecz o 3. miejsce</div>", unsafe_allow_html=True)
