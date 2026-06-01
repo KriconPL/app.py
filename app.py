@@ -7,25 +7,17 @@ import json
 from datetime import datetime, timedelta
 import gspread
 
-# 1. Konfiguracja aplikacji i Szata Graficzna
+# 1. Konfiguracja aplikacji
 st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", layout="wide")
 
-# --- BEZPIECZNE WGRYWANIE LOGO BASE64 ---
+# --- WGRYWANIE LOGO I CSS ---
 logo_css = ""
 if os.path.exists("logo.png"):
     with open("logo.png", 'rb') as f:
         bin_str = base64.b64encode(f.read()).decode()
-    
-    css_lines_logo = [
-        ".kricon-logo-container { ",
-        f"background-image: url('data:image/png;base64,{bin_str}'); ",
-        "background-size: contain; background-repeat: no-repeat; ",
-        "background-position: center; height: 220px; width: 100%; }"
-    ]
-    logo_css = "".join(css_lines_logo)
+    logo_css = ".kricon-logo-container { background-image: url('data:image/png;base64," + bin_str + "'); background-size: contain; background-repeat: no-repeat; background-position: center; height: 220px; width: 100%; }"
 
-# GŁÓWNY SILNIK CSS DLA CAŁEJ APLIKACJI
-css_styles = [
+css_lines = [
     "<style>",
     logo_css,
     "* { -webkit-user-select: none !important; -moz-user-select: none !important; -ms-user-select: none !important; user-select: none !important; }",
@@ -105,9 +97,9 @@ css_styles = [
     ".final-venue { font-size: 0.75rem; color: #94A3B8; }",
     "</style>"
 ]
-st.markdown("".join(css_styles), unsafe_allow_html=True)
+st.markdown("".join(css_lines), unsafe_allow_html=True)
 
-# GLOBALNE PROFILE I CONFIG
+# 2. GLOBALNE PROFILE I CONFIG
 USER_CREDENTIALS = {
     "Adam": "adam2026", "Maciej": "maciej2026", "Marcin": "marcin2026",
     "Kamil": "kamil2026", "Kuba M": "kubam2026", "Tomek": "tomek2026",
@@ -158,10 +150,10 @@ def clean_and_sanitize_team_string(raw_name):
 
 def get_cdn_flag_img_html(team_name):
     c_name = clean_and_sanitize_team_string(team_name)
-    if c_name == "TBD": return "🌐"
+    if c_name == "TBD": return '🌐'
     code = ISO_FLAGS_MAP.get(c_name, None)
-    if code: return f"<img src='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/{code}.svg' class='flag-img' />"
-    return "🌐"
+    if code: return "<img src='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/" + code + ".svg' class='flag-img' />"
+    return '🌐'
 
 def calculate_points(pred_h, pred_a, real_h, real_a):
     try:
@@ -171,7 +163,7 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- SILNIK GOOGLE Z PAMIĘCIĄ PODRĘCZNĄ (SUPER SZYBKOŚĆ) ---
+# 3. SILNIK GOOGLE (PAMIĘĆ PODRĘCZNA = BŁYSKAWICZNY ZAPIS)
 @st.cache_resource
 def get_gspread_client():
     creds_json = base64.b64decode(st.secrets["gcp_base64_creds"]).decode('utf-8')
@@ -230,20 +222,17 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
             if user in st.session_state.bets.get(m_id, {}):
                 del st.session_state.bets[m_id][user]
         return True
-    except Exception as e:
-        import traceback
-        print("\n!!! [BŁĄD KRYTYCZNY GOOGLE SHEETS] !!!")
-        traceback.print_exc()
+    except Exception:
         return False
 
-# --- FUNKCJE CALLBACK (SZYBKI ZAPIS I USUNIĘCIE BEZ BŁĘDÓW STREAMLIT) ---
+# BŁYSKAWICZNE FUNKCJE CALLBACK (ZERO BŁĘDÓW STREAMLIT)
 def handle_save(m_id, user, h_key, a_key):
     h = st.session_state.get(h_key, 0)
     a = st.session_state.get(a_key, 0)
     if save_to_google_sheets(m_id, user, h, a, action="save"):
         st.session_state.toast_msg = f"Zapisano typ {h}:{a} dla meczu #{m_id}! 💾"
     else:
-        st.session_state.toast_msg = "Błąd zapisu połączenia z Google! ❌"
+        st.session_state.toast_msg = "Błąd połączenia z bazą! ❌"
 
 def handle_delete(m_id, user, h_key, a_key):
     if save_to_google_sheets(m_id, user, 0, 0, action="delete"):
@@ -253,7 +242,7 @@ def handle_delete(m_id, user, h_key, a_key):
     else:
         st.session_state.toast_msg = "Błąd usuwania! ❌"
 
-# --- FUNKCJE WIZUALNE ---
+# 4. FUNKCJE WIZUALNE I LOGICZNE
 @st.dialog("👁️ Typy graczy dla tego meczu")
 def show_other_bets(m_id, current_user):
     st.markdown(f"<h4 style='text-align: center; color: #F97316 !important;'>Mecz #{m_id}</h4>", unsafe_allow_html=True)
@@ -342,17 +331,11 @@ def generate_schedule():
             if (i + 1) % matches_per_date == 0: date_idx += 1
     return schedule
 
-# W TEJ WERSJI TESTUJEMY DZIAŁANIE APLIKACJI WYPEŁNIAJĄC 4 PIERWSZE MECZE!
 def fetch_official_results_from_api(now_time):
-    # W przyszłości: API prawdziwych meczów.
-    # Obecnie dla testów - po uruchomieniu upewniamy się, że pierwsze 4 mecze są Zakończone, żeby pokazać działanie punktacji
-    demo_results = {1: (2, 1), 2: (0, 0), 3: (3, 0), 4: (1, 1)}
-    for d_id, (dh, da) in demo_results.items():
-        if st.session_state.results[d_id]['status'] == "Oczekuje":
-            st.session_state.results[d_id]['score_h'] = dh
-            st.session_state.results[d_id]['score_a'] = da
-            st.session_state.results[d_id]['status'] = "Zakończony"
+    # TO JEST FUNKCJA API. Puste po starcie mistrzostw, do tego czasu udaje wyniki.
+    pass
 
+# 5. INICJALIZACJA STANU APLIKACJI
 if 'results' not in st.session_state or len(st.session_state.results) != 104: st.session_state.results = generate_schedule()
 if 'bets' not in st.session_state or len(st.session_state.bets) != 104: st.session_state.bets = {m_id: {} for m_id in st.session_state.results.keys()}
 if 'last_positions' not in st.session_state: st.session_state.last_positions = {player: idx + 1 for idx, player in enumerate(players)}
@@ -370,7 +353,6 @@ for m_id, m in st.session_state.results.items():
     if m.get('status') != "Zakończony" and timedelta(minutes=0) <= (now - m['timestamp']) <= timedelta(minutes=120): m['status'] = "LIVE"
 
 # --- RENDEROWANIE INTERFEJSU ---
-
 if st.session_state.toast_msg:
     st.toast(st.session_state.toast_msg)
     st.session_state.toast_msg = ""
@@ -391,12 +373,10 @@ if st.session_state.logged_in_user is None:
 else:
     st.markdown("<div class='stAppHeader'><div class='kricon-logo-container'></div></div>", unsafe_allow_html=True)
     st.sidebar.write(f"👤 Gracz: **{st.session_state.logged_in_user}**")
-    
     if st.sidebar.button("🔄 Odśwież dane chmury", type="secondary"):
         load_from_google_sheets()
         st.toast("Pomyślnie zaktualizowano typy z Google Sheets! 📈")
         st.rerun()
-        
     if st.sidebar.button("Wyloguj się", type="primary"):
         st.session_state.logged_in_user = None
         st.session_state.pop('gs_initialized', None)
