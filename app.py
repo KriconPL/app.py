@@ -16,16 +16,7 @@ logo_css = ""
 if os.path.exists("logo.png"):
     with open("logo.png", 'rb') as f:
         bin_str = base64.b64encode(f.read()).decode()
-    logo_css = f"""
-    .kricon-logo-container {{
-        background-image: url("data:image/png;base64,{bin_str}");
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-        height: 220px; 
-        width: 100%;
-    }}
-    """
+    logo_css = f".kricon-logo-container {{ background-image: url('data:image/png;base64,{bin_str}'); background-size: contain; background-repeat: no-repeat; background-position: center; height: 220px; width: 100%; }}"
 else:
     st.warning("⚠️ Brak pliku 'logo.png' w folderze aplikacji! Wgraj go, aby zobaczyć logo.")
 
@@ -179,20 +170,14 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- SILNIK GENEROWANIA KLIENTA GOOGLE (PROSTOWANIE KLUCZA FORMATEM PEM STAGED) ---
+# --- SILNIK GENEROWANIA KLIENTA GOOGLE (NIEZNISZCZALNE FORMATOWANIE CHR) ---
 def get_gspread_client():
     creds = dict(st.secrets["gcp_service_account"])
     if "private_key" in creds:
-        k = creds["private_key"]
+        k = creds["private_key"].replace(chr(92) + chr(110), chr(10))
         k = k.replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "")
-        k = k.replace("\\\\n", "").replace("\\n", "")
-        # Usuwamy całkowicie wszelkie białe znaki za pomocą regexa
-        k = re.sub(r'\\s+', '', k).strip()
-        
-        # Formujemy rygorystyczny format PEM: dzielimy ciąg na równe linie po 64 znaki
-        chunks = [k[i:i+64] for i in range(0, len(k), 64)]
-        formatted_key = "-----BEGIN PRIVATE KEY-----\n" + "\n".join(chunks) + "\n-----END PRIVATE KEY-----\n"
-        creds["private_key"] = formatted_key
+        lines = [line.strip() for line in k.split(chr(10)) if line.strip()]
+        creds["private_key"] = "-----BEGIN PRIVATE KEY-----\n" + "\n".join(lines) + "\n-----END PRIVATE KEY-----\n"
     return gspread.service_account_from_dict(creds)
 
 def load_from_google_sheets():
@@ -539,7 +524,3 @@ else:
             for i in range(81, 89): render_bracket_match_html_clean(i)
         with c_g2:
             for g in ["G","H","I","J","K","L"]: st.markdown(get_mini_group_html_string(g), unsafe_allow_html=True)
-"""
-print("CLEAN")}
-}}
-"""
