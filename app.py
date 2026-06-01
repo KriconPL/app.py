@@ -179,7 +179,7 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- ULTRAPANCERNY GENERATOR KLIENTA GOOGLE (CZYŚCI I SKŁADA CAŁY KLUCZ OD NOWA) ---
+# --- SILNIK GENEROWANIA KLIENTA GOOGLE (Z POPRAWIONYM PRZETWARZANIEM KLUCZA) ---
 def get_gspread_client():
     creds = dict(st.secrets["gcp_service_account"])
     if "private_key" in creds:
@@ -244,7 +244,8 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
     except Exception as e:
         import traceback
         print("\n!!! [BŁĄD KRYTYCZNY GOOGLE SHEETS] !!!")
-        traceback.printExc()
+        # FIX: Poprawiono krytyczną literówkę z printExc() na print_exc()
+        traceback.print_exc()
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
         return False
 
