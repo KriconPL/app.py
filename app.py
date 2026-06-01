@@ -7,7 +7,7 @@ import json
 from datetime import datetime, timedelta
 import gspread
 
-# 1. Konfiguracja aplikacji i Szata Graficzna Dark Navy & Orange
+# 1. Konfiguracja aplikacji i Szata Graficzna
 st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", layout="wide")
 
 # --- BEZPIECZNE WGRYWANIE LOGO BASE64 ---
@@ -16,15 +16,13 @@ if os.path.exists("logo.png"):
     with open("logo.png", 'rb') as f:
         bin_str = base64.b64encode(f.read()).decode()
     
-    css_lines = [
+    css_lines_logo = [
         ".kricon-logo-container { ",
         f"background-image: url('data:image/png;base64,{bin_str}'); ",
         "background-size: contain; background-repeat: no-repeat; ",
         "background-position: center; height: 220px; width: 100%; }"
     ]
-    logo_css = "".join(css_lines)
-else:
-    st.warning("⚠️ Brak pliku 'logo.png' w folderze aplikacji! Wgraj go, aby zobaczyć logo.")
+    logo_css = "".join(css_lines_logo)
 
 # GŁÓWNY SILNIK CSS DLA CAŁEJ APLIKACJI
 css_styles = [
@@ -38,7 +36,6 @@ css_styles = [
     "h1, h2, h3, h4, h5, h6, p, span, label, div { color: #F8FAFC !important; }",
     ".stAppHeader { position: sticky !important; top: 0 !important; width: 100% !important; height: auto !important; background-color: #0A1128 !important; z-index: 9999 !important; padding-left: 25px !important; padding-right: 25px !important; padding-top: 18px !important; padding-bottom: 18px !important; border-bottom: 1px solid #1E3A8A; }",
     "[data-testid='stAppViewContainer'] > section:nth-child(2) { padding-top: 100px !important; }",
-    "@keyframes pulseAlertCore { 0% { opacity: 1.0; } 50% { opacity: 0.3; } 100% { opacity: 1.0; } }",
     "div[data-testid='stHorizontalBlock']:has(.match-row-anchor) { background: #172554 !important; border: 1px solid #1E3A8A !important; border-radius: 0 0 6px 6px; padding: 6px 10px !important; margin-bottom: 6px !important; align-items: center !important; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }",
     "div[data-testid='stHorizontalBlock']:has(.match-row-anchor) > div[data-testid='column'] { padding: 0 4px !important; }",
     ".meta-upper-bar-container { background-color: #1E293B !important; border: 1px solid #1E3A8A !important; border-bottom: none !important; border-radius: 6px 6px 0 0; display: flex; align-items: center; gap: 12px; font-size: 0.75rem !important; color: #94A3B8 !important; padding: 4px 14px !important; width: 100%; margin-top: 10px !important; }",
@@ -63,7 +60,6 @@ css_styles = [
     "div[data-testid='stNumberInput'] input { color: #F8FAFC !important; -webkit-text-fill-color: #F8FAFC !important; background-color: #0A1128 !important; font-size: 1.25rem !important; font-weight: 900 !important; text-align: center !important; padding: 0 !important; }",
     "div[data-testid='stNumberInput'] button { background-color: #1E293B !important; border: none !important; border-radius: 4px !important; width: 32px !important; height: 32px !important; margin: 2px !important; transition: transform 0.1s ease !important; }",
     "div[data-testid='stNumberInput'] button svg { fill: #F97316 !important; color: #F97316 !important; }",
-    "div[data-testid='stNumberInput'] button:active, div[data-testid='stNumberInput'] button:focus { opacity: 1.0 !important; background-color: #0F172A !important; transform: scale(0.90) !important; outline: none !important; box-shadow: none !important; }",
     "div[data-testid='stNumberInput'] button:hover { background-color: #334155 !important; }",
     "div[data-testid='stNumberInput'] button:hover svg { fill: #FFFFFF !important; }",
     "button[kind='secondary'] { background-color: #1E293B !important; border: 1px solid #334155 !important; border-radius: 4px !important; height: 38px !important; min-height: 38px !important; padding: 0 !important; width: 100% !important; display: block !important; }",
@@ -74,8 +70,7 @@ css_styles = [
     "button[kind='primary'] * { color: #FFFFFF !important; font-size: 0.9rem !important; font-weight: bold !important; }",
     "button[kind='primary']:hover { background-color: #EA580C !important; border-color: #C2410C !important; }",
     ".success-bet-banner { background: #16A34A; color: white; text-align: center; font-weight: bold; border-radius: 4px; height: 38px; line-height: 38px; font-size: 0.8rem; width: 100%; white-space: nowrap; display:block; }",
-    ".missing-bet-banner-blink { animation: pulseAlertCore 1.2s infinite ease-in-out !important; background-color: #DC2626 !important; color: #FFFFFF !important; font-weight: bold !important; text-align: center !important; height: 38px !important; line-height: 38px !important; border-radius: 4px !important; font-size: 0.7rem !important; display: block !important; width: 100% !important; margin: 0 !important; white-space: nowrap !important; }",
-    ".status-waiting-blink { animation: pulseAlertCore 2.0s infinite ease-in-out !important; color: #D97706 !important; font-weight: bold !important; font-size: 0.65rem !important; }",
+    ".missing-bet-banner-blink { background-color: #DC2626 !important; color: #FFFFFF !important; font-weight: bold !important; text-align: center !important; height: 38px !important; line-height: 38px !important; border-radius: 4px !important; font-size: 0.7rem !important; display: block !important; width: 100% !important; margin: 0 !important; white-space: nowrap !important; }",
     ".status-badge-ended { color: #94A3B8 !important; font-weight: bold; font-size: 0.65rem !important; }",
     ".status-badge-live { color: #DC2626 !important; font-weight: bold; font-size: 0.65rem !important; }",
     ".kricon-table { width: 100%; border-collapse: collapse; margin: 15px 0 35px 0; background-color: #172554 !important; border-radius: 8px; overflow: hidden; }",
@@ -93,7 +88,6 @@ css_styles = [
     ".trend-up { color: #16A34A !important; font-weight: bold; }",
     ".trend-down { color: #DC2626 !important; font-weight: bold; }",
     ".trend-stable { color: #64748B !important; }",
-    ".points-legend { background-color: #060B19; border-left: 5px solid #F97316; padding: 12px; margin-bottom: 15px; border-radius: 4px; }",
     ".flag-img { width: 22px !important; height: 14px !important; object-fit: cover !important; border-radius: 2px !important; display: inline-block; vertical-align: middle; border: 1px solid rgba(255,255,255,0.2); }",
     ".bracket-match-card { background: #172554 !important; border: 2px solid #1E3A8A !important; border-radius: 8px; padding: 6px; font-size: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }",
     ".bracket-match-title { font-size: 0.70rem !important; color: #F97316 !important; font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid #1E3A8A; padding-bottom: 2px; }",
@@ -177,7 +171,7 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- SILNIK GOOGLE (BASE64 + CACHE DLA SZYBKOŚCI ZAPISU) ---
+# --- SILNIK GOOGLE Z PAMIĘCIĄ PODRĘCZNĄ (SUPER SZYBKOŚĆ) ---
 @st.cache_resource
 def get_gspread_client():
     creds_json = base64.b64decode(st.secrets["gcp_base64_creds"]).decode('utf-8')
@@ -240,9 +234,26 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
         import traceback
         print("\n!!! [BŁĄD KRYTYCZNY GOOGLE SHEETS] !!!")
         traceback.print_exc()
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
         return False
 
+# --- FUNKCJE CALLBACK (SZYBKI ZAPIS I USUNIĘCIE BEZ BŁĘDÓW STREAMLIT) ---
+def handle_save(m_id, user, h_key, a_key):
+    h = st.session_state.get(h_key, 0)
+    a = st.session_state.get(a_key, 0)
+    if save_to_google_sheets(m_id, user, h, a, action="save"):
+        st.session_state.toast_msg = f"Zapisano typ {h}:{a} dla meczu #{m_id}! 💾"
+    else:
+        st.session_state.toast_msg = "Błąd zapisu połączenia z Google! ❌"
+
+def handle_delete(m_id, user, h_key, a_key):
+    if save_to_google_sheets(m_id, user, 0, 0, action="delete"):
+        if h_key in st.session_state: del st.session_state[h_key]
+        if a_key in st.session_state: del st.session_state[a_key]
+        st.session_state.toast_msg = f"Usunięto typ dla meczu #{m_id}! 🗑️"
+    else:
+        st.session_state.toast_msg = "Błąd usuwania! ❌"
+
+# --- FUNKCJE WIZUALNE ---
 @st.dialog("👁️ Typy graczy dla tego meczu")
 def show_other_bets(m_id, current_user):
     st.markdown(f"<h4 style='text-align: center; color: #F97316 !important;'>Mecz #{m_id}</h4>", unsafe_allow_html=True)
@@ -331,17 +342,22 @@ def generate_schedule():
             if (i + 1) % matches_per_date == 0: date_idx += 1
     return schedule
 
+# W TEJ WERSJI TESTUJEMY DZIAŁANIE APLIKACJI WYPEŁNIAJĄC 4 PIERWSZE MECZE!
 def fetch_official_results_from_api(now_time):
-    for m_id, m in st.session_state.results.items():
-        if m['timestamp'] <= now_time and m['status'] != "Zakończony":
-            np.random.seed(m_id)
-            m['score_h'], m['score_a'], m['status'] = int(np.random.choice([0, 1, 2, 3])), int(np.random.choice([0, 1, 2])), "Zakończony"
-            if m_id >= 73: m['home'], m['away'] = "Meksyk" if m['home'] == "TBD" else m['home'], "RPA" if m['away'] == "TBD" else m['away']
+    # W przyszłości: API prawdziwych meczów.
+    # Obecnie dla testów - po uruchomieniu upewniamy się, że pierwsze 4 mecze są Zakończone, żeby pokazać działanie punktacji
+    demo_results = {1: (2, 1), 2: (0, 0), 3: (3, 0), 4: (1, 1)}
+    for d_id, (dh, da) in demo_results.items():
+        if st.session_state.results[d_id]['status'] == "Oczekuje":
+            st.session_state.results[d_id]['score_h'] = dh
+            st.session_state.results[d_id]['score_a'] = da
+            st.session_state.results[d_id]['status'] = "Zakończony"
 
 if 'results' not in st.session_state or len(st.session_state.results) != 104: st.session_state.results = generate_schedule()
 if 'bets' not in st.session_state or len(st.session_state.bets) != 104: st.session_state.bets = {m_id: {} for m_id in st.session_state.results.keys()}
 if 'last_positions' not in st.session_state: st.session_state.last_positions = {player: idx + 1 for idx, player in enumerate(players)}
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
+if 'toast_msg' not in st.session_state: st.session_state.toast_msg = ""
 
 if 'gs_initialized' not in st.session_state:
     load_from_google_sheets()
@@ -352,6 +368,12 @@ fetch_official_results_from_api(now)
 
 for m_id, m in st.session_state.results.items():
     if m.get('status') != "Zakończony" and timedelta(minutes=0) <= (now - m['timestamp']) <= timedelta(minutes=120): m['status'] = "LIVE"
+
+# --- RENDEROWANIE INTERFEJSU ---
+
+if st.session_state.toast_msg:
+    st.toast(st.session_state.toast_msg)
+    st.session_state.toast_msg = ""
 
 if st.session_state.logged_in_user is None:
     st.markdown("<div class='stAppHeader'><div class='kricon-logo-container'></div></div>", unsafe_allow_html=True)
@@ -369,30 +391,36 @@ if st.session_state.logged_in_user is None:
 else:
     st.markdown("<div class='stAppHeader'><div class='kricon-logo-container'></div></div>", unsafe_allow_html=True)
     st.sidebar.write(f"👤 Gracz: **{st.session_state.logged_in_user}**")
+    
     if st.sidebar.button("🔄 Odśwież dane chmury", type="secondary"):
         load_from_google_sheets()
         st.toast("Pomyślnie zaktualizowano typy z Google Sheets! 📈")
         st.rerun()
+        
     if st.sidebar.button("Wyloguj się", type="primary"):
         st.session_state.logged_in_user = None
         st.session_state.pop('gs_initialized', None)
         st.rerun()
+        
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 Ranking", "📅 Terminarz", "🕵️ Typy graczy", "📈 Tabele", "🏆 Drabinka Turniejowa"])
+    
     with tab1:
         current_positions_map = {}
         st.markdown(render_leaderboard_html(now, current_positions_map), unsafe_allow_html=True)
         if current_positions_map: st.session_state.last_positions = current_positions_map
+        
     with tab2:
         mode = st.radio("Filtruj mecze:", ["Oczekujące", "Wszystkie", "Zakończone"], horizontal=True)
         for m_id, m in sorted(st.session_state.results.items()):
             if (mode == "Oczekujące" and m.get('status') == "Zakończony") or (mode == "Zakończone" and m.get('status') == "Oczekuje"): continue
             status_html = "<span class='status-badge-live'>🔴 LIVE</span>" if m.get('status') == "LIVE" else "<span class='status-badge-ended'>⚫ Zakończony</span>" if m.get('status') == "Zakończony" else "<span class='status-waiting-blink'>🟡 Oczekuje</span>"
             locked = (m['timestamp'] - now).total_seconds() <= 0
-            has_bet = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user) is not None
+            
+            has_bet = st.session_state.logged_in_user in st.session_state.bets.get(m_id, {})
             saved_h, saved_a = st.session_state.bets.get(m_id, {}).get(st.session_state.logged_in_user, (0,0))
-            h_key, a_key = f"h_{m_id}", f"a_{m_id}"
-            if h_key not in st.session_state: st.session_state[h_key] = int(saved_h)
-            if a_key not in st.session_state: st.session_state[a_key] = int(saved_a)
+            
+            h_key = f"h_{m_id}"
+            a_key = f"a_{m_id}"
             
             html_top_lines = [
                 "<div class='meta-upper-bar-container'>",
@@ -409,14 +437,16 @@ else:
                     pts = calculate_points(saved_h, saved_a, m.get('score_h'), m.get('score_a')) if m.get('status') == "Zakończony" else 0
                     class_res = "bet-exact" if pts==3 else "bet-winner" if pts==1 else "bet-wrong" if m.get('status') == "Zakończony" else "bet-locked"
                     st.markdown(f"<div class='result-box {class_res}'>{saved_h if has_bet else '-'}</div>", unsafe_allow_html=True)
-                else: st.number_input("H", min_value=0, max_value=20, key=h_key, label_visibility="collapsed")
+                else: 
+                    st.number_input("H", min_value=0, max_value=20, value=int(saved_h) if has_bet else 0, key=h_key, label_visibility="collapsed")
             with c_sep: st.markdown("<div class='score-colon'>:</div>", unsafe_allow_html=True)
             with c_inpa:
                 if locked:
                     pts = calculate_points(saved_h, saved_a, m.get('score_h'), m.get('score_a')) if m.get('status') == "Zakończony" else 0
                     class_res = "bet-exact" if pts==3 else "bet-winner" if pts==1 else "bet-wrong" if m.get('status') == "Zakończony" else "bet-locked"
                     st.markdown(f"<div class='result-box {class_res}'>{saved_a if has_bet else '-'}</div>", unsafe_allow_html=True)
-                else: st.number_input("A", min_value=0, max_value=20, key=a_key, label_visibility="collapsed")
+                else: 
+                    st.number_input("A", min_value=0, max_value=20, value=int(saved_a) if has_bet else 0, key=a_key, label_visibility="collapsed")
             with c_away: st.markdown(f"<div class='team-align-left'>{get_cdn_flag_img_html(m['away'])} <span>{m['away']}</span></div>", unsafe_allow_html=True)
             with c_score: st.markdown(f"<div class='off-score'>Wynik: {m.get('score_h') if m.get('score_h') is not None else '?'} : {m.get('score_a') if m.get('score_a') is not None else '?'}</div>", unsafe_allow_html=True)
             
@@ -424,20 +454,10 @@ else:
                 if locked:
                     if st.button("👥 Typy", key=f"typy_{m_id}"): show_other_bets(m_id, st.session_state.logged_in_user)
                 else:
-                    if st.button("Zapisz", key=f"save_{m_id}", type="primary"):
-                        with st.spinner("Łączenie z bazą Google..."):
-                            if save_to_google_sheets(m_id, st.session_state.logged_in_user, st.session_state[h_key], st.session_state[a_key], action="save"):
-                                st.success("Zapisano!")
-                                st.rerun()
-                            else:
-                                st.error("Błąd uwierzytelnienia klucza Google! Zweryfikuj zakładkę Secrets.")
+                    st.button("Zapisz", key=f"save_{m_id}", type="primary", on_click=handle_save, args=(m_id, st.session_state.logged_in_user, h_key, a_key))
             with c_del:
                 if not locked and has_bet:
-                    if st.button("✖", key=f"del_{m_id}", type="secondary"):
-                        if save_to_google_sheets(m_id, st.session_state.logged_in_user, 0, 0, action="delete"):
-                            st.session_state[h_key] = 0
-                            st.session_state[a_key] = 0
-                            st.rerun()
+                    st.button("✖", key=f"del_{m_id}", type="secondary", on_click=handle_delete, args=(m_id, st.session_state.logged_in_user, h_key, a_key))
             with c_status:
                 class_banner = "success-bet-banner" if has_bet else "missing-bet-banner-blink"
                 txt_banner = "✔ OK" if has_bet else "⚠️ BRAK TYPU"
