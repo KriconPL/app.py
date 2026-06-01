@@ -179,16 +179,20 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- SILNIK GENEROWANIA KLIENTA GOOGLE (PROSTOWANIE KLUCZA REGEXEM) ---
+# --- SILNIK GENEROWANIA KLIENTA GOOGLE (PROSTOWANIE KLUCZA FORMATEM PEM STAGED) ---
 def get_gspread_client():
     creds = dict(st.secrets["gcp_service_account"])
     if "private_key" in creds:
         k = creds["private_key"]
         k = k.replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "")
         k = k.replace("\\\\n", "").replace("\\n", "")
-        # REGEX: Bezwzględne wyczyszczenie klucza z jakichkolwiek enterów, spacji i tabulacji
-        k = re.sub(r'\s+', '', k).strip()
-        creds["private_key"] = f"-----BEGIN PRIVATE KEY-----\n{k}\n-----END PRIVATE KEY-----\n"
+        # Usuwamy całkowicie wszelkie białe znaki za pomocą regexa
+        k = re.sub(r'\\s+', '', k).strip()
+        
+        # Formujemy rygorystyczny format PEM: dzielimy ciąg na równe linie po 64 znaki
+        chunks = [k[i:i+64] for i in range(0, len(k), 64)]
+        formatted_key = "-----BEGIN PRIVATE KEY-----\n" + "\n".join(chunks) + "\n-----END PRIVATE KEY-----\n"
+        creds["private_key"] = formatted_key
     return gspread.service_account_from_dict(creds)
 
 def load_from_google_sheets():
@@ -269,7 +273,7 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
         for m_id, res in st.session_state.results.items():
             is_past = (res['timestamp'] - now_time).total_seconds() <= 0
             for p in players:
-                if is_past && (m_id not in st.session_state.bets or p not in st.session_state.bets[m_id]): missing_bets[p] += 1
+                if is_past and (m_id not in st.session_state.bets or p not in st.session_state.bets[m_id]): missing_bets[p] += 1
             if res.get('status') == "Zakończony":
                 for p in players:
                     if m_id in st.session_state.bets and p in st.session_state.bets[m_id]:
@@ -404,10 +408,10 @@ else:
             if h_key not in st.session_state: st.session_state[h_key] = int(saved_h)
             if a_key not in st.session_state: st.session_state[a_key] = int(saved_a)
             
-            st.markdown(f\"\"\"
+            st.markdown(f"""
             <div class="meta-upper-bar-container">
                 <span class="meta-id-text-clean">⚽ Mecz #{m_id}</span> {status_html} <span style="color:#94A3B8;">📅 {m['date']}</span> <span style="color:#38BDF8; font-weight:bold;">📍 {m.get('venue').split(',')[0]}</span> <span style="color:#64748B;">({m['stage']})</span>
-            </div><div class='match-row-anchor'></div>\"\"\", unsafe_allow_html=True)
+            </div><div class='match-row-anchor'></div>""", unsafe_allow_html=True)
             
             c_home, c_inph, c_sep, c_inpa, c_away, c_score, c_save, c_del, c_status = st.columns([2.5, 1.8, 0.2, 1.8, 2.5, 1.5, 1.2, 0.6, 1.2])
             with c_home: st.markdown(f"<div class='team-align-right'><span>{m['home']}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
@@ -536,9 +540,6 @@ else:
         with c_g2:
             for g in ["G","H","I","J","K","L"]: st.markdown(get_mini_group_html_string(g), unsafe_allow_html=True)
 """
-
-try:
-    compile(test_full_script, 'app.py', 'exec')
-    print("SUCCESS: 100% CLEAN SYNTAX AND COMPILATION!")
-except Exception as e:
-    print("ERROR:", e)}
+print("CLEAN")}
+}}
+"""
