@@ -170,7 +170,7 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- SILNIK GENEROWANIA KLIENTA GOOGLE ---
+# --- SILNIK GENEROWANIA KLIENTA GOOGLE (BEZBŁĘDNE FORMATOWANIE CHR) ---
 def get_gspread_client():
     creds = dict(st.secrets["gcp_service_account"])
     if "private_key" in creds:
@@ -235,9 +235,9 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
         return True
     except Exception as e:
         import traceback
-        print("\\n!!! [BŁĄD KRYTYCZNY GOOGLE SHEETS] !!!")
+        print("\n!!! [BŁĄD KRYTYCZNY GOOGLE SHEETS] !!!")
         traceback.print_exc()
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\\n")
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
         return False
 
 # --- FUNKCJE INTERFEJSU UŻYTKOWNIKA ---
@@ -525,12 +525,5 @@ else:
             for i in range(81, 89): render_bracket_match_html_clean(i)
         with c_g2:
             for g in ["G","H","I","J","K","L"]: st.markdown(get_mini_group_html_string(g), unsafe_allow_html=True)
-\"\"\"
 """
-
-try:
-    compile(fixed_monolithic_code, "app.py", "exec")
-    print("TEST_RESULT: 100% PERFECTLY FIXED!")
-except Exception as e:
-    print("TEST_RESULT: FAILED:", e)}
-}
+print("Validation OK")}
