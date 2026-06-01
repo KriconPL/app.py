@@ -15,12 +15,19 @@ logo_css = ""
 if os.path.exists("logo.png"):
     with open("logo.png", 'rb') as f:
         bin_str = base64.b64encode(f.read()).decode()
-    logo_css = ".kricon-logo-container { background-image: url('data:image/png;base64," + bin_str + "'); background-size: contain; background-repeat: no-repeat; background-position: center; height: 220px; width: 100%; }"
+    
+    css_lines = [
+        ".kricon-logo-container { ",
+        f"background-image: url('data:image/png;base64,{bin_str}'); ",
+        "background-size: contain; background-repeat: no-repeat; ",
+        "background-position: center; height: 220px; width: 100%; }"
+    ]
+    logo_css = "".join(css_lines)
 else:
     st.warning("⚠️ Brak pliku 'logo.png' w folderze aplikacji! Wgraj go, aby zobaczyć logo.")
 
-# GŁÓWNY SILNIK CSS DLA CAŁEJ APLIKACJI (Bezpieczne, jednowierszowe formatowanie)
-css_lines = [
+# GŁÓWNY SILNIK CSS DLA CAŁEJ APLIKACJI
+css_styles = [
     "<style>",
     logo_css,
     "* { -webkit-user-select: none !important; -moz-user-select: none !important; -ms-user-select: none !important; user-select: none !important; }",
@@ -104,7 +111,7 @@ css_lines = [
     ".final-venue { font-size: 0.75rem; color: #94A3B8; }",
     "</style>"
 ]
-st.markdown("".join(css_lines), unsafe_allow_html=True)
+st.markdown("".join(css_styles), unsafe_allow_html=True)
 
 # GLOBALNE PROFILE I CONFIG
 USER_CREDENTIALS = {
@@ -159,7 +166,7 @@ def get_cdn_flag_img_html(team_name):
     c_name = clean_and_sanitize_team_string(team_name)
     if c_name == "TBD": return "🌐"
     code = ISO_FLAGS_MAP.get(c_name, None)
-    if code: return f"<img src='[https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/](https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/){code}.svg' class='flag-img' />"
+    if code: return f"<img src='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/{code}.svg' class='flag-img' />"
     return "🌐"
 
 def calculate_points(pred_h, pred_a, real_h, real_a):
@@ -170,7 +177,7 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- SILNIK GOOGLE (ODKODOWUJĄCY BASE64) ---
+# --- SILNIK GOOGLE (BASE64 + CACHE DLA SZYBKOŚCI ZAPISU) ---
 @st.cache_resource
 def get_gspread_client():
     creds_json = base64.b64decode(st.secrets["gcp_base64_creds"]).decode('utf-8')
