@@ -83,7 +83,7 @@ st.markdown(f"""
     .status-badge-live {{ color: #DC2626 !important; font-weight: bold; font-size: 0.65rem !important; }}
     .kricon-table {{ width: 100%; border-collapse: collapse; margin: 15px 0 35px 0; background-color: #172554 !important; border-radius: 8px; overflow: hidden; }}
     .kricon-table th {{ background-color: #F97316 !important; color: #0A1128 !important; padding: 12px; font-weight: 800; }}
-    .kricon-table td {{ padding: 11px 12px; border-bottom: 1px solid #1E3A8A !important; }}
+    .kricon-table td {{ padding: 11px 12px; border-bottom: 1px solid #1E3A8A !important; color: #F8FAFC; }}
     .col-pos {{ width: 60px !important; text-align: center !important; }}
     .col-trend {{ width: 60px !important; text-align: center !important; }}
     .col-missing {{ width: 100px !important; text-align: center !important; font-weight: bold !important; }}
@@ -417,7 +417,7 @@ else:
             g_rows = "".join([f"<tr {'style=\"background-color:#16A34A;\"' if idx in [1, 2] else 'style=\"background-color:#EA580C;\"' if idx==3 else ''}><td><b>{idx}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>" for idx, r in df_g.iterrows()])
             st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table>", unsafe_allow_html=True)
 
-        # --- NOWA SEKCJA: GENEROWANIE I WYŚWIETLANIE TABELI 3. MIEJSC ---
+        # --- SEKCJA NAPRAWIONA: WYŚWIETLANIE TABELI 3. MIEJSC (BEZ BŁĘDNYCH WCIĘĆ) ---
         st.divider()
         st.header("📊 Zbiorcza Tabela 3. Miejsc")
         st.write("Do Fazy Pucharowej (1/16 Finału) awansuje **8 najlepszych reprezentacji** z trzecich miejsc.")
@@ -428,33 +428,11 @@ else:
             
             t3_rows = ""
             for idx, r in df_3rd.iterrows():
-                # Pierwsze 8 miejsc awansuje (zielone tło), reszta odpada (ciemnoczerwone/standardowe)
                 bg_style = 'style="background-color:#16A34A;"' if idx <= 8 else 'style="background-color:#450A0A; opacity:0.8;"'
-                t3_rows += f"""
-                <tr {bg_style}>
-                    <td><b>{idx}</b></td>
-                    <td><small style='color:#94A3B8;'>{r['Grupa']}</small></td>
-                    <td>{get_cdn_flag_img_html(r['Reprezentacja'])} {r['Reprezentacja']}</td>
-                    <td><b>{r['Pkt']}</b></td>
-                    <td>{r['BZ']}</td>
-                    <td>{r['BS']}</td>
-                    <td>{r['RB']}</td>
-                </tr>
-                """
-            st.markdown(f"""
-            <table class='kricon-table'>
-                <tr>
-                    <th>Poz.</th>
-                    <th>Grupa</th>
-                    <th>Kraj</th>
-                    <th>Pkt</th>
-                    <th>BZ</th>
-                    <th>BS</th>
-                    <th>Bilans</th>
-                </tr>
-                {t3_rows}
-            </table>
-            """, unsafe_allow_html=True)
+                t3_rows += f"<tr {bg_style}><td><b>{idx}</b></td><td><small style='color:#94A3B8;'>{r['Grupa']}</small></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
+            
+            t3_table_html = f"<table class='kricon-table'><tr><th>Poz.</th><th>Grupa</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{t3_rows}</table>"
+            st.markdown(t3_table_html, unsafe_allow_html=True)
 
     with tab5:
         st.header("🏆 Drabinka Fazy Pucharowej")
