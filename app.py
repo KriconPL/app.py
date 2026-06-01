@@ -179,13 +179,13 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- SILNIK GENEROWANIA KLIENTA GOOGLE (PROSTOWANIE KLUCZA) ---
+# --- SILNIK GENEROWANIA KLIENTA GOOGLE ---
 def get_gspread_client():
     creds = dict(st.secrets["gcp_service_account"])
     if "private_key" in creds:
         k = creds["private_key"]
         k = k.replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "")
-        k = k.replace("\\n", "").replace("\n", "").replace("\r", "").replace(" ", "").strip()
+        k = k.replace("\\\\n", "").replace("\\n", "").replace("\r", "").replace(" ", "").strip()
         creds["private_key"] = f"-----BEGIN PRIVATE KEY-----\n{k}\n-----END PRIVATE KEY-----\n"
     return gspread.service_account_from_dict(creds)
 
@@ -247,6 +247,67 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
         traceback.print_exc()
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
         return False
+
+# --- FUNKCJE INTERFEJSU UŻYTKOWNIKA (PRZYWRÓCONE I SPRAWDZONE) ---
+@st.dialog("👁️ Typy graczy dla tego meczu")
+def show_other_bets(m_id, current_user):
+    st.markdown(f"<h4 style='text-align: center; color: #F97316 !important;'>Mecz #{m_id}</h4>", unsafe_allow_html=True)
+    other_bets = []
+    for p in players:
+        if p != current_user:
+            bet = st.session_state.bets.get(m_id, {}).get(p)
+            if bet: other_bets.append({"Gracz": p, "Typ": f"{bet[0]} : {bet[1]}"})
+            else: other_bets.append({"Gracz": p, "Typ": "Brak typu"})
+    st.dataframe(pd.DataFrame(other_bets), use_container_width=True, hide_index=True)
+
+def render_leaderboard_html(now_time, new_positions_dict_dest=None):
+    scores = {p: 0 for p in players}
+    missing_bets = {p: 0 for p in players}
+    if 'results' in st.session_state and 'bets' in st.session_state:
+        for m_id, res in st.session_state.results.items():
+            is_past = (res['timestamp'] - now_time).total_seconds() <= 0
+            for p in players:
+                if is_past and (m_id not in st.session_state.bets or p not in st.session_state.bets[m_id]): missing_bets[p] += 1
+            if res.get('status') == "Zakończony":
+                for p in players:
+                    if m_id in st.session_state.bets and p in st.session_state.bets[m_id]:
+                        scores[p] += calculate_points(st.session_state.bets[m_id][p][0], st.session_state.bets[m_id][p][1], res.get('score_h'), res.get('score_a'))
+    df = pd.merge(pd.DataFrame(list(scores.items()), columns=["Gracz", "Punkty"]), pd.DataFrame(list(missing_bets.items()), columns=["Gracz", "Brak typu"]), on="Gracz").sort_values(by="Punkty", ascending=False).reset_index(drop=True)
+    rows = ""
+    for idx, row in df.iterrows():
+        pos, p_name = idx + 1, row['Gracz']
+        if new_positions_dict_dest is not None: new_positions_dict_dest[p_name] = pos
+        old_pos = st.session_state.last_positions.get(p_name, pos) if 'last_positions' in st.session_state else pos
+        trend_html = '<span class="trend-up">▲</span>' if old_pos > pos else '<span class="trend-down">▼</span>' if old_pos < pos else '<span class="trend-stable">•</span>'
+        bg_class = 'class="gold-medal-row"' if pos == 1 else 'class="silver-medal-row"' if pos == 2 else 'class="bronze-medal-row"' if pos == 3 else ""
+        miss_html = f"<span style='color: #DC2626;'>{row['Brak typu']}</span>" if row['Brak typu'] > 0 else "<span style='color: #64748B;'>0</span>"
+        rows += f"<tr {bg_class}><td class='col-pos'><b>{pos}</b></td><td class='col-trend'>{trend_html}</td><td>{p_name}</td><td><b>{row['Punkty']} pkt</b></td><td class='col-missing'>{miss_html}</td></tr>"
+    return f"<table class='kricon-table'><tr><th class='col-pos'>Miejsce</th><th class='col-trend'>Trend</th><th>Gracz</th><th>Punkty</th><th class='col-missing'>Brak typu</th></tr>{rows}</table>"
+
+def render_bracket_match_html_clean(match_id, mt="0px", mb="6px"):
+    m = st.session_state.results.get(match_id)
+    if not m: return
+    status = m.get("status")
+    sh, sa = (str(m.get("score_h")), str(m.get("score_a"))) if status in ["Zakończony", "LIVE"] and m.get("score_h") is not None else ("?", "?")
+    win_h = status == "Zakończony" and m.get("score_h", 0) > m.get("score_a", 0)
+    win_a = status == "Zakończony" and m.get("score_a", 0) > m.get("score_h", 0)
+    st.markdown(f"""
+    <div class="bracket-match-card" style="margin-top: {mt}; margin-bottom: {mb};">
+        <div class="bracket-match-title">Mecz #{match_id}</div>
+        <div class='bracket-row {"bracket-team-winner" if win_h else ""}'>
+            <div style="display:flex; align-items:center; gap:6px; overflow: hidden;">{get_cdn_flag_img_html(m['home'])}<span class="bracket-team-name">{m['home']}</span></div>
+            <span class="bracket-score-cell">{sh}</span>
+        </div>
+        <div class='bracket-row {"bracket-team-winner" if win_a else ""}'>
+            <div style="display:flex; align-items:center; gap:6px; overflow: hidden;">{get_cdn_flag_img_html(m['away'])}<span class="bracket-team-name">{m['away']}</span></div>
+            <span class="bracket-score-cell">{sa}</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+def get_mini_group_html_string(g_code):
+    lines = "".join([f"<div style='text-align:left; padding:2px 0; font-size:0.85rem; display:flex; align-items:center; gap:6px;'>{get_cdn_flag_img_html(t)} <span style='max-width: 75px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>{t}</span></div>" for t in GROUPS_DICT.get(f"Grupa {g_code}", [])])
+    return f"""<div class="bracket-group-box"><div style="font-weight:bold; color:#F97316; margin-bottom:4px; font-size:0.85rem;">GRUPA {g_code}</div>{lines}</div>"""
 
 def generate_schedule():
     schedule = {}
@@ -364,9 +425,8 @@ else:
             
             with c_save:
                 if locked:
-                    if st.button("👥 Typy", key=f"typy_{m_id}", type="secondary"): show_other_bets(m_id, st.session_state.logged_in_user)
+                    if st.button("👥 Typy", key=f"typy_{m_id}"): show_other_bets(m_id, st.session_state.logged_in_user)
                 else:
-                    # RENDEROWANIE INTERAKTYWNE Z ALERTEM NA EKRANIE UŻYTKOWNIKA
                     if st.button("Zapisz", key=f"save_{m_id}", type="primary"):
                         with st.spinner("Łączenie z bazą Google..."):
                             if save_to_google_sheets(m_id, st.session_state.logged_in_user, st.session_state[h_key], st.session_state[a_key], action="save"):
