@@ -16,7 +16,14 @@ logo_css = ""
 if os.path.exists("logo.png"):
     with open("logo.png", 'rb') as f:
         bin_str = base64.b64encode(f.read()).decode()
-    logo_css = f".kricon-logo-container {{ background-image: url('data:image/png;base64,{bin_str}'); background-size: contain; background-repeat: no-repeat; background-position: center; height: 220px; width: 100%; }}"
+    
+    css_lines = [
+        ".kricon-logo-container { ",
+        f"background-image: url('data:image/png;base64,{bin_str}'); ",
+        "background-size: contain; background-repeat: no-repeat; ",
+        "background-position: center; height: 220px; width: 100%; }"
+    ]
+    logo_css = "".join(css_lines)
 else:
     st.warning("⚠️ Brak pliku 'logo.png' w folderze aplikacji! Wgraj go, aby zobaczyć logo.")
 
@@ -76,7 +83,7 @@ def get_cdn_flag_img_html(team_name):
     c_name = clean_and_sanitize_team_string(team_name)
     if c_name == "TBD": return '🌐'
     code = ISO_FLAGS_MAP.get(c_name, None)
-    if code: return f'<img src="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/{code}.svg" class="flag-img" />'
+    if code: return f"<img src='[https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/](https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/){code}.svg' class='flag-img' />"
     return '🌐'
 
 def calculate_points(pred_h, pred_a, real_h, real_a):
@@ -92,8 +99,7 @@ def get_gspread_client():
     creds = dict(st.secrets["gcp_service_account"])
     if "private_key" in creds:
         k = creds["private_key"]
-        k = k.replace("\\\\n", "\\n")
-        k = k.replace("\\n", chr(10))
+        k = k.replace(chr(92) + "n", chr(10))
         k = k.replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "")
         lines = [line.strip() for line in k.split(chr(10)) if line.strip()]
         creds["private_key"] = "-----BEGIN PRIVATE KEY-----" + chr(10) + chr(10).join(lines) + chr(10) + "-----END PRIVATE KEY-----" + chr(10)
@@ -121,24 +127,29 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
         gc = get_gspread_client()
         sh = gc.open("Kricon_Typer_2026").sheet1
         all_records = sh.get_all_records()
+        
         current_cloud_bets = {}
         for row in all_records:
             m = int(row["Mecz"])
             p = str(row["Gracz"])
             if m not in current_cloud_bets: current_cloud_bets[m] = {}
             current_cloud_bets[m][p] = (int(row["Typ_H"]), int(row["Typ_A"]))
+            
         if action == "save":
             if m_id not in current_cloud_bets: current_cloud_bets[m_id] = {}
             current_cloud_bets[m_id][user] = (h_val, a_val)
         elif action == "delete":
             if m_id in current_cloud_bets and user in current_cloud_bets[m_id]:
                 del current_cloud_bets[m_id][user]
+                
         rows = [["Mecz", "Gracz", "Typ_H", "Typ_A"]]
         for m, p_bets in current_cloud_bets.items():
             for p, tpl in p_bets.items():
                 rows.append([m, p, tpl[0], tpl[1]])
+                
         sh.clear()
         sh.update(range_name='A1', values=rows)
+        
         if action == "save":
             if m_id not in st.session_state.bets: st.session_state.bets[m_id] = {}
             st.session_state.bets[m_id][user] = (h_val, a_val)
@@ -153,6 +164,7 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
         return False
 
+# --- FUNKCJE INTERFEJSU UŻYTKOWNIKA ---
 @st.dialog("👁️ Typy graczy dla tego meczu")
 def show_other_bets(m_id, current_user):
     st.markdown(f"<h4 style='text-align: center; color: #F97316 !important;'>Mecz #{m_id}</h4>", unsafe_allow_html=True)
@@ -177,16 +189,18 @@ def render_leaderboard_html(now_time, new_positions_dict_dest=None):
                     if m_id in st.session_state.bets and p in st.session_state.bets[m_id]:
                         scores[p] += calculate_points(st.session_state.bets[m_id][p][0], st.session_state.bets[m_id][p][1], res.get('score_h'), res.get('score_a'))
     df = pd.merge(pd.DataFrame(list(scores.items()), columns=["Gracz", "Punkty"]), pd.DataFrame(list(missing_bets.items()), columns=["Gracz", "Brak typu"]), on="Gracz").sort_values(by="Punkty", ascending=False).reset_index(drop=True)
-    rows = ""
+    
+    html_lines = ["<table class='kricon-table'><tr><th class='col-pos'>Miejsce</th><th class='col-trend'>Trend</th><th>Gracz</th><th>Punkty</th><th class='col-missing'>Brak typu</th></tr>"]
     for idx, row in df.iterrows():
         pos, p_name = idx + 1, row['Gracz']
         if new_positions_dict_dest is not None: new_positions_dict_dest[p_name] = pos
         old_pos = st.session_state.last_positions.get(p_name, pos) if 'last_positions' in st.session_state else pos
         trend_html = '<span class="trend-up">▲</span>' if old_pos > pos else '<span class="trend-down">▼</span>' if old_pos < pos else '<span class="trend-stable">•</span>'
-        bg_class = 'class="gold-medal-row"' if pos == 1 else 'class="silver-medal-row"' if pos == 2 else 'class="bronze-medal-row"' if pos == 3 else ""
+        bg_class = "class='gold-medal-row'" if pos == 1 else "class='silver-medal-row'" if pos == 2 else "class='bronze-medal-row'" if pos == 3 else ""
         miss_html = f"<span style='color: #DC2626;'>{row['Brak typu']}</span>" if row['Brak typu'] > 0 else "<span style='color: #64748B;'>0</span>"
-        rows += f"<tr {bg_class}><td class='col-pos'><b>{pos}</b></td><td class='col-trend'>{trend_html}</td><td>{p_name}</td><td><b>{row['Punkty']} pkt</b></td><td class='col-missing'>{miss_html}</td></tr>"
-    return f"<table class='kricon-table'><tr><th class='col-pos'>Miejsce</th><th class='col-trend'>Trend</th><th>Gracz</th><th>Punkty</th><th class='col-missing'>Brak typu</th></tr>{rows}</table>"
+        html_lines.append(f"<tr {bg_class}><td class='col-pos'><b>{pos}</b></td><td class='col-trend'>{trend_html}</td><td>{p_name}</td><td><b>{row['Punkty']} pkt</b></td><td class='col-missing'>{miss_html}</td></tr>")
+    html_lines.append("</table>")
+    return "".join(html_lines)
 
 def render_bracket_match_html_clean(match_id, mt="0px", mb="6px"):
     m = st.session_state.results.get(match_id)
@@ -195,21 +209,25 @@ def render_bracket_match_html_clean(match_id, mt="0px", mb="6px"):
     sh, sa = (str(m.get("score_h")), str(m.get("score_a"))) if status in ["Zakończony", "LIVE"] and m.get("score_h") is not None else ("?", "?")
     win_h = status == "Zakończony" and m.get("score_h", 0) > m.get("score_a", 0)
     win_a = status == "Zakończony" and m.get("score_a", 0) > m.get("score_h", 0)
-    html_card = f"<div class='bracket-match-card' style='margin-top: {mt}; margin-bottom: {mb};'>"
-    html_card += f"<div class='bracket-match-title'>Mecz #{match_id}</div>"
-    class_h = "bracket-team-winner" if win_h else ""
-    html_card += f"<div class='bracket-row {class_h}'>"
-    html_card += f"<div style='display:flex; align-items:center; gap:6px; overflow: hidden;'>{get_cdn_flag_img_html(m['home'])}<span class='bracket-team-name'>{m['home']}</span></div>"
-    html_card += f"<span class='bracket-score-cell'>{sh}</span></div>"
-    class_a = "bracket-team-winner" if win_a else ""
-    html_card += f"<div class='bracket-row {class_a}'>"
-    html_card += f"<div style='display:flex; align-items:center; gap:6px; overflow: hidden;'>{get_cdn_flag_img_html(m['away'])}<span class='bracket-team-name'>{m['away']}</span></div>"
-    html_card += f"<span class='bracket-score-cell'>{sa}</span></div></div>"
-    st.markdown(html_card, unsafe_allow_html=True)
+    
+    html_card_lines = [
+        f"<div class='bracket-match-card' style='margin-top: {mt}; margin-bottom: {mb};'>",
+        f"<div class='bracket-match-title'>Mecz #{match_id}</div>",
+        f"<div class='bracket-row {'bracket-team-winner' if win_h else ''}'>",
+        f"<div style='display:flex; align-items:center; gap:6px; overflow: hidden;'>{get_cdn_flag_img_html(m['home'])}<span class='bracket-team-name'>{m['home']}</span></div>",
+        f"<span class='bracket-score-cell'>{sh}</span></div>",
+        f"<div class='bracket-row {'bracket-team-winner' if win_a else ''}'>",
+        f"<div style='display:flex; align-items:center; gap:6px; overflow: hidden;'>{get_cdn_flag_img_html(m['away'])}<span class='bracket-team-name'>{m['away']}</span></div>",
+        f"<span class='bracket-score-cell'>{sa}</span></div></div>"
+    ]
+    st.markdown("".join(html_card_lines), unsafe_allow_html=True)
 
 def get_mini_group_html_string(g_code):
-    lines = "".join([f"<div style='text-align:left; padding:2px 0; font-size:0.85rem; display:flex; align-items:center; gap:6px;'>{get_cdn_flag_img_html(t)} <span style='max-width: 75px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>{t}</span></div>" for t in GROUPS_DICT.get(f"Grupa {g_code}", [])])
-    return f"<div class='bracket-group-box'><div style='font-weight:bold; color:#F97316; margin-bottom:4px; font-size:0.85rem;'>GRUPA {g_code}</div>{lines}</div>"
+    html_lines = [f"<div class='bracket-group-box'><div style='font-weight:bold; color:#F97316; margin-bottom:4px; font-size:0.85rem;'>GRUPA {g_code}</div>"]
+    for t in GROUPS_DICT.get(f"Grupa {g_code}", []):
+        html_lines.append(f"<div style='text-align:left; padding:2px 0; font-size:0.85rem; display:flex; align-items:center; gap:6px;'>{get_cdn_flag_img_html(t)} <span style='max-width: 75px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>{t}</span></div>")
+    html_lines.append("</div>")
+    return "".join(html_lines)
 
 def generate_schedule():
     schedule = {}
@@ -304,10 +322,13 @@ else:
             if h_key not in st.session_state: st.session_state[h_key] = int(saved_h)
             if a_key not in st.session_state: st.session_state[a_key] = int(saved_a)
             
-            st.markdown(f"""
-            <div class="meta-upper-bar-container">
-                <span class="meta-id-text-clean">⚽ Mecz #{m_id}</span> {status_html} <span style="color:#94A3B8;">📅 {m['date']}</span> <span style="color:#38BDF8; font-weight:bold;">📍 {m.get('venue').split(',')[0]}</span> <span style="color:#64748B;">({m['stage']})</span>
-            </div><div class='match-row-anchor'></div>""", unsafe_allow_html=True)
+            html_top_lines = [
+                "<div class='meta-upper-bar-container'>",
+                f"<span class='meta-id-text-clean'>⚽ Mecz #{m_id}</span> {status_html} <span style='color:#94A3B8;'>📅 {m['date']}</span> ",
+                f"<span style='color:#38BDF8; font-weight:bold;'>📍 {m.get('venue').split(',')[0]}</span> <span style='color:#64748B;'>({m['stage']})</span>",
+                "</div><div class='match-row-anchor'></div>"
+            ]
+            st.markdown("".join(html_top_lines), unsafe_allow_html=True)
             
             c_home, c_inph, c_sep, c_inpa, c_away, c_score, c_save, c_del, c_status = st.columns([2.5, 1.8, 0.2, 1.8, 2.5, 1.5, 1.2, 0.6, 1.2])
             with c_home: st.markdown(f"<div class='team-align-right'><span>{m['home']}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
@@ -350,11 +371,21 @@ else:
         locked_matches = [m_id for m_id, m in st.session_state.results.items() if (m['timestamp'] - now).total_seconds() <= 0]
         if not locked_matches: st.info("Żaden mecz jeszcze się nie rozpoczął. Obstawione wyniki rywali są zablokowane! 🔒")
         else:
-            table_html = "<table class='kricon-table'><tr><th style='text-align:left; padding-left:15px;'>Mecz</th>" + "".join([f"<th>{p}</th>" for p in players]) + "</tr>"
+            table_html_lines = ["<table class='kricon-table'><tr><th style='text-align:left; padding-left:15px;'>Mecz</th>"]
+            for p in players:
+                table_html_lines.append(f"<th>{p}</th>")
+            table_html_lines.append("</tr>")
+            
             for m_id in sorted(locked_matches, reverse=True):
                 m = st.session_state.results[m_id]
-                table_html += f"<tr><td style='text-align:left; padding-left:15px;'><b style='color:#F97316;'>#{m_id}</b>&nbsp;&nbsp; {get_cdn_flag_img_html(m['home'])} {m['home']} <b>-</b> {m['away']} {get_cdn_flag_img_html(m['away'])}</td>" + "".join([f"<td style='text-align:center; font-weight:bold;'>{st.session_state.bets.get(m_id, {}).get(p)[0]} : {st.session_state.bets.get(m_id, {}).get(p)[1]}</td>" if st.session_state.bets.get(m_id, {}).get(p) else "<td style='text-align:center; color:#64748B;'>-</td>" for p in players]) + "</tr>"
-            st.markdown(table_html + "</table>", unsafe_allow_html=True)
+                table_html_lines.append(f"<tr><td style='text-align:left; padding-left:15px;'><b style='color:#F97316;'>#{m_id}</b>&nbsp;&nbsp; {get_cdn_flag_img_html(m['home'])} {m['home']} <b>-</b> {m['away']} {get_cdn_flag_img_html(m['away'])}</td>")
+                for p in players:
+                    p_bet = st.session_state.bets.get(m_id, {}).get(p)
+                    if p_bet: table_html_lines.append(f"<td style='text-align:center; font-weight:bold;'>{p_bet[0]} : {p_bet[1]}</td>")
+                    else: table_html_lines.append("<td style='text-align:center; color:#64748B;'>-</td>")
+                table_html_lines.append("</tr>")
+            table_html_lines.append("</table>")
+            st.markdown("".join(table_html_lines), unsafe_allow_html=True)
 
     with tab4:
         st.header("Tabele Grup Turniejowych")
@@ -374,11 +405,11 @@ else:
             df_g.index += 1
             if len(df_g) >= 3: third_places_list.append(df_g.iloc[2].to_dict())
             
-            g_rows = ""
+            html_g_rows = []
             for idx, r in df_g.iterrows():
-                bg_style = 'style="background-color:#16A34A;"' if idx in [1, 2] else 'style="background-color:#EA580C;"' if idx==3 else ''
-                g_rows += f"<tr {bg_style}><td><b>{idx}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
-            st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table>", unsafe_allow_html=True)
+                bg_style = "style='background-color:#16A34A;'" if idx in [1, 2] else "style='background-color:#EA580C;'" if idx==3 else ""
+                html_g_rows.append(f"<tr {bg_style}><td><b>{idx}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>")
+            st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{''.join(html_g_rows)}</table>", unsafe_allow_html=True)
 
         st.divider()
         st.header("📊 Zbiorcza Tabela 3. Miejsc")
@@ -388,13 +419,12 @@ else:
             df_3rd = pd.DataFrame(third_places_list).sort_values(by=["Pkt", "RB", "BZ"], ascending=False).reset_index(drop=True)
             df_3rd.index += 1
             
-            t3_rows = ""
+            html_t3_rows = []
             for idx, r in df_3rd.iterrows():
-                bg_style = 'style="background-color:#16A34A;"' if idx <= 8 else 'style="background-color:#450A0A; opacity:0.8;"'
-                t3_rows += f"<tr {bg_style}><td><b>{idx}</b></td><td><small style='color:#94A3B8;'>{r['Grupa']}</small></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
+                bg_style = "style='background-color:#16A34A;'" if idx <= 8 else "style='background-color:#450A0A; opacity:0.8;'"
+                html_t3_rows.append(f"<tr {bg_style}><td><b>{idx}</b></td><td><small style='color:#94A3B8;'>{r['Grupa']}</small></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>")
             
-            t3_table_html = f"<table class='kricon-table'><tr><th>Poz.</th><th>Grupa</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{t3_rows}</table>"
-            st.markdown(t3_table_html, unsafe_allow_html=True)
+            st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Grupa</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{''.join(html_t3_rows)}</table>", unsafe_allow_html=True)
 
     with tab5:
         st.header("🏆 Drabinka Fazy Pucharowej")
@@ -413,8 +443,19 @@ else:
         with c_fin:
             m_104 = st.session_state.results.get(104, {})
             sh_f, sa_f = (str(m_104.get('score_h')), str(m_104.get('score_a'))) if m_104.get('score_h') is not None else ("?", "?")
-            html_final = f"<div class='center-final-card-wrapper' style='margin-top: 195px;'><div class='center-final-card'><div class='final-title'>🏆 WIELKI FINAŁ</div><div class='final-teams'><div class='final-team'>{get_cdn_flag_img_html(m_104.get('home'))}<span class='bracket-team-name'>{m_104.get('home','TBD')}</span></div><div class='final-score'>{sh_f} : {sa_f}</div><div class='final-team'>{get_cdn_flag_img_html(m_104.get('away'))}<span class='bracket-team-name'>{m_104.get('away','TBD')}</span></div></div><div class='final-venue'>📍 {m_104.get('venue','TBD')} | 📅 {m_104.get('date','TBD')}</div></div></div>"
-            st.markdown(html_final, unsafe_allow_html=True)
+            
+            html_final_lines = [
+                "<div class='center-final-card-wrapper' style='margin-top: 195px;'>",
+                "<div class='center-final-card'>",
+                "<div class='final-title'>🏆 WIELKI FINAŁ</div>",
+                "<div class='final-teams'>",
+                f"<div class='final-team'>{get_cdn_flag_img_html(m_104.get('home'))}<span class='bracket-team-name'>{m_104.get('home','TBD')}</span></div>",
+                f"<div class='final-score'>{sh_f} : {sa_f}</div>",
+                f"<div class='final-team'>{get_cdn_flag_img_html(m_104.get('away'))}<span class='bracket-team-name'>{m_104.get('away','TBD')}</span></div>",
+                f"</div><div class='final-venue'>📍 {m_104.get('venue','TBD')} | 📅 {m_104.get('date','TBD')}</div>",
+                "</div></div>"
+            ]
+            st.markdown("".join(html_final_lines), unsafe_allow_html=True)
             st.markdown("<div style='text-align:center; margin-top:20px; font-weight:bold; color:#94A3B8; font-size: 0.8rem;'>🥉 Mecz o 3. miejsce</div>", unsafe_allow_html=True)
             render_bracket_match_html_clean(103)
         with c_2r:
@@ -427,6 +468,3 @@ else:
             for i in range(81, 89): render_bracket_match_html_clean(i)
         with c_g2:
             for g in ["G","H","I","J","K","L"]: st.markdown(get_mini_group_html_string(g), unsafe_allow_html=True)
-"""
-print("Verification of pure final string complete.")}
-}
