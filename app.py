@@ -179,11 +179,17 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- SILNIK GOOGLE SHEETS VIA GSPREAD (Z POPRAWKĄ PROSTOWANIA ZNAKÓW \n) ---
+# --- ULTRAPANCERNY GENERATOR KLIENTA GOOGLE (IGNORUJE BŁĘDY FORMATOWANIA W SECRETS) ---
 def get_gspread_client():
     creds = dict(st.secrets["gcp_service_account"])
     if "private_key" in creds:
-        creds["private_key"] = creds["private_key"].replace("\\n", "\n")
+        k = creds["private_key"]
+        # Usuwamy wszelkie nagłówki, by odizolować czysty kod base64 i pozbyć się śmieci tekstowych
+        k = k.replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "")
+        # Kasujemy absolutnie wszystkie tekstowe \n, prawdziwe entery, spacji i tabulatory
+        k = k.replace("\\n", "").replace("\n", "").replace("\r", "").replace(" ", "").strip()
+        # Budujemy od zera idealny, jednolity ciąg PEM, który bez problemu przetworzy biblioteka Google
+        creds["private_key"] = f"-----BEGIN PRIVATE KEY-----\n{k}\n-----END PRIVATE KEY-----\n"
     return gspread.service_account_from_dict(creds)
 
 def load_from_google_sheets():
@@ -462,7 +468,7 @@ else:
             df_g = pd.DataFrame.from_dict(stats, orient='index').reset_index().rename(columns={'index': 'Reprezentacja'}).sort_values(by=["Pkt", "RB", "BZ"], ascending=False).reset_index(drop=True)
             df_g.index += 1
             if len(df_g) >= 3: third_places_list.append(df_g.iloc[2].to_dict())
-            g_rows = "".join([f"<tr {'style=\"background-color:#16A34A;\"' if idx in [1, 2] else 'style=\"background-color:#EA580C;\"' if idx==3 else ''}><td><b>{idx}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>" for idx, r in df_g.iterrows()])
+            g_rows = "".join([f"<tr {'style=\"background-color:#16A34A;\"' if idx in [1, 2] else 'style=\"background-color:#EA580C;\"' if idx==3 else ''}><td><b>{idx}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BZ']}</td><td>{r['RB']}</td></tr>" for idx, r in df_g.iterrows()])
             st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table>", unsafe_allow_html=True)
 
         st.divider()
