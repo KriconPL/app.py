@@ -170,9 +170,14 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- SILNIK GOOGLE SHEETS W FORMACIE JEDNOLINIJKOWEGO JSON ---
+# --- SILNIK GOOGLE SHEETS Z FILTREM CZYSZCZĄCYM ARTEFAKTY TEKSTOWE ---
 def get_gspread_client():
-    creds = json.loads(st.secrets["google_creds"])
+    creds = dict(st.secrets["gcp_service_account"])
+    if "private_key" in creds:
+        raw_key = creds["private_key"]
+        raw_key = raw_key.replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "")
+        clean_key = "".join(raw_key.split())
+        creds["private_key"] = f"-----BEGIN PRIVATE KEY-----\n{clean_key}\n-----END PRIVATE KEY-----\n"
     return gspread.service_account_from_dict(creds)
 
 def load_from_google_sheets():
@@ -461,7 +466,7 @@ else:
             g_rows = ""
             for idx, r in df_g.iterrows():
                 bg_style = 'style="background-color:#16A34A;"' if idx in [1, 2] else 'style="background-color:#EA580C;"' if idx==3 else ''
-                g_rows += f"<tr {bg_style}><td><b>{idx}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BZ']}</td><td>{r['RB']}</td></tr>"
+                g_rows += f"<tr {bg_style}><td><b>{idx}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>"
             st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{g_rows}</table>", unsafe_allow_html=True)
 
         st.divider()
@@ -497,7 +502,7 @@ else:
         with c_fin:
             m_104 = st.session_state.results.get(104, {})
             sh_f, sa_f = (str(m_104.get('score_h')), str(m_104.get('score_a'))) if m_104.get('score_h') is not None else ("?", "?")
-            st.markdown(f\"\"\"
+            st.markdown(f"""
             <div class='center-final-card-wrapper' style='margin-top: 195px;'>
                 <div class='center-final-card'>
                     <div class='final-title'>🏆 WIELKI FINAŁ</div>
@@ -506,7 +511,7 @@ else:
                         <div class='final-score'>{sh_f} : {sa_f}</div>
                         <div class='final-team'>{get_cdn_flag_img_html(m_104.get('away'))}<span class="bracket-team-name">{m_104.get('away','TBD')}</span></div>
                     </div><div class='final-venue'>📍 {m_104.get('venue')} | 📅 {m_104.get('date')}</div>
-                </div></div>\"\"\", unsafe_allow_html=True)
+                </div></div>""", unsafe_allow_html=True)
             st.markdown("<div style='text-align:center; margin-top:20px; font-weight:bold; color:#94A3B8; font-size: 0.8rem;'>🥉 Mecz o 3. miejsce</div>", unsafe_allow_html=True)
             render_bracket_match_html_clean(103)
         with c_2r:
