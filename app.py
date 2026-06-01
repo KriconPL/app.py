@@ -179,16 +179,13 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- ULTRAPANCERNY GENERATOR KLIENTA GOOGLE (IGNORUJE BŁĘDY FORMATOWANIA W SECRETS) ---
+# --- ULTRAPANCERNY GENERATOR KLIENTA GOOGLE (CZYŚCI I SKŁADA CAŁY KLUCZ OD NOWA) ---
 def get_gspread_client():
     creds = dict(st.secrets["gcp_service_account"])
     if "private_key" in creds:
         k = creds["private_key"]
-        # Usuwamy wszelkie nagłówki, by odizolować czysty kod base64 i pozbyć się śmieci tekstowych
         k = k.replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "")
-        # Kasujemy absolutnie wszystkie tekstowe \n, prawdziwe entery, spacji i tabulatory
         k = k.replace("\\n", "").replace("\n", "").replace("\r", "").replace(" ", "").strip()
-        # Budujemy od zera idealny, jednolity ciąg PEM, który bez problemu przetworzy biblioteka Google
         creds["private_key"] = f"-----BEGIN PRIVATE KEY-----\n{k}\n-----END PRIVATE KEY-----\n"
     return gspread.service_account_from_dict(creds)
 
@@ -247,7 +244,7 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
     except Exception as e:
         import traceback
         print("\n!!! [BŁĄD KRYTYCZNY GOOGLE SHEETS] !!!")
-        traceback.print_exc()
+        traceback.printExc()
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
         return False
 
