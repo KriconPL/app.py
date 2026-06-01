@@ -170,14 +170,15 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- SILNIK GENEROWANIA KLIENTA GOOGLE (NIEZNISZCZALNE FORMATOWANIE CHR) ---
+# --- SILNIK GENEROWANIA KLIENTA GOOGLE (ODPORNY NA ROZRYWANIE STRINGÓW) ---
 def get_gspread_client():
     creds = dict(st.secrets["gcp_service_account"])
     if "private_key" in creds:
-        k = creds["private_key"].replace(chr(92) + chr(110), chr(10))
+        k = creds["private_key"]
         k = k.replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "")
-        lines = [line.strip() for line in k.split(chr(10)) if line.strip()]
-        creds["private_key"] = "-----BEGIN PRIVATE KEY-----\n" + "\n".join(lines) + "\n-----END PRIVATE KEY-----\n"
+        k = k.replace(chr(92) + "n", "").replace(chr(10), "").replace(chr(13), "").replace(" ", "").strip()
+        chunks = [k[i:i+64] for i in range(0, len(k), 64)]
+        creds["private_key"] = "-----BEGIN PRIVATE KEY-----" + chr(10) + chr(10).join(chunks) + chr(10) + "-----END PRIVATE KEY-----" + chr(10)
     return gspread.service_account_from_dict(creds)
 
 def load_from_google_sheets():
@@ -502,7 +503,7 @@ else:
         with c_fin:
             m_104 = st.session_state.results.get(104, {})
             sh_f, sa_f = (str(m_104.get('score_h')), str(m_104.get('score_a'))) if m_104.get('score_h') is not None else ("?", "?")
-            st.markdown(f\"\"\"
+            st.markdown(f"""
             <div class='center-final-card-wrapper' style='margin-top: 195px;'>
                 <div class='center-final-card'>
                     <div class='final-title'>🏆 WIELKI FINAŁ</div>
@@ -511,7 +512,7 @@ else:
                         <div class='final-score'>{sh_f} : {sa_f}</div>
                         <div class='final-team'>{get_cdn_flag_img_html(m_104.get('away'))}<span class="bracket-team-name">{m_104.get('away','TBD')}</span></div>
                     </div><div class='final-venue'>📍 {m_104.get('venue')} | 📅 {m_104.get('date')}</div>
-                </div></div>\"\"\", unsafe_allow_html=True)
+                </div></div>""", unsafe_allow_html=True)
             st.markdown("<div style='text-align:center; margin-top:20px; font-weight:bold; color:#94A3B8; font-size: 0.8rem;'>🥉 Mecz o 3. miejsce</div>", unsafe_allow_html=True)
             render_bracket_match_html_clean(103)
         with c_2r:
