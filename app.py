@@ -47,64 +47,47 @@ css_styles = [
     ".team-align-left { font-size: 1.15rem !important; font-weight: bold !important; text-align: left; display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; white-space: nowrap; height: 38px; line-height: 38px; color: #F8FAFC !important; }",
     ".off-score { font-size: 0.85rem !important; font-weight: bold !important; color: #94A3B8 !important; background-color: #1E293B !important; border: 1px solid #334155 !important; border-radius: 4px; display: block; text-align: center; white-space: nowrap; height: 38px !important; line-height: 36px !important; width: 100%; }",
     ".score-colon { text-align: center; font-weight: bold; color: #F97316 !important; font-size: 1.4rem; height: 38px; line-height: 34px; width: 100%; }",
-    ".result-box { display: flex; align-items: center; justify-content: center; height: 38px; width: 100%; border-radius: 6px; font-weight: 900; font-size: 1.3rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }",
-    ".bet-locked { background: #0F172A; color: #64748B; border: 1px solid #1E293B; }",
-    ".bet-exact { background: #16A34A; color: #FFFFFF; border: 2px solid #4ADE80; box-shadow: 0 0 10px rgba(74, 222, 128, 0.4); } ",
-    ".bet-winner { background: #064E3B; color: #4ADE80; border: 1px dashed #16A34A; } ",
-    ".bet-wrong { background: #450A0A; color: #FCA5A5; border: 1px dashed #DC2626; } ",
     "div[data-testid='stSelectbox'] div[data-baseweb='select'] > div { background-color: #1E293B !important; border: 1px solid #334155 !important; }",
     "div[data-testid='stSelectbox'] div[data-baseweb='select'] span { color: #F8FAFC !important; }",
-    "ul[role='listbox'] { background-color: #1E293B !important; }",
-    "li[role='option'] { background-color: #1E293B !important; color: #F8FAFC !important; }",
-    "li[role='option']:hover, li[role='option'][aria-selected='true'] { background-color: #334155 !important; color: #F97316 !important; }",
     "div[data-testid='stTextInput'] div[data-baseweb='input'] { background-color: #1E293B !important; border: 1px solid #334155 !important; }",
     "div[data-testid='stTextInput'] input { color: #F8FAFC !important; -webkit-text-fill-color: #F8FAFC !important; background-color: transparent !important; }",
-    "div[data-testid='stNumberInput'] div[data-baseweb='input'] { background-color: #0A1128 !important; border: 1px solid #1E3A8A !important; border-radius: 6px !important; height: 38px !important; transition: none !important; overflow: hidden; }",
+    "div[data-testid='stNumberInput'] div[data-baseweb='input'] { background-color: #0A1128 !important; border: 1px solid #1E3A8A !important; border-radius: 6px !important; height: 38px !important; overflow: hidden; }",
     "div[data-testid='stNumberInput'] input { color: #F8FAFC !important; -webkit-text-fill-color: #F8FAFC !important; background-color: #0A1128 !important; font-size: 1.25rem !important; font-weight: 900 !important; text-align: center !important; padding: 0 !important; }",
-    "div[data-testid='stNumberInput'] button { background-color: #1E293B !important; border: none !important; border-radius: 4px !important; width: 32px !important; height: 32px !important; margin: 2px !important; transition: transform 0.1s ease !important; }",
+    "div[data-testid='stNumberInput'] button { background-color: #1E293B !important; border: none !important; width: 32px !important; height: 32px !important; margin: 2px !important; }",
     "div[data-testid='stNumberInput'] button svg { fill: #F97316 !important; color: #F97316 !important; }",
-    "div[data-testid='stNumberInput'] button:hover { background-color: #334155 !important; }",
-    "div[data-testid='stNumberInput'] button:hover svg { fill: #FFFFFF !important; }",
-    "button[kind='secondary'] { background-color: #1E293B !important; border: 1px solid #334155 !important; border-radius: 4px !important; height: 38px !important; min-height: 38px !important; padding: 0 !important; width: 100% !important; display: block !important; }",
+    "button[kind='secondary'] { background-color: #1E293B !important; border: 1px solid #334155 !important; border-radius: 4px !important; height: 38px !important; width: 100% !important; }",
     "button[kind='secondary'] * { color: #F97316 !important; font-weight: bold !important; font-size: 1.1rem !important; }",
-    "button[kind='secondary']:hover { background-color: #334155 !important; }",
-    "button[kind='secondary']:hover * { color: #FFFFFF !important; }",
-    "button[kind='primary'] { background-color: #F97316 !important; border: 1px solid #EA580C !important; border-radius: 4px !important; height: 38px !important; min-height: 38px !important; padding: 0 !important; width: 100% !important; display: block !important; box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important; }",
-    "button[kind='primary'] * { color: #FFFFFF !important; font-size: 0.9rem !important; font-weight: bold !important; }",
-    "button[kind='primary']:hover { background-color: #EA580C !important; border-color: #C2410C !important; }",
-    ".success-bet-banner { background: #16A34A; color: white; text-align: center; font-weight: bold; border-radius: 4px; height: 38px; line-height: 38px; font-size: 0.8rem; width: 100%; white-space: nowrap; display:block; }",
-    ".missing-bet-banner-blink { animation: blinker 1.2s infinite !important; border: 1px solid #EF4444; color: #FFFFFF !important; font-weight: bold !important; text-align: center !important; height: 38px !important; line-height: 38px !important; border-radius: 4px !important; font-size: 0.7rem !important; display: block !important; width: 100% !important; margin: 0 !important; white-space: nowrap !important; }",
-    ".status-badge-ended { color: #94A3B8 !important; font-weight: bold; font-size: 0.65rem !important; }",
+    "button[kind='primary'] { background-color: #F97316 !important; border: 1px solid #EA580C !important; border-radius: 4px !important; height: 38px !important; width: 100% !important; }",
+    "button[kind='primary'] * { color: #FFFFFF !important; font-weight: bold !important; }",
+    "status-badge-ended { color: #94A3B8 !important; font-weight: bold; font-size: 0.65rem !important; }",
     ".status-badge-live { color: #DC2626 !important; font-weight: bold; font-size: 0.65rem !important; }",
     ".kricon-table { width: 100%; border-collapse: collapse; margin: 15px 0 35px 0; background-color: #172554 !important; border-radius: 8px; overflow: hidden; }",
-    ".kricon-table th { background-color: #F97316 !important; color: #0A1128 !important; padding: 12px; font-weight: 800; }",
-    ".kricon-table td { padding: 11px 12px; border-bottom: 1px solid #1E3A8A !important; color: #F8FAFC; }",
+    ".kricon-table th { background-color: #F97316 !important; color: #0A1128 !important; padding: 12px; font-weight: 800; text-align: center; }",
+    ".kricon-table td { padding: 11px 12px; border-bottom: 1px solid #1E3A8A !important; color: #F8FAFC; text-align: center; }",
+    ".kricon-table td.team-cell { text-align: left !important; font-weight: bold; }",
     ".col-pos { width: 60px !important; text-align: center !important; }",
     ".col-trend { width: 60px !important; text-align: center !important; }",
-    ".col-missing { width: 100px !important; text-align: center !important; font-weight: bold !important; }",
-    ".gold-medal-row { background-color: rgba(254, 240, 138, 0.95) !important; font-weight: bold; }",
-    ".gold-medal-row td, .gold-medal-row b { color: #0A1128 !important; }",
-    ".silver-medal-row { background-color: rgba(226, 232, 240, 0.95) !important; font-weight: bold; }",
-    ".silver-medal-row td, .silver-medal-row b { color: #0A1128 !important; }",
-    ".bronze-medal-row { background-color: rgba(254, 215, 170, 0.95) !important; font-weight: bold; }",
-    ".bronze-medal-row td, .bronze-medal-row b { color: #0A1128 !important; }",
+    ".gold-medal-row { background-color: rgba(254, 240, 138, 0.95) !important; }",
+    ".gold-medal-row td { color: #0A1128 !important; }",
+    ".silver-medal-row { background-color: rgba(226, 232, 240, 0.95) !important; }",
+    ".silver-medal-row td { color: #0A1128 !important; }",
+    ".bronze-medal-row { background-color: rgba(254, 215, 170, 0.95) !important; }",
+    ".bronze-medal-row td { color: #0A1128 !important; }",
     ".trend-up { color: #16A34A !important; font-weight: bold; }",
     ".trend-down { color: #DC2626 !important; font-weight: bold; }",
     ".trend-stable { color: #64748B !important; }",
-    ".points-legend { background-color: #060B19; border-left: 5px solid #F97316; padding: 12px; margin-bottom: 15px; border-radius: 4px; }",
-    ".flag-img { width: 22px !important; height: 14px !important; object-fit: cover !important; border-radius: 2px !important; display: inline-block; vertical-align: middle; border: 1px solid rgba(255,255,255,0.2); }",
+    ".flag-img { width: 22px !important; height: 14px !important; object-fit: cover !important; border-radius: 2px !important; display: inline-block; vertical-align: middle; border: 1px solid rgba(255,255,255,0.2); margin-right: 6px; }",
     ".bracket-match-card { background: #172554 !important; border: 2px solid #1E3A8A !important; border-radius: 8px; padding: 6px; font-size: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }",
     ".bracket-match-title { font-size: 0.70rem !important; color: #F97316 !important; font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid #1E3A8A; padding-bottom: 2px; }",
     ".bracket-row { display: flex; justify-content: space-between; align-items: center; padding: 2px 0; font-size: 0.85rem !important; }",
     ".bracket-score-cell { background: #0A1128; color: #F97316; font-weight: bold; padding: 1px 6px; border-radius: 4px; min-width: 22px; text-align: center; border: 1px solid #1E3A8A; }",
     ".bracket-team-winner { color: #4ADE80 !important; font-weight: bold; }",
     ".bracket-team-name { max-width: 60px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; vertical-align: middle; }",
-    ".bracket-group-box { background: #0D1B3E !important; border: 1px solid #F97316 !important; border-radius: 8px; padding: 8px; margin-bottom: 8px; }",
     ".center-final-card-wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 250px; }",
     ".center-final-card { background: linear-gradient(145deg, #1E3A8A, #0A1128) !important; border: 2px solid #F97316 !important; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 0 20px rgba(249,115,22,0.3); width: 100%; }",
-    ".final-title { color: #F97316; font-size: 1.1rem; font-weight: 900; margin-bottom: 10px; letter-spacing: 1px; text-transform: uppercase; }",
+    ".final-title { color: #F97316; font-size: 1.1rem; font-weight: 900; margin-bottom: 10px; text-transform: uppercase; }",
     ".final-teams { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }",
-    ".final-team { font-size: 1.05rem; font-weight: bold; color: #F8FAFC; display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center; overflow: hidden; }",
+    ".final-team { font-size: 1.05rem; font-weight: bold; color: #F8FAFC; display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center; }",
     ".final-score { font-size: 1.5rem; font-weight: 900; color: #F97316; background: #060B19; padding: 4px 12px; border-radius: 8px; border: 1px solid #334155; }",
     ".final-venue { font-size: 0.75rem; color: #94A3B8; }",
     "</style>"
@@ -156,14 +139,9 @@ ISO_FLAGS_MAP = {
     "Anglia": "gb-eng", "Chorwacja": "hr", "Ghana": "gh", "Panama": "pa"
 }
 
-def clean_and_sanitize_team_string(raw_name):
-    if not raw_name or raw_name == "TBD": return "TBD"
-    return str(raw_name).strip()
-
 def get_cdn_flag_img_html(team_name):
-    c_name = clean_and_sanitize_team_string(team_name)
-    if c_name == "TBD": return '🌐'
-    code = ISO_FLAGS_MAP.get(c_name, None)
+    if not team_name or team_name == "TBD": return '🌐'
+    code = ISO_FLAGS_MAP.get(team_name.strip(), None)
     if code: return f"<img src='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.4.6/flags/4x3/{code}.svg' class='flag-img' />"
     return '🌐'
 
@@ -175,12 +153,11 @@ def calculate_points(pred_h, pred_a, real_h, real_a):
     except (ValueError, TypeError): pass
     return 0
 
-# --- 3. SILNIK GOOGLE CACHED ---
+# --- 3. SILNIK GOOGLE CHMURY ---
 @st.cache_resource
 def get_gspread_client():
     creds_json = base64.b64decode(st.secrets["gcp_base64_creds"]).decode('utf-8')
-    creds = json.loads(creds_json)
-    return gspread.service_account_from_dict(creds)
+    return gspread.service_account_from_dict(json.loads(creds_json))
 
 def load_from_google_sheets():
     try:
@@ -197,12 +174,10 @@ def load_from_google_sheets():
                 a = int(row["Typ_A"]) if str(row["Typ_A"]).strip() != "" else 0
                 if player in players or player == "admin":
                     new_bets[m_id][player] = (h, a)
-            except (ValueError, KeyError):
-                continue
+            except (ValueError, KeyError): continue
         st.session_state.bets = new_bets
         return True
-    except Exception as e:
-        return False
+    except Exception: return False
 
 def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
     try:
@@ -217,11 +192,9 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
                 p = str(row["Gracz"]).strip()
                 h_b = int(row["Typ_H"]) if str(row["Typ_H"]).strip() != "" else 0
                 a_b = int(row["Typ_A"]) if str(row["Typ_A"]).strip() != "" else 0
-                if m not in current_cloud_bets: 
-                    current_cloud_bets[m] = {}
+                if m not in current_cloud_bets: current_cloud_bets[m] = {}
                 current_cloud_bets[m][p] = (h_b, a_b)
-            except (ValueError, KeyError):
-                continue
+            except (ValueError, KeyError): continue
                 
         if action == "save":
             if m_id not in current_cloud_bets: current_cloud_bets[m_id] = {}
@@ -242,13 +215,11 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
             if m_id not in st.session_state.bets: st.session_state.bets[m_id] = {}
             st.session_state.bets[m_id][user] = (h_val, a_val)
         elif action == "delete":
-            if user in st.session_state.bets.get(m_id, {}):
-                del st.session_state.bets[m_id][user]
+            if user in st.session_state.bets.get(m_id, {}): del st.session_state.bets[m_id][user]
         return True
-    except Exception as e:
-        return False
+    except Exception: return False
 
-# BŁYSKAWICZNE FUNKCJE CALLBACK DLA ZAPISU/USUWANIA
+# CALLBACKI WYWOŁYWANE PRZY ZAPISIE
 def handle_save(m_id, user, h_key, a_key):
     h = st.session_state.get(h_key, 0)
     a = st.session_state.get(a_key, 0)
@@ -265,7 +236,86 @@ def handle_delete(m_id, user, h_key, a_key):
     else:
         st.session_state.toast_msg = "Błąd usuwania! ❌"
 
-# --- 4. FUNKCJE WIZUALNE I LOGICZNE ---
+# --- 4. SEKCJA LOGIKI TABEL GRUPOWYCH ---
+def calculate_group_tables_html():
+    # Inicjalizacja słownika statystyk drużyn
+    stats = {}
+    for g_name, teams in GROUPS_DICT.items():
+        for t in teams:
+            stats[t] = {"M": 0, "Pkt": 0, "Z": 0, "R": 0, "P": 0, "BZ": 0, "BS": 0, "Grupa": g_name}
+            
+    # Przetwarzanie meczów fazy grupowej (Mecze 1-72)
+    for m_id in range(1, 73):
+        m = st.session_state.results.get(m_id)
+        if m and m.get("status") == "Zakończony" and m.get("score_h") is not None and m.get("score_a") is not None:
+            h, a = m["home"], m["away"]
+            sh, sa = int(m["score_h"]), int(m["score_a"])
+            
+            stats[h]["M"] += 1
+            stats[a]["M"] += 1
+            stats[h]["BZ"] += sh
+            stats[h]["BS"] += sa
+            stats[a]["BZ"] += sa
+            stats[a]["BS"] += sh
+            
+            if sh > sa:
+                stats[h]["Pkt"] += 3
+                stats[h]["Z"] += 1
+                stats[a]["P"] += 1
+            elif sh < sa:
+                stats[a]["Pkt"] += 3
+                stats[a]["Z"] += 1
+                stats[h]["P"] += 1
+            else:
+                stats[h]["Pkt"] += 1
+                stats[a]["Pkt"] += 1
+                stats[h]["R"] += 1
+                stats[a]["R"] += 1
+
+    # Budowanie html z widokiem tabel podzielonych na kolumny
+    html_output = []
+    groups_list = sorted(list(GROUPS_DICT.keys()))
+    
+    # Wyświetlamy po dwie grupy w jednym rzędzie wizualnym Streamlit za pomocą HTML
+    for i in range(0, len(groups_list), 2):
+        g1, g2 = groups_list[i], groups_list[i+1] if i+1 < len(groups_list) else None
+        
+        html_output.append("<div style='display: flex; gap: 20px; margin-bottom: 20px; width: 100%; flex-wrap: wrap;'>")
+        
+        # Tabela 1
+        html_output.append(f"<div style='flex: 1; min-width: 300px;'>")
+        html_output.append(f"<h4 style='color: #F97316 !important; border-bottom: 2px solid #F97316; padding-bottom: 4px;'>{g1}</h4>")
+        html_output.append("<table class='kricon-table'><tr><th>Poz</th><th style='text-align:left;'>Drużyna</th><th>M</th><th>Pkt</th><th>Z</th><th>R</th><th>P</th><th>Bilans</th></tr>")
+        
+        g1_teams = [t for t, data in stats.items() if data["Grupa"] == g1]
+        # Sortowanie: Punkty -> Bilans bramkowy -> Bramki zdobyte
+        g1_teams_sorted = sorted(g1_teams, key=lambda x: (stats[x]["Pkt"], stats[x]["BZ"] - stats[x]["BS"], stats[x]["BZ"]), reverse=True)
+        
+        for idx, team in enumerate(g1_teams_sorted):
+            d = stats[team]
+            bg_row = "class='gold-medal-row'" if idx < 2 else ""
+            html_output.append(f"<tr {bg_row}><td><b>{idx+1}</b></td><td class='team-cell'>{get_cdn_flag_img_html(team)} {team}</td><td>{d['M']}</td><td><b>{d['Pkt']}</b></td><td>{d['Z']}</td><td>{d['R']}</td><td>{d['P']}</td><td>{d['BZ']}:{d['BS']}</td></tr>")
+        html_output.append("</table></div>")
+        
+        # Tabela 2
+        if g2:
+            html_output.append(f"<div style='flex: 1; min-width: 300px;'>")
+            html_output.append(f"<h4 style='color: #F97316 !important; border-bottom: 2px solid #F97316; padding-bottom: 4px;'>{g2}</h4>")
+            html_output.append("<table class='kricon-table'><tr><th>Poz</th><th style='text-align:left;'>Drużyna</th><th>M</th><th>Pkt</th><th>Z</th><th>R</th><th>P</th><th>Bilans</th></tr>")
+            
+            g2_teams = [t for t, data in stats.items() if data["Grupa"] == g2]
+            g2_teams_sorted = sorted(g2_teams, key=lambda x: (stats[x]["Pkt"], stats[x]["BZ"] - stats[x]["BS"], stats[x]["BZ"]), reverse=True)
+            
+            for idx, team in enumerate(g2_teams_sorted):
+                d = stats[team]
+                bg_row = "class='gold-medal-row'" if idx < 2 else ""
+                html_output.append(f"<tr {bg_row}><td><b>{idx+1}</b></td><td class='team-cell'>{get_cdn_flag_img_html(team)} {team}</td><td>{d['M']}</td><td><b>{d['Pkt']}</b></td><td>{d['Z']}</td><td>{d['R']}</td><td>{d['P']}</td><td>{d['BZ']}:{d['BS']}</td></tr>")
+            html_output.append("</table></div>")
+            
+        html_output.append("</div>")
+        
+    return "".join(html_output)
+
 @st.dialog("👁️ Typy graczy dla tego meczu")
 def show_other_bets(m_id, current_user):
     st.markdown(f"<h4 style='text-align: center; color: #F97316 !important;'>Mecz #{m_id}</h4>", unsafe_allow_html=True)
@@ -323,18 +373,10 @@ def render_bracket_match_html_clean(match_id, mt="0px", mb="6px"):
     ]
     st.markdown("".join(html_lines), unsafe_allow_html=True)
 
-def get_mini_group_html_string(g_code):
-    html_lines = [f"<div class='bracket-group-box'><div style='font-weight:bold; color:#F97316; margin-bottom:4px; font-size:0.85rem;'>GRUPA {g_code}</div>"]
-    for t in GROUPS_DICT.get(f"Grupa {g_code}", []):
-        html_lines.append(f"<div style='text-align:left; padding:2px 0; font-size:0.85rem; display:flex; align-items:center; gap:6px;'>{get_cdn_flag_img_html(t)} <span style='max-width: 75px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>{t}</span></div>")
-    html_lines.append("</div>")
-    return "".join(html_lines)
-
 def generate_schedule():
     schedule = {}
     months_pl = {6: "Czerwca", 7: "Lipca"}
     match_id = 1
-    
     group_slots = [18, 21, 0, 3]
     start_date_group = datetime(2026, 6, 11, 21, 0)
     
@@ -342,37 +384,23 @@ def generate_schedule():
         for g_name, teams in GROUPS_DICT.items():
             pairs = [(teams[0], teams[1]), (teams[2], teams[3])] if matchday == 0 else [(teams[0], teams[2]), (teams[3], teams[1])] if matchday == 1 else [(teams[0], teams[3]), (teams[1], teams[2])]
             for t_home, t_away in pairs:
-                slot_idx = (match_id - 1) % 4
-                days_offset = (match_id - 1) // 4
-                
-                if match_id == 1:
-                    dt = start_date_group
+                if match_id == 1: dt = start_date_group
                 else:
-                    adjusted_id = match_id
-                    slot_idx_adj = adjusted_id % 4
-                    days_offset_adj = adjusted_id // 4
+                    slot_idx_adj = match_id % 4
+                    days_offset_adj = match_id // 4
                     dt = datetime(2026, 6, 12, group_slots[slot_idx_adj], 0) + timedelta(days=days_offset_adj)
                 
                 schedule[match_id] = {
-                    "timestamp": dt, 
-                    "date": f"{dt.day} {months_pl.get(dt.month)} {dt.strftime('%H:%M')}", 
-                    "stage": g_name, 
-                    "home": t_home, 
-                    "away": t_away, 
-                    "score_h": None, 
-                    "score_a": None, 
-                    "status": "Oczekuje", 
-                    "venue": VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]
+                    "timestamp": dt, "date": f"{dt.day} {months_pl.get(dt.month)} {dt.strftime('%H:%M')}", 
+                    "stage": g_name, "home": t_home, "away": t_away, "score_h": None, "score_a": None, 
+                    "status": "Oczekuje", "venue": VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]
                 }
                 match_id += 1
 
     ko_stages = [
-        ("1/16 Finału", 16, [(29,6), (30,6), (1,7), (2,7)]), 
-        ("1/8 Finału", 8, [(4,7), (5,7), (6,7), (7,7)]), 
-        ("Ćwierćfinały", 4, [(9,7), (10,7)]), 
-        ("Półfinały", 2, [(14,7), (15,7)]), 
-        ("Mecz o 3. miejsce", 1, [(18,7)]), 
-        ("Finał", 1, [(19,7)])
+        ("1/16 Finału", 16, [(29,6), (30,6), (1,7), (2,7)]), ("1/8 Finału", 8, [(4,7), (5,7), (6,7), (7,7)]), 
+        ("Ćwierćfinały", 4, [(9,7), (10,7)]), ("Półfinały", 2, [(14,7), (15,7)]), 
+        ("Mecz o 3. miejsce", 1, [(18,7)]), ("Finał", 1, [(19,7)])
     ]
     
     for stage_name, count, stage_dates in ko_stages:
@@ -380,43 +408,20 @@ def generate_schedule():
         matches_per_date = max(1, count // len(stage_dates))
         for i in range(count):
             d, m_num = stage_dates[date_idx % len(stage_dates)]
-            
-            if stage_name == "Finał":
-                hour = 21
-            elif stage_name == "Mecz o 3. miejsce":
-                hour = 22
-            elif stage_name == "Półfinały":
-                hour = 22
-            else:
-                hour = 18 if i % 2 == 0 else 22
-                
+            hour = 21 if stage_name == "Finał" else 22 if stage_name in ["Półfinały", "Mecz o 3. miejsce"] else (18 if i % 2 == 0 else 22)
             match_dt = datetime(2026, m_num, d, hour, 0, 0)
             schedule[match_id] = {
-                "timestamp": match_dt, 
-                "date": f"{d} {months_pl.get(m_num)} {match_dt.strftime('%H:%M')}", 
-                "stage": stage_name, 
-                "home": "TBD", 
-                "away": "TBD", 
-                "score_h": None, 
-                "score_a": None, 
-                "status": "Oczekuje", 
-                "venue": "MetLife Stadium, Nowy Jork" if stage_name == "Finał" else VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]
+                "timestamp": match_dt, "date": f"{d} {months_pl.get(m_num)} {match_dt.strftime('%H:%M')}", 
+                "stage": stage_name, "home": "TBD", "away": "TBD", "score_h": None, "score_a": None, 
+                "status": "Oczekuje", "venue": "MetLife Stadium, Nowy Jork" if stage_name == "Finał" else VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]
             }
             match_id += 1
             if (i + 1) % matches_per_date == 0: date_idx += 1
-            
     return schedule
 
-def fetch_official_results_from_api(now_time):
-    pass
-
 # 5. INICJALIZACJA STANU APLIKACJI
-if 'results' not in st.session_state or len(st.session_state.results) != 104: 
-    st.session_state.results = generate_schedule()
-
-if 'bets' not in st.session_state:
-    st.session_state.bets = {m_id: {} for m_id in range(1, 105)}
-
+if 'results' not in st.session_state or len(st.session_state.results) != 104: st.session_state.results = generate_schedule()
+if 'bets' not in st.session_state: st.session_state.bets = {m_id: {} for m_id in range(1, 105)}
 if 'last_positions' not in st.session_state: st.session_state.last_positions = {player: idx + 1 for idx, player in enumerate(players)}
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 if 'toast_msg' not in st.session_state: st.session_state.toast_msg = ""
@@ -426,12 +431,9 @@ if 'gs_initialized' not in st.session_state:
     st.session_state.gs_initialized = True
 
 now = datetime.now()
-fetch_official_results_from_api(now)
-
 for m_id, m in st.session_state.results.items():
     if m.get('status') != "Zakończony" and timedelta(minutes=0) <= (now - m['timestamp']) <= timedelta(minutes=120): m['status'] = "LIVE"
 
-# --- RENDEROWANIE INTERFEJSU ---
 if st.session_state.toast_msg:
     st.toast(st.session_state.toast_msg)
     st.session_state.toast_msg = ""
@@ -481,27 +483,23 @@ else:
             h_key = f"h_{m_id}"
             a_key = f"a_{m_id}"
             
+            # STABILNE PRZYPISANIE WARTOŚCI DO STATE BEZ RYZYKA RESETU
             if h_key not in st.session_state: st.session_state[h_key] = saved_h if has_bet else 0
             if a_key not in st.session_state: st.session_state[a_key] = saved_a if has_bet else 0
             
             st.markdown(f"<div class='meta-upper-bar-container'><span class='meta-id-text-clean'>⚽ Mecz #{m_id}</span> {status_html} <span style='color:#94A3B8;'>📅 {m['date']}</span> <span style='color:#38BDF8; font-weight:bold;'>📍 {m.get('venue').split(',')[0]}</span></div>", unsafe_allow_html=True)
-            
             col_h_team, col_h_score, col_colon, col_a_score, col_a_team, col_action = st.columns([3, 1.5, 0.5, 1.5, 3, 2], gap="small")
             
             with col_h_team:
                 st.markdown(f"<div class='team-align-right'>{m['home']} {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
             with col_h_score:
-                if locked:
-                    st.markdown(f"<div class='off-score'>{saved_h if has_bet else '-'}</div>", unsafe_allow_html=True)
-                else:
-                    st.number_input("Gole Home", min_value=0, max_value=20, step=1, key=h_key, label_visibility="collapsed")
+                if locked: st.markdown(f"<div class='off-score'>{saved_h if has_bet else '-'}</div>", unsafe_allow_html=True)
+                else: st.number_input("Gole Home", min_value=0, max_value=20, step=1, key=h_key, label_visibility="collapsed")
             with col_colon:
                 st.markdown("<div class='score-colon'>:</div>", unsafe_allow_html=True)
             with col_a_score:
-                if locked:
-                    st.markdown(f"<div class='off-score'>{saved_a if has_bet else '-'}</div>", unsafe_allow_html=True)
-                else:
-                    st.number_input("Gole Away", min_value=0, max_value=20, step=1, key=a_key, label_visibility="collapsed")
+                if locked: st.markdown(f"<div class='off-score'>{saved_a if has_bet else '-'}</div>", unsafe_allow_html=True)
+                else: st.number_input("Gole Away", min_value=0, max_value=20, step=1, key=a_key, label_visibility="collapsed")
             with col_a_team:
                 st.markdown(f"<div class='team-align-left'>{get_cdn_flag_img_html(m['away'])} {m['away']}</div>", unsafe_allow_html=True)
                 
@@ -511,112 +509,56 @@ else:
                     st.button("👁️ Zobacz typy", key=f"view_{m_id}", type="secondary", on_click=show_other_bets, args=(m_id, st.session_state.logged_in_user))
                 else:
                     cb1, cb2 = st.columns(2)
-                    with cb1:
-                        st.button("💾 Zapisz", key=f"save_btn_{m_id}", type="primary", on_click=handle_save, args=(m_id, st.session_state.logged_in_user, h_key, a_key))
-                    with cb2:
-                        st.button("🗑️ Usuń", key=f"del_btn_{m_id}", type="secondary", on_click=handle_delete, args=(m_id, st.session_state.logged_in_user, h_key, a_key))
+                    with cb1: st.button("💾 Zapisz", key=f"save_btn_{m_id}", type="primary", on_click=handle_save, args=(m_id, st.session_state.logged_in_user, h_key, a_key))
+                    with cb2: st.button("🗑️ Usuń", key=f"del_btn_{m_id}", type="secondary", on_click=handle_delete, args=(m_id, st.session_state.logged_in_user, h_key, a_key))
 
     with tab3:
         st.subheader("🕵️ Przegląd typów wszystkich graczy")
         selected_match = st.selectbox("Wybierz mecz do podglądu:", [f"Mecz #{i} - {st.session_state.results[i]['home']} vs {st.session_state.results[i]['away']}" for i in range(1, 105)])
         m_id_sel = int(selected_match.split("#")[1].split(" ")[0])
-        
         match_info = st.session_state.results[m_id_sel]
-        is_locked_sel = (match_info['timestamp'] - now).total_seconds() <= 0
-        
-        if not is_locked_sel and st.session_state.logged_in_user != "admin":
+        if (match_info['timestamp'] - now).total_seconds() > 0 and st.session_state.logged_in_user != "admin":
             st.warning("🔒 Typy innych graczy zostaną odblokowane automatycznie po rozpoczęciu tego meczu!")
         else:
-            show_data = []
-            for p in players:
-                bet = st.session_state.bets.get(m_id_sel, {}).get(p)
-                show_data.append({
-                    "Gracz": p,
-                    "Typ": f"{bet[0]} : {bet[1]}" if bet else "Brak typu"
-                })
+            show_data = [{"Gracz": p, "Typ": f"{st.session_state.bets.get(m_id_sel, {}).get(p)[0]} : {st.session_state.bets.get(m_id_sel, {}).get(p)[1]}" if st.session_state.bets.get(m_id_sel, {}).get(p) else "Brak typu"} for p in players]
             st.table(pd.DataFrame(show_data))
 
     with tab4:
-        st.subheader("📈 Tabele Grupowe")
-        st.info("Tabele generują się automatycznie na podstawie oficjalnych wyników wprowadzonych przez administratora.")
+        st.subheader("📈 Aktywne Tabele Grupowe")
+        # WYWOŁANIE NOWEGO AUTOMATYCZNEGO SILNIKA TABEL
+        st.markdown(calculate_group_tables_html(), unsafe_allow_html=True)
 
     with tab5:
         st.subheader("🏆 Drabinka Turniejowa MŚ 2026")
-        
         c1, c2, c3, c4, c5, c6, c7, c8, c9 = st.columns([1.2, 0.4, 1.2, 1.2, 1.6, 1.2, 1.2, 0.4, 1.2], gap="small")
-        
         with c1:
-            st.markdown("<p style='text-align:center; font-weight:bold; color:#F97316;'>1/16 Finału (Lewa)</p>", unsafe_allow_html=True)
-            render_bracket_match_html_clean(73)
-            render_bracket_match_html_clean(74)
-            render_bracket_match_html_clean(75)
-            render_bracket_match_html_clean(76)
-            render_bracket_match_html_clean(77)
-            render_bracket_match_html_clean(78)
-            render_bracket_match_html_clean(79)
-            render_bracket_match_html_clean(80)
-            
+            st.markdown("<p style='text-align:center; font-weight:bold; color:#F97316;'>1/16 Finału</p>", unsafe_allow_html=True)
+            for i in range(73, 81): render_bracket_match_html_clean(i)
         with c3:
             st.markdown("<p style='text-align:center; font-weight:bold; color:#F97316;'>1/8 Finału</p>", unsafe_allow_html=True)
-            render_bracket_match_html_clean(89, mt="35px", mb="65px")
-            render_bracket_match_html_clean(90, mt="35px", mb="65px")
-            render_bracket_match_html_clean(91, mt="35px", mb="65px")
-            render_bracket_match_html_clean(92, mt="35px")
-            
+            for i in range(89, 93): render_bracket_match_html_clean(i, mt="35px", mb="65px" if i<92 else "0px")
         with c4:
             st.markdown("<p style='text-align:center; font-weight:bold; color:#F97316;'>Ćwierćfinały</p>", unsafe_allow_html=True)
             render_bracket_match_html_clean(97, mt="110px", mb="210px")
             render_bracket_match_html_clean(98, mt="110px")
-            
         with c5:
             st.markdown("<p style='text-align:center; font-weight:bold; color:#F97316;'>Półfinały & Finał</p>", unsafe_allow_html=True)
             render_bracket_match_html_clean(101, mt="220px")
-            
-            # Centralna karta wielkiego finału
             m_fin = st.session_state.results.get(104)
-            status_f = m_fin.get("status")
-            sh_f, sa_f = (str(m_fin.get("score_h")), str(m_fin.get("score_a"))) if status_f in ["Zakończony", "LIVE"] and m_fin.get("score_h") is not None else ("?", "?")
-            
-            st.markdown(
-                f"<div class='center-final-card-wrapper'>"
-                f"<div class='center-final-card'>"
-                f"<div class='final-title'>🏆 WIELKI FINAŁ 🏆</div>"
-                f"<div class='final-teams'>"
-                f"<div class='final-team'>{get_cdn_flag_img_html(m_fin['home'])} <span>{m_fin['home']}</span></div>"
-                f"<div class='final-score'>{sh_f} : {sa_f}</div>"
-                f"<div class='final-team'><span>{m_fin['away']}</span> {get_cdn_flag_img_html(m_fin['away'])}</div>"
-                f"</div>"
-                f"<div class='final-venue'>📍 {m_fin['venue']}</div>"
-                f"</div></div>", 
-                unsafe_allow_html=True
-            )
-            
-            # Mecz o 3. miejsce pod spodem finału
+            sf = m_fin.get("status")
+            sh_f, sa_f = (str(m_fin.get("score_h")), str(m_fin.get("score_a"))) if sf in ["Zakończony", "LIVE"] and m_fin.get("score_h") is not None else ("?", "?")
+            st.markdown(f"<div class='center-final-card-wrapper'><div class='center-final-card'><div class='final-title'>🏆 WIELKI FINAŁ 🏆</div><div class='final-teams'><div class='final-team'>{get_cdn_flag_img_html(m_fin['home'])} {m_fin['home']}</div><div class='final-score'>{sh_f} : {sa_f}</div><div class='final-team'>{m_fin['away']} {get_cdn_flag_img_html(m_fin['away'])}</div></div><div class='final-venue'>📍 {m_fin['venue']}</div></div></div>", unsafe_allow_html=True)
             st.markdown("<div style='margin-top:50px;'></div>", unsafe_allow_html=True)
             render_bracket_match_html_clean(103, mt="40px")
             st.markdown("<p style='text-align:center; color:#94A3B8; font-size:0.75rem; font-weight:bold;'>Mecz o 3. miejsce</p>", unsafe_allow_html=True)
-            
             render_bracket_match_html_clean(102, mt="50px")
-            
         with c6:
             st.markdown("<p style='text-align:center; font-weight:bold; color:#F97316;'>Ćwierćfinały</p>", unsafe_allow_html=True)
             render_bracket_match_html_clean(99, mt="110px", mb="210px")
             render_bracket_match_html_clean(100, mt="110px")
-            
         with c7:
             st.markdown("<p style='text-align:center; font-weight:bold; color:#F97316;'>1/8 Finału</p>", unsafe_allow_html=True)
-            render_bracket_match_html_clean(93, mt="35px", mb="65px")
-            render_bracket_match_html_clean(94, mt="35px", mb="65px")
-            render_bracket_match_html_clean(95, mt="35px", mb="65px")
-            render_bracket_match_html_clean(96, mt="35px")
-            
+            for i in range(93, 97): render_bracket_match_html_clean(i, mt="35px", mb="65px" if i<96 else "0px")
         with c9:
-            st.markdown("<p style='text-align:center; font-weight:bold; color:#F97316;'>1/16 Finału (Prawa)</p>", unsafe_allow_html=True)
-            render_bracket_match_html_clean(81)
-            render_bracket_match_html_clean(82)
-            render_bracket_match_html_clean(83)
-            render_bracket_match_html_clean(84)
-            render_bracket_match_html_clean(85)
-            render_bracket_match_html_clean(86)
-            render_bracket_match_html_clean(87)
-            render_bracket_match_html_clean(88)
+            st.markdown("<p style='text-align:center; font-weight:bold; color:#F97316;'>1/16 Finału</p>", unsafe_allow_html=True)
+            for i in range(81, 89): render_bracket_match_html_clean(i)
