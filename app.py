@@ -4,8 +4,8 @@ import numpy as np
 import os
 import base64
 import json 
-from datetime import datetime, timedelta
 import gspread
+from datetime import datetime, timedelta
 
 # 1. Konfiguracja aplikacji i Szata Graficzna Dark Navy & Orange
 st.set_page_config(page_title="Kricon BV - Typer MŚ 2026", page_icon="⚽", layout="wide")
@@ -111,7 +111,7 @@ css_styles = [
 ]
 st.markdown("".join(css_styles), unsafe_allow_html=True)
 
-# 2. GLOBALNE PROFILE I CONFIG (Marcin usunięty)
+# 2. GLOBALNE PROFILE I CONFIG
 USER_CREDENTIALS = {
     "Adam": "adam2026", "Maciej": "maciej2026", "Kamil": "kamil2026", 
     "Kuba M": "kubam2026", "Tomek": "tomek2026", "Kuba K": "kubak2026", 
@@ -323,24 +323,86 @@ def generate_schedule():
     schedule = {}
     months_pl = {6: "Czerwca", 7: "Lipca"}
     match_id = 1
-    start_dt = datetime(2026, 6, 11, 21, 0)
+    
+    # 1. OFICJALNE GODZINY DLA FAZY GRUPOWEJ (POLSKI CZAS CEST: 18:00, 21:00, 00:00, 03:00)
+    # Mecze ułożone dzień po dniu, symulując pełne, profesjonalne okienka transmisyjne FIFA
+    group_slots = [18, 21, 0, 3]
+    start_date_group = datetime(2026, 6, 11, 21, 0) # Pierwszy mecz: 11 czerwca, 21:00 CEST
+    
+    # Wygenerowanie 72 meczów grupowych w powtarzalnych cyklach transmisyjnych dla Europy
     for matchday in range(3):
         for g_name, teams in GROUPS_DICT.items():
             pairs = [(teams[0], teams[1]), (teams[2], teams[3])] if matchday == 0 else [(teams[0], teams[2]), (teams[3], teams[1])] if matchday == 1 else [(teams[0], teams[3]), (teams[1], teams[2])]
             for t_home, t_away in pairs:
-                dt = start_dt + timedelta(days=(match_id-1)//4, hours=((match_id-1)%4)*3)
-                schedule[match_id] = {"timestamp": dt, "date": f"{dt.day} {months_pl.get(dt.month)} {dt.strftime('%H:%M')}", "stage": g_name, "home": t_home, "away": t_away, "score_h": None, "score_a": None, "status": "Oczekuje", "venue": VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]}
+                # Wyliczamy kolejny slot godzinowy
+                slot_idx = (match_id - 1) % 4
+                days_offset = (match_id - 1) // 4
+                
+                # Pierwszy dzień ma tylko mecz otwarcia o 21:00, kolejne dni idą pełnym cyklem czterech spotkań
+                if match_id == 1:
+                    dt = start_date_group
+                else:
+                    # Przesuwamy bazę o 1 dzień w przód, aby pominąć puste sloty z 11 czerwca
+                    adjusted_id = match_id
+                    slot_idx_adj = adjusted_id % 4
+                    days_offset_adj = adjusted_id // 4
+                    dt = datetime(2026, 6, 12, group_slots[slot_idx_adj], 0) + timedelta(days=days_offset_adj)
+                
+                schedule[match_id] = {
+                    "timestamp": dt, 
+                    "date": f"{dt.day} {months_pl.get(dt.month)} {dt.strftime('%H:%M')}", 
+                    "stage": g_name, 
+                    "home": t_home, 
+                    "away": t_away, 
+                    "score_h": None, 
+                    "score_a": None, 
+                    "status": "Oczekuje", 
+                    "venue": VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]
+                }
                 match_id += 1
-    ko_stages = [("1/16 Finału", 16, [(29,6), (30,6), (1,7), (2,7)]), ("1/8 Finału", 8, [(4,7), (5,7), (6,7), (7,7)]), ("Ćwierćfinały", 4, [(9,7), (10,7)]), ("Półfinały", 2, [(14,7), (15,7)]), ("Mecz o 3. miejsce", 1, [(18,7)]), ("Finał", 1, [(19,7)])]
+
+    # 2. OFICJALNE STREFY CZASOWE DLA FAZY PUCHAROWEJ (1/16 do Finału)
+    # Końcówka czerwca i lipiec to mecze głównie o 18:00, 21:00 i 22:00 czasu polskiego
+    ko_stages = [
+        ("1/16 Finału", 16, [(29,6), (30,6), (1,7), (2,7)]), 
+        ("1/8 Finału", 8, [(4,7), (5,7), (6,7), (7,7)]), 
+        ("Ćwierćfinały", 4, [(9,7), (10,7)]), 
+        ("Półfinały", 2, [(14,7), (15,7)]), 
+        ("Mecz o 3. miejsce", 1, [(18,7)]), 
+        ("Finał", 1, [(19,7)])
+    ]
+    
     for stage_name, count, stage_dates in ko_stages:
         date_idx = 0
         matches_per_date = max(1, count // len(stage_dates))
         for i in range(count):
             d, m_num = stage_dates[date_idx % len(stage_dates)]
-            match_dt = datetime(2026, m_num, d, 18 if i % 2 == 0 else 22, 0, 0)
-            schedule[match_id] = {"timestamp": match_dt, "date": f"{d} {months_pl.get(m_num)} {match_dt.strftime('%H:%M')}", "stage": stage_name, "home": "TBD", "away": "TBD", "score_h": None, "score_a": None, "status": "Oczekuje", "venue": "MetLife, NY" if stage_name == "Finał" else VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]}
+            
+            # Dobór realistycznych godzin pod polskiego kibica (brak meczów o 3 rano w decydującej fazie)
+            if stage_name == "Finał":
+                hour = 21 # Wielki Finał o 21:00 czasu polskiego
+            elif stage_name == "Mecz o 3. miejsce":
+                hour = 22
+            elif stage_name == "Półfinały":
+                hour = 22
+            else:
+                hour = 18 if i % 2 == 0 else 22
+                
+            match_dt = datetime(2026, m_num, d, hour, 0, 0)
+            schedule[match_id] = {
+                "timestamp": match_dt, 
+                "date": f"{d} {months_pl.get(m_num)} {match_dt.strftime('%H:%M')}", 
+                "stage": stage_name, 
+                "home": "TBD", 
+                "away": "TBD", 
+                "score_h": None, 
+                "score_a": None, 
+                "status": "Oczekuje", 
+                "venue": "MetLife, NY" if stage_name == "Finał" else VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]
+            }
             match_id += 1
             if (i + 1) % matches_per_date == 0: date_idx += 1
+            
     return schedule
 
 def fetch_official_results_from_api(now_time):
@@ -439,120 +501,112 @@ else:
                 else: 
                     st.number_input("A", min_value=0, max_value=20, value=int(saved_a) if has_bet else 0, key=a_key, label_visibility="collapsed")
             with c_away: st.markdown(f"<div class='team-align-left'>{get_cdn_flag_img_html(m['away'])} <span>{m['away']}</span></div>", unsafe_allow_html=True)
-            with c_score: st.markdown(f"<div class='off-score'>Wynik: {m.get('score_h') if m.get('score_h') is not None else '?'} : {m.get('score_a') if m.get('score_a') is not None else '?'}</div>", unsafe_allow_html=True)
             
+            with c_score:
+                sh_real = str(m.get('score_h')) if m.get('score_h') is not None else "-"
+                sa_real = str(m.get('score_a')) if m.get('score_a') is not None else "-"
+                st.markdown(f"<div class='off-score'>Wynik: {sh_real}:{sa_real}</div>", unsafe_allow_html=True)
+                
             with c_save:
                 if locked:
-                    if st.button("👥 Typy", key=f"typy_{m_id}"): show_other_bets(m_id, st.session_state.logged_in_user)
+                    pts = calculate_points(saved_h, saved_a, m.get('score_h'), m.get('score_a')) if m.get('status') == "Zakończony" else 0
+                    txt = f"+{pts} pkt" if m.get('status') == "Zakończony" else "Zablokowane"
+                    st.markdown(f"<div class='success-bet-banner'>{txt}</div>", unsafe_allow_html=True)
                 else:
-                    st.button("Zapisz", key=f"save_{m_id}", type="primary", on_click=handle_save, args=(m_id, st.session_state.logged_in_user, h_key, a_key))
+                    st.button("Zapisz", key=f"btn_s_{m_id}", type="primary", on_click=handle_save, args=(m_id, st.session_state.logged_in_user, h_key, a_key))
             with c_del:
-                if not locked and has_bet:
-                    st.button("✖", key=f"del_{m_id}", type="secondary", on_click=handle_delete, args=(m_id, st.session_state.logged_in_user, h_key, a_key))
+                if not locked:
+                    st.button("🗑️", key=f"btn_d_{m_id}", type="secondary", on_click=handle_delete, args=(m_id, st.session_state.logged_in_user, h_key, a_key))
             with c_status:
-                class_banner = "success-bet-banner" if has_bet else "missing-bet-banner-blink"
-                txt_banner = "✔ OK" if has_bet else "⚠️ BRAK TYPU"
-                st.markdown(f"<div class='{class_banner}'>{txt_banner}</div>", unsafe_allow_html=True)
+                st.button("Kto co?", key=f"btn_o_{m_id}", type="secondary", on_click=show_other_bets, args=(m_id, st.session_state.logged_in_user))
 
     with tab3:
-        st.header("🕵️ Podgląd typów wszystkich graczy")
-        locked_matches = [m_id for m_id, m in st.session_state.results.items() if (m['timestamp'] - now).total_seconds() <= 0]
-        if not locked_matches: st.info("Żaden mecz jeszcze się nie rozpoczął. Obstawione wyniki rywali są zablokowane! 🔒")
-        else:
-            table_html_lines = ["<table class='kricon-table'><tr><th style='text-align:left; padding-left:15px;'>Mecz</th>"]
-            for p in players:
-                table_html_lines.append(f"<th>{p}</th>")
-            table_html_lines.append("</tr>")
+        st.subheader("🕵️ Przegląd typów wszystkich graczy")
+        m_list = [f"Mecz #{i} ({m['home']} - {m['away']})" for i, m in sorted(st.session_state.results.items())]
+        selected_m_str = st.selectbox("Wybierz mecz do analizy:", m_list)
+        if selected_m_str:
+            sel_id = int(selected_m_str.split("#")[1].split(" ")[0])
+            res_m = st.session_state.results[sel_id]
+            st.write(f"**Faza:** {res_m['stage']} | **Miejsce:** {res_m['venue']}")
+            st.write(f"**Oficjalny wynik:** {res_m['score_h'] if res_m['score_h'] is not None else '-'} : {res_m['score_a'] if res_m['score_a'] is not None else '-'}")
             
-            for m_id in sorted(locked_matches, reverse=True):
-                m = st.session_state.results[m_id]
-                table_html_lines.append(f"<tr><td style='text-align:left; padding-left:15px;'><b style='color:#F97316;'>#{m_id}</b>&nbsp;&nbsp; {get_cdn_flag_img_html(m['home'])} {m['home']} <b>-</b> {m['away']} {get_cdn_flag_img_html(m['away'])}</td>")
-                for p in players:
-                    p_bet = st.session_state.bets.get(m_id, {}).get(p)
-                    if p_bet: table_html_lines.append(f"<td style='text-align:center; font-weight:bold;'>{p_bet[0]} : {p_bet[1]}</td>")
-                    else: table_html_lines.append("<td style='text-align:center; color:#64748B;'>-</td>")
-                table_html_lines.append("</tr>")
-            table_html_lines.append("</table>")
-            st.markdown("".join(table_html_lines), unsafe_allow_html=True)
+            analysis_data = []
+            for p in players:
+                bet = st.session_state.bets.get(sel_id, {}).get(p)
+                p_text = f"{bet[0]} : {bet[1]}" if bet else "Brak typu"
+                pts = calculate_points(bet[0], bet[1], res_m.get('score_h'), res_m.get('score_a')) if bet and res_m.get('status') == "Zakończony" else 0
+                analysis_data.append({"Gracz": p, "Typ": p_text, "Zdobyte punkty": f"{pts} pkt" if res_m.get('status') == "Zakończony" else "-"})
+            st.dataframe(pd.DataFrame(analysis_data), use_container_width=True, hide_index=True)
 
     with tab4:
-        st.header("Tabele Grup Turniejowych")
-        third_places_list = []
-        for g_name, g_teams in GROUPS_DICT.items():
-            st.markdown(f"### {g_name}")
-            stats = {t: {"Pkt": 0, "BZ": 0, "BS": 0, "RB": 0, "Zwyciestwa": 0, "Grupa": g_name} for t in g_teams}
-            for m in st.session_state.results.values():
-                if m.get("stage") == g_name and m.get("status") == "Zakończony":
-                    h, a, sh, sa = m.get("home"), m.get("away"), m.get("score_h"), m.get("score_a")
-                    if h in stats and a in stats:
-                        stats[h]["BZ"]+=sh; stats[h]["BS"]+=sa; stats[h]["RB"]+=(sh-sa); stats[a]["BZ"]+=sa; stats[a]["BS"]+=sh; stats[a]["RB"]+=(sa-sh)
-                        if sh>sa: stats[h]["Pkt"]+=3; stats[h]["Zwyciestwa"]+=1
-                        elif sa>sh: stats[a]["Pkt"]+=3; stats[a]["Zwyciestwa"]+=1
-                        else: stats[h]["Pkt"]+=1; stats[a]["Pkt"]+=1
-            df_g = pd.DataFrame.from_dict(stats, orient='index').reset_index().rename(columns={'index': 'Reprezentacja'}).sort_values(by=["Pkt", "RB", "BZ"], ascending=False).reset_index(drop=True)
-            df_g.index += 1
-            if len(df_g) >= 3: third_places_list.append(df_g.iloc[2].to_dict())
-            
-            html_g_rows = []
-            for idx, r in df_g.iterrows():
-                bg_style = "style='background-color:#16A34A;'" if idx in [1, 2] else "style='background-color:#EA580C;'" if idx==3 else ""
-                html_g_rows.append(f"<tr {bg_style}><td><b>{idx}</b></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>")
-            st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{''.join(html_g_rows)}</table>", unsafe_allow_html=True)
-
-        st.divider()
-        st.header("📊 Zbiorcza Tabela 3. Miejsc")
-        st.write("Do Fazy Pucharowej (1/16 Finału) awansuje **8 najlepszych reprezentacji** z trzecich miejsc.")
-        
-        if third_places_list:
-            df_3rd = pd.DataFrame(third_places_list).sort_values(by=["Pkt", "RB", "BZ"], ascending=False).reset_index(drop=True)
-            df_3rd.index += 1
-            
-            html_t3_rows = []
-            for idx, r in df_3rd.iterrows():
-                bg_style = "style='background-color:#16A34A;'" if idx <= 8 else "style='background-color:#450A0A; opacity:0.8;'"
-                html_t3_rows.append(f"<tr {bg_style}><td><b>{idx}</b></td><td><small style='color:#94A3B8;'>{r['Grupa']}</small></td><td>{get_cdn_flag_img_html(r['Reprezentacja'])} {r['Reprezentacja']}</td><td><b>{r['Pkt']}</b></td><td>{r['BZ']}</td><td>{r['BS']}</td><td>{r['RB']}</td></tr>")
-            
-            st.markdown(f"<table class='kricon-table'><tr><th>Poz.</th><th>Grupa</th><th>Kraj</th><th>Pkt</th><th>BZ</th><th>BS</th><th>Bilans</th></tr>{''.join(html_t3_rows)}</table>", unsafe_allow_html=True)
+        st.subheader("📈 Tabele grupowe (Symulacja na podstawie wyników)")
+        g_cols = st.columns(3)
+        for idx, g_name in enumerate(sorted(GROUPS_DICT.keys())):
+            with g_cols[idx % 3]:
+                st.markdown(f"<h5>{g_name}</h5>", unsafe_allow_html=True)
+                t_teams = GROUPS_DICT[g_name]
+                t_stats = {t: {"M": 0, "Pkt": 0, "BZ": 0, "BS": 0} for t in t_teams}
+                
+                for m_id, m in st.session_state.results.items():
+                    if m['stage'] == g_name and m['status'] == "Zakończony" and m['score_h'] is not None:
+                        th, ta = m['home'], m['away']
+                        sh, sa = int(m['score_h']), int(m['score_a'])
+                        t_stats[th]["M"] += 1; t_stats[ta]["M"] += 1
+                        t_stats[th]["BZ"] += sh; t_stats[th]["BS"] += sa
+                        t_stats[ta]["BZ"] += sa; t_stats[ta]["BS"] += sh
+                        if sh > sa: t_stats[th]["Pkt"] += 3
+                        elif sh < sa: t_stats[ta]["Pkt"] += 3
+                        else: t_stats[th]["Pkt"] += 1; t_stats[ta]["Pkt"] += 1
+                        
+                df_g = pd.DataFrame([{"Drużyna": t, "M": s["M"], "Bilans": f"{s['BZ']}:{s['BS']}", "Pkt": s["Pkt"]} for t, s in t_stats.items()]).sort_values(by="Pkt", ascending=False).reset_index(drop=True)
+                st.dataframe(df_g, use_container_width=True, hide_index=True)
 
     with tab5:
-        st.header("🏆 Drabinka Fazy Pucharowej")
-        st.divider()
-        c_g1, c_16l, c_8l, c_4l, c_2l, c_fin, c_2r, c_4r, c_8r, c_16r, c_g2 = st.columns([0.8, 1.1, 1.1, 1.1, 1.1, 2.0, 1.1, 1.1, 1.1, 1.1, 0.8])
-        with c_g1:
-            for g in ["A","B","C","D","E","F"]: st.markdown(get_mini_group_html_string(g), unsafe_allow_html=True)
-        with c_16l:
-            for i in range(73, 81): render_bracket_match_html_clean(i)
-        with c_8l:
-            render_bracket_match_html_clean(89, mt="34px", mb="68px"); render_bracket_match_html_clean(90, mb="68px"); render_bracket_match_html_clean(91, mb="68px"); render_bracket_match_html_clean(92)
-        with c_4l:
-            render_bracket_match_html_clean(97, mt="106px", mb="210px"); render_bracket_match_html_clean(98)
-        with c_2l:
-            render_bracket_match_html_clean(101, mt="248px")
-        with c_fin:
-            m_104 = st.session_state.results.get(104, {})
-            sh_f, sa_f = (str(m_104.get('score_h')), str(m_104.get('score_a'))) if m_104.get('score_h') is not None else ("?", "?")
+        st.subheader("🏆 Drabinka Turniejowa (Faza Pucharowa)")
+        st.write("Podgląd struktury pucharowej od 1/16 Finału do Wielkiego Finału")
+        
+        col_1_16, col_1_8, col_1_4, col_1_2, col_f = st.columns(5)
+        
+        with col_1_16:
+            st.markdown("<p style='font-weight:bold; color:#F97316;'>1/16 Finału</p>", unsafe_allow_html=True)
+            for m_id in range(73, 89): render_bracket_match_html_clean(m_id, mb="12px")
+                
+        with col_1_8:
+            st.markdown("<p style='font-weight:bold; color:#F97316;'>1/8 Finału</p>", unsafe_allow_html=True)
+            for m_id in range(89, 97): render_bracket_match_html_clean(m_id, mt="25px", mb="45px")
+                
+        with col_1_4:
+            st.markdown("<p style='font-weight:bold; color:#F97316;'>Ćwierćfinały</p>", unsafe_allow_html=True)
+            for m_id in range(97, 101): render_bracket_match_html_clean(m_id, mt="90px", mb="150px")
+                
+        with col_1_2:
+            st.markdown("<p style='font-weight:bold; color:#F97316;'>Półfinały</p>", unsafe_allow_html=True)
+            for m_id in range(101, 103): render_bracket_match_html_clean(m_id, mt="240px", mb="380px")
+                
+        with col_f:
+            st.markdown("<p style='font-weight:bold; color:#F97316; text-align:center;'>Finały</p>", unsafe_allow_html=True)
+            st.markdown("<div class='center-final-card-wrapper'>", unsafe_allow_html=True)
             
-            html_final_lines = [
-                "<div class='center-final-card-wrapper' style='margin-top: 195px;'>",
-                "<div class='center-final-card'>",
-                "<div class='final-title'>🏆 WIELKI FINAŁ</div>",
-                "<div class='final-teams'>",
-                f"<div class='final-team'>{get_cdn_flag_img_html(m_104.get('home'))}<span class='bracket-team-name'>{m_104.get('home','TBD')}</span></div>",
-                f"<div class='final-score'>{sh_f} : {sa_f}</div>",
-                f"<div class='final-team'>{get_cdn_flag_img_html(m_104.get('away'))}<span class='bracket-team-name'>{m_104.get('away','TBD')}</span></div>",
-                f"</div><div class='final-venue'>📍 {m_104.get('venue','TBD')} | 📅 {m_104.get('date','TBD')}</div>",
-                "</div></div>"
-            ]
-            st.markdown("".join(html_final_lines), unsafe_allow_html=True)
-            st.markdown("<div style='text-align:center; margin-top:20px; font-weight:bold; color:#94A3B8; font-size: 0.8rem;'>🥉 Mecz o 3. miejsce</div>", unsafe_allow_html=True)
-            render_bracket_match_html_clean(103)
-        with c_2r:
-            render_bracket_match_html_clean(102, mt="248px")
-        with c_4r:
-            render_bracket_match_html_clean(99, mt="106px", mb="210px"); render_bracket_match_html_clean(100)
-        with c_8r:
-            render_bracket_match_html_clean(93, mt="34px", mb="68px"); render_bracket_match_html_clean(94, mb="68px"); render_bracket_match_html_clean(95, mb="68px"); render_bracket_match_html_clean(96)
-        with c_16r:
-            for i in range(81, 89): render_bracket_match_html_clean(i)
-        with c_g2:
-            for g in ["G","H","I","J","K","L"]: st.markdown(get_mini_group_html_string(g), unsafe_allow_html=True)
+            m_3rd = st.session_state.results.get(103)
+            if m_3rd:
+                st.markdown("<div class='bracket-match-title' style='width:100%; text-align:center;'>Mecz o 3. miejsce</div>", unsafe_allow_html=True)
+                render_bracket_match_html_clean(103, mt="5px", mb="40px")
+                
+            m_fin = st.session_state.results.get(104)
+            if m_fin:
+                f_sh = str(m_fin.get('score_h')) if m_fin.get('status') in ["Zakończony", "LIVE"] and m_fin.get('score_h') is not None else "?"
+                f_sa = str(m_fin.get('score_a')) if m_fin.get('status') in ["Zakończony", "LIVE"] and m_fin.get('score_a') is not None else "?"
+                
+                fin_html = [
+                    "<div class='center-final-card'>",
+                    "<div class='final-title'>🏆 WIELKI FINAŁ 🏆</div>",
+                    "<div class='final-teams'>",
+                    f"<div class='final-team'>{get_cdn_flag_img_html(m_fin['home'])} <span>{m_fin['home']}</span></div>",
+                    f"<div class='final-score'>{f_sh} : {f_sa}</div>",
+                    f"<div class='final-team'><span>{m_fin['away']}</span> {get_cdn_flag_img_html(m_fin['away'])}</div>",
+                    "</div>",
+                    f"<div class='final-venue'>📍 MetLife Stadium, Nowy Jork</div>",
+                    "</div>"
+                ]
+                st.markdown("".join(fin_html), unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
