@@ -187,16 +187,24 @@ def load_from_google_sheets():
         gc = get_gspread_client()
         sh = gc.open("Kricon_Typer_2026").sheet1
         all_records = sh.get_all_records()
+        
+        # Resetujemy tylko pamięć lokalną sesji przed wgraniem nowych danych z chmury
+        new_bets = {m_id: {} for m_id in range(1, 105)}
         for row in all_records:
-            m_id = int(row["Mecz"])
-            player = str(row["Gracz"])
-            h = int(row["Typ_H"])
-            a = int(row["Typ_A"])
-            if m_id not in st.session_state.bets:
-                st.session_state.bets[m_id] = {}
-            st.session_state.bets[m_id][player] = (h, a)
+            try:
+                m_id = int(row["Mecz"])
+                player = str(row["Gracz"]).strip()
+                # Bezpieczne parsowanie typów (obsługa pustych komórek jako 0)
+                h = int(row["Typ_H"]) if str(row["Typ_H"]).strip() != "" else 0
+                a = int(row["Typ_A"]) if str(row["Typ_A"]).strip() != "" else 0
+                if player in players or player == "admin":
+                    new_bets[m_id][player] = (h, a)
+            except (ValueError, KeyError):
+                continue
+        st.session_state.bets = new_bets
         return True
-    except Exception:
+    except Exception as e:
+        st.error(f"Błąd krytyczny odczytu z Sheets: {e}")
         return False
 
 def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
@@ -207,11 +215,17 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
         
         current_cloud_bets = {}
         for row in all_records:
-            m = int(row["Mecz"])
-            p = str(row["Gracz"])
-            if m not in current_cloud_bets: current_cloud_bets[m] = {}
-            current_cloud_bets[m][p] = (int(row["Typ_H"]), int(row["Typ_A"]))
-            
+            try:
+                m = int(row["Mecz"])
+                p = str(row["Gracz"]).strip()
+                h_b = int(row["Typ_H"]) if str(row["Typ_H"]).strip() != "" else 0
+                a_b = int(row["Typ_A"]) if str(row["Typ_A"]).strip() != "" else 0
+                if m not in current_cloud_bets: 
+                    current_cloud_bets[m] = {}
+                current_cloud_bets[m][p] = (h_b, a_b)
+            except (ValueError, KeyError):
+                continue
+                
         if action == "save":
             if m_id not in current_cloud_bets: current_cloud_bets[m_id] = {}
             current_cloud_bets[m_id][user] = (h_val, a_val)
@@ -220,8 +234,8 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
                 del current_cloud_bets[m_id][user]
                 
         rows = [["Mecz", "Gracz", "Typ_H", "Typ_A"]]
-        for m, p_bets in current_cloud_bets.items():
-            for p, tpl in p_bets.items():
+        for m in sorted(current_cloud_bets.keys()):
+            for p, tpl in current_cloud_bets[m].items():
                 rows.append([m, p, tpl[0], tpl[1]])
                 
         sh.clear()
@@ -234,7 +248,8 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
             if user in st.session_state.bets.get(m_id, {}):
                 del st.session_state.bets[m_id][user]
         return True
-    except Exception:
+    except Exception as e:
+        st.error(f"Błąd zapisu danych: {e}")
         return False
 
 # BŁYSKAWICZNE FUNKCJE CALLBACK DLA ZAPISU/USUWANIA
@@ -324,25 +339,19 @@ def generate_schedule():
     months_pl = {6: "Czerwca", 7: "Lipca"}
     match_id = 1
     
-    # 1. OFICJALNE GODZINY DLA FAZY GRUPOWEJ (POLSKI CZAS CEST: 18:00, 21:00, 00:00, 03:00)
-    # Mecze ułożone dzień po dniu, symulując pełne, profesjonalne okienka transmisyjne FIFA
     group_slots = [18, 21, 0, 3]
-    start_date_group = datetime(2026, 6, 11, 21, 0) # Pierwszy mecz: 11 czerwca, 21:00 CEST
+    start_date_group = datetime(2026, 6, 11, 21, 0)
     
-    # Wygenerowanie 72 meczów grupowych w powtarzalnych cyklach transmisyjnych dla Europy
     for matchday in range(3):
         for g_name, teams in GROUPS_DICT.items():
             pairs = [(teams[0], teams[1]), (teams[2], teams[3])] if matchday == 0 else [(teams[0], teams[2]), (teams[3], teams[1])] if matchday == 1 else [(teams[0], teams[3]), (teams[1], teams[2])]
             for t_home, t_away in pairs:
-                # Wyliczamy kolejny slot godzinowy
                 slot_idx = (match_id - 1) % 4
                 days_offset = (match_id - 1) // 4
                 
-                # Pierwszy dzień ma tylko mecz otwarcia o 21:00, kolejne dni idą pełnym cyklem czterech spotkań
                 if match_id == 1:
                     dt = start_date_group
                 else:
-                    # Przesuwamy bazę o 1 dzień w przód, aby pominąć puste sloty z 11 czerwca
                     adjusted_id = match_id
                     slot_idx_adj = adjusted_id % 4
                     days_offset_adj = adjusted_id // 4
@@ -361,8 +370,6 @@ def generate_schedule():
                 }
                 match_id += 1
 
-    # 2. OFICJALNE STREFY CZASOWE DLA FAZY PUCHAROWEJ (1/16 do Finału)
-    # Końcówka czerwca i lipiec to mecze głównie o 18:00, 21:00 i 22:00 czasu polskiego
     ko_stages = [
         ("1/16 Finału", 16, [(29,6), (30,6), (1,7), (2,7)]), 
         ("1/8 Finału", 8, [(4,7), (5,7), (6,7), (7,7)]), 
@@ -378,9 +385,8 @@ def generate_schedule():
         for i in range(count):
             d, m_num = stage_dates[date_idx % len(stage_dates)]
             
-            # Dobór realistycznych godzin pod polskiego kibica (brak meczów o 3 rano w decydującej fazie)
             if stage_name == "Finał":
-                hour = 21 # Wielki Finał o 21:00 czasu polskiego
+                hour = 21
             elif stage_name == "Mecz o 3. miejsce":
                 hour = 22
             elif stage_name == "Półfinały":
@@ -409,12 +415,18 @@ def fetch_official_results_from_api(now_time):
     pass
 
 # 5. INICJALIZACJA STANU APLIKACJI
-if 'results' not in st.session_state or len(st.session_state.results) != 104: st.session_state.results = generate_schedule()
-if 'bets' not in st.session_state or len(st.session_state.bets) != 104: st.session_state.bets = {m_id: {} for m_id in st.session_state.results.keys()}
+if 'results' not in st.session_state or len(st.session_state.results) != 104: 
+    st.session_state.results = generate_schedule()
+
+# POPRAWKA: Bezpieczne inicjowanie pustego słownika na typy, jeśli nie został pobrany z bazy
+if 'bets' not in st.session_state:
+    st.session_state.bets = {m_id: {} for m_id in range(1, 105)}
+
 if 'last_positions' not in st.session_state: st.session_state.last_positions = {player: idx + 1 for idx, player in enumerate(players)}
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 if 'toast_msg' not in st.session_state: st.session_state.toast_msg = ""
 
+# Ładowanie z bazy danych wywołujemy TYLKO raz, aby nie nadpisać pamięci podręcznej w sesji użytkownika
 if 'gs_initialized' not in st.session_state:
     load_from_google_sheets()
     st.session_state.gs_initialized = True
@@ -475,138 +487,38 @@ else:
             h_key = f"h_{m_id}"
             a_key = f"a_{m_id}"
             
-            html_top_lines = [
-                "<div class='meta-upper-bar-container'>",
-                f"<span class='meta-id-text-clean'>⚽ Mecz #{m_id}</span> {status_html} <span style='color:#94A3B8;'>📅 {m['date']}</span> ",
-                f"<span style='color:#38BDF8; font-weight:bold;'>📍 {m.get('venue').split(',')[0]}</span> <span style='color:#64748B;'>({m['stage']})</span>",
-                "</div><div class='match-row-anchor'></div>"
-            ]
-            st.markdown("".join(html_top_lines), unsafe_allow_html=True)
+            # Zapobiegamy nadpisywaniu wprowadzanych wartości przez widgety
+            if h_key not in st.session_state: st.session_state[h_key] = saved_h if has_bet else 0
+            if a_key not in st.session_state: st.session_state[a_key] = saved_a if has_bet else 0
             
-            c_home, c_inph, c_sep, c_inpa, c_away, c_score, c_save, c_del, c_status = st.columns([2.5, 1.8, 0.2, 1.8, 2.5, 1.5, 1.2, 0.6, 1.2])
-            with c_home: st.markdown(f"<div class='team-align-right'><span>{m['home']}</span> {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
-            with c_inph:
-                if locked:
-                    pts = calculate_points(saved_h, saved_a, m.get('score_h'), m.get('score_a')) if m.get('status') == "Zakończony" else 0
-                    class_res = "bet-exact" if pts==3 else "bet-winner" if pts==1 else "bet-wrong" if m.get('status') == "Zakończony" else "bet-locked"
-                    st.markdown(f"<div class='result-box {class_res}'>{saved_h if has_bet else '-'}</div>", unsafe_allow_html=True)
-                else: 
-                    st.number_input("H", min_value=0, max_value=20, value=int(saved_h) if has_bet else 0, key=h_key, label_visibility="collapsed")
-            with c_sep: st.markdown("<div class='score-colon'>:</div>", unsafe_allow_html=True)
-            with c_inpa:
-                if locked:
-                    pts = calculate_points(saved_h, saved_a, m.get('score_h'), m.get('score_a')) if m.get('status') == "Zakończony" else 0
-                    class_res = "bet-exact" if pts==3 else "bet-winner" if pts==1 else "bet-wrong" if m.get('status') == "Zakończony" else "bet-locked"
-                    st.markdown(f"<div class='result-box {class_res}'>{saved_a if has_bet else '-'}</div>", unsafe_allow_html=True)
-                else: 
-                    st.number_input("A", min_value=0, max_value=20, value=int(saved_a) if has_bet else 0, key=a_key, label_visibility="collapsed")
-            with c_away: st.markdown(f"<div class='team-align-left'>{get_cdn_flag_img_html(m['away'])} <span>{m['away']}</span></div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='meta-upper-bar-container'><span class='meta-id-text-clean'>⚽ Mecz #{m_id}</span> {status_html} <span style='color:#94A3B8;'>📅 {m['date']}</span> <span style='color:#38BDF8; font-weight:bold;'>📍 {m.get('venue').split(',')[0]}</span></div>", unsafe_allow_html=True)
             
-            with c_score:
-                sh_real = str(m.get('score_h')) if m.get('score_h') is not None else "-"
-                sa_real = str(m.get('score_a')) if m.get('score_a') is not None else "-"
-                st.markdown(f"<div class='off-score'>Wynik: {sh_real}:{sa_real}</div>", unsafe_allow_html=True)
-                
-            with c_save:
+            col_h_team, col_h_score, col_colon, col_a_score, col_a_team, col_action = st.columns([3, 1.5, 0.5, 1.5, 3, 2], gap="small")
+            
+            with col_h_team:
+                st.markdown(f"<div class='team-align-right'>{m['home']} {get_cdn_flag_img_html(m['home'])}</div>", unsafe_allow_html=True)
+            with col_h_score:
                 if locked:
-                    pts = calculate_points(saved_h, saved_a, m.get('score_h'), m.get('score_a')) if m.get('status') == "Zakończony" else 0
-                    txt = f"+{pts} pkt" if m.get('status') == "Zakończony" else "Zablokowane"
-                    st.markdown(f"<div class='success-bet-banner'>{txt}</div>", unsafe_allow_html=True)
+                    st.markdown(f"<div class='off-score'>{saved_h if has_bet else '-'}</div>", unsafe_allow_html=True)
                 else:
-                    st.button("Zapisz", key=f"btn_s_{m_id}", type="primary", on_click=handle_save, args=(m_id, st.session_state.logged_in_user, h_key, a_key))
-            with c_del:
-                if not locked:
-                    st.button("🗑️", key=f"btn_d_{m_id}", type="secondary", on_click=handle_delete, args=(m_id, st.session_state.logged_in_user, h_key, a_key))
-            with c_status:
-                st.button("Kto co?", key=f"btn_o_{m_id}", type="secondary", on_click=show_other_bets, args=(m_id, st.session_state.logged_in_user))
-
-    with tab3:
-        st.subheader("🕵️ Przegląd typów wszystkich graczy")
-        m_list = [f"Mecz #{i} ({m['home']} - {m['away']})" for i, m in sorted(st.session_state.results.items())]
-        selected_m_str = st.selectbox("Wybierz mecz do analizy:", m_list)
-        if selected_m_str:
-            sel_id = int(selected_m_str.split("#")[1].split(" ")[0])
-            res_m = st.session_state.results[sel_id]
-            st.write(f"**Faza:** {res_m['stage']} | **Miejsce:** {res_m['venue']}")
-            st.write(f"**Oficjalny wynik:** {res_m['score_h'] if res_m['score_h'] is not None else '-'} : {res_m['score_a'] if res_m['score_a'] is not None else '-'}")
-            
-            analysis_data = []
-            for p in players:
-                bet = st.session_state.bets.get(sel_id, {}).get(p)
-                p_text = f"{bet[0]} : {bet[1]}" if bet else "Brak typu"
-                pts = calculate_points(bet[0], bet[1], res_m.get('score_h'), res_m.get('score_a')) if bet and res_m.get('status') == "Zakończony" else 0
-                analysis_data.append({"Gracz": p, "Typ": p_text, "Zdobyte punkty": f"{pts} pkt" if res_m.get('status') == "Zakończony" else "-"})
-            st.dataframe(pd.DataFrame(analysis_data), use_container_width=True, hide_index=True)
-
-    with tab4:
-        st.subheader("📈 Tabele grupowe (Symulacja na podstawie wyników)")
-        g_cols = st.columns(3)
-        for idx, g_name in enumerate(sorted(GROUPS_DICT.keys())):
-            with g_cols[idx % 3]:
-                st.markdown(f"<h5>{g_name}</h5>", unsafe_allow_html=True)
-                t_teams = GROUPS_DICT[g_name]
-                t_stats = {t: {"M": 0, "Pkt": 0, "BZ": 0, "BS": 0} for t in t_teams}
+                    st.number_input("Gole Home", min_value=0, max_value=20, step=1, key=h_key, label_visibility="collapsed")
+            with col_colon:
+                st.markdown("<div class='score-colon'>:</div>", unsafe_allow_html=True)
+            with col_a_score:
+                if locked:
+                    st.markdown(f"<div class='off-score'>{saved_a if has_bet else '-'}</div>", unsafe_allow_html=True)
+                else:
+                    st.number_input("Gole Away", min_value=0, max_value=20, step=1, key=a_key, label_visibility="collapsed")
+            with col_a_team:
+                st.markdown(f"<div class='team-align-left'>{get_cdn_flag_img_html(m['away'])} {m['away']}</div>", unsafe_allow_html=True)
                 
-                for m_id, m in st.session_state.results.items():
-                    if m['stage'] == g_name and m['status'] == "Zakończony" and m['score_h'] is not None:
-                        th, ta = m['home'], m['away']
-                        sh, sa = int(m['score_h']), int(m['score_a'])
-                        t_stats[th]["M"] += 1; t_stats[ta]["M"] += 1
-                        t_stats[th]["BZ"] += sh; t_stats[th]["BS"] += sa
-                        t_stats[ta]["BZ"] += sa; t_stats[ta]["BS"] += sh
-                        if sh > sa: t_stats[th]["Pkt"] += 3
-                        elif sh < sa: t_stats[ta]["Pkt"] += 3
-                        else: t_stats[th]["Pkt"] += 1; t_stats[ta]["Pkt"] += 1
-                        
-                df_g = pd.DataFrame([{"Drużyna": t, "M": s["M"], "Bilans": f"{s['BZ']}:{s['BS']}", "Pkt": s["Pkt"]} for t, s in t_stats.items()]).sort_values(by="Pkt", ascending=False).reset_index(drop=True)
-                st.dataframe(df_g, use_container_width=True, hide_index=True)
-
-    with tab5:
-        st.subheader("🏆 Drabinka Turniejowa (Faza Pucharowa)")
-        st.write("Podgląd struktury pucharowej od 1/16 Finału do Wielkiego Finału")
-        
-        col_1_16, col_1_8, col_1_4, col_1_2, col_f = st.columns(5)
-        
-        with col_1_16:
-            st.markdown("<p style='font-weight:bold; color:#F97316;'>1/16 Finału</p>", unsafe_allow_html=True)
-            for m_id in range(73, 89): render_bracket_match_html_clean(m_id, mb="12px")
-                
-        with col_1_8:
-            st.markdown("<p style='font-weight:bold; color:#F97316;'>1/8 Finału</p>", unsafe_allow_html=True)
-            for m_id in range(89, 97): render_bracket_match_html_clean(m_id, mt="25px", mb="45px")
-                
-        with col_1_4:
-            st.markdown("<p style='font-weight:bold; color:#F97316;'>Ćwierćfinały</p>", unsafe_allow_html=True)
-            for m_id in range(97, 101): render_bracket_match_html_clean(m_id, mt="90px", mb="150px")
-                
-        with col_1_2:
-            st.markdown("<p style='font-weight:bold; color:#F97316;'>Półfinały</p>", unsafe_allow_html=True)
-            for m_id in range(101, 103): render_bracket_match_html_clean(m_id, mt="240px", mb="380px")
-                
-        with col_f:
-            st.markdown("<p style='font-weight:bold; color:#F97316; text-align:center;'>Finały</p>", unsafe_allow_html=True)
-            st.markdown("<div class='center-final-card-wrapper'>", unsafe_allow_html=True)
-            
-            m_3rd = st.session_state.results.get(103)
-            if m_3rd:
-                st.markdown("<div class='bracket-match-title' style='width:100%; text-align:center;'>Mecz o 3. miejsce</div>", unsafe_allow_html=True)
-                render_bracket_match_html_clean(103, mt="5px", mb="40px")
-                
-            m_fin = st.session_state.results.get(104)
-            if m_fin:
-                f_sh = str(m_fin.get('score_h')) if m_fin.get('status') in ["Zakończony", "LIVE"] and m_fin.get('score_h') is not None else "?"
-                f_sa = str(m_fin.get('score_a')) if m_fin.get('status') in ["Zakończony", "LIVE"] and m_fin.get('score_a') is not None else "?"
-                
-                fin_html = [
-                    "<div class='center-final-card'>",
-                    "<div class='final-title'>🏆 WIELKI FINAŁ 🏆</div>",
-                    "<div class='final-teams'>",
-                    f"<div class='final-team'>{get_cdn_flag_img_html(m_fin['home'])} <span>{m_fin['home']}</span></div>",
-                    f"<div class='final-score'>{f_sh} : {f_sa}</div>",
-                    f"<div class='final-team'><span>{m_fin['away']}</span> {get_cdn_flag_img_html(m_fin['away'])}</div>",
-                    "</div>",
-                    f"<div class='final-venue'>📍 MetLife Stadium, Nowy Jork</div>",
-                    "</div>"
-                ]
-                st.markdown("".join(fin_html), unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+            with col_action:
+                st.markdown("<div class='match-row-anchor' style='display:none;'></div>", unsafe_allow_html=True)
+                if locked:
+                    st.button("👁️ Zobacz typy", key=f"view_{m_id}", type="secondary", on_click=show_other_bets, args=(m_id, st.session_state.logged_in_user))
+                else:
+                    cb1, cb2 = st.columns(2)
+                    with cb1:
+                        st.button("💾 Zapisz", key=f"save_btn_{m_id}", type="primary", on_click=handle_save, args=(m_id, st.session_state.logged_in_user, h_key, a_key))
+                    with cb2:
+                        st.button("🗑️ Usuń", key=f"del_btn_{m_id}", type="secondary", on_click=handle_delete, args=(m_id, st.session_state.logged_in_user, h_key, a_key))
