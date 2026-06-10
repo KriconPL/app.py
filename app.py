@@ -188,13 +188,11 @@ def load_from_google_sheets():
         sh = gc.open("Kricon_Typer_2026").sheet1
         all_records = sh.get_all_records()
         
-        # Resetujemy tylko pamięć lokalną sesji przed wgraniem nowych danych z chmury
         new_bets = {m_id: {} for m_id in range(1, 105)}
         for row in all_records:
             try:
                 m_id = int(row["Mecz"])
                 player = str(row["Gracz"]).strip()
-                # Bezpieczne parsowanie typów (obsługa pustych komórek jako 0)
                 h = int(row["Typ_H"]) if str(row["Typ_H"]).strip() != "" else 0
                 a = int(row["Typ_A"]) if str(row["Typ_A"]).strip() != "" else 0
                 if player in players or player == "admin":
@@ -204,7 +202,6 @@ def load_from_google_sheets():
         st.session_state.bets = new_bets
         return True
     except Exception as e:
-        st.error(f"Błąd krytyczny odczytu z Sheets: {e}")
         return False
 
 def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
@@ -249,7 +246,6 @@ def save_to_google_sheets(m_id, user, h_val, a_val, action="save"):
                 del st.session_state.bets[m_id][user]
         return True
     except Exception as e:
-        st.error(f"Błąd zapisu danych: {e}")
         return False
 
 # BŁYSKAWICZNE FUNKCJE CALLBACK DLA ZAPISU/USUWANIA
@@ -404,7 +400,7 @@ def generate_schedule():
                 "score_h": None, 
                 "score_a": None, 
                 "status": "Oczekuje", 
-                "venue": "MetLife, NY" if stage_name == "Finał" else VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]
+                "venue": "MetLife Stadium, Nowy Jork" if stage_name == "Finał" else VENUES_LIST[(match_id - 1) % len(VENUES_LIST)]
             }
             match_id += 1
             if (i + 1) % matches_per_date == 0: date_idx += 1
@@ -418,7 +414,6 @@ def fetch_official_results_from_api(now_time):
 if 'results' not in st.session_state or len(st.session_state.results) != 104: 
     st.session_state.results = generate_schedule()
 
-# POPRAWKA: Bezpieczne inicjowanie pustego słownika na typy, jeśli nie został pobrany z bazy
 if 'bets' not in st.session_state:
     st.session_state.bets = {m_id: {} for m_id in range(1, 105)}
 
@@ -426,7 +421,6 @@ if 'last_positions' not in st.session_state: st.session_state.last_positions = {
 if 'logged_in_user' not in st.session_state: st.session_state.logged_in_user = None
 if 'toast_msg' not in st.session_state: st.session_state.toast_msg = ""
 
-# Ładowanie z bazy danych wywołujemy TYLKO raz, aby nie nadpisać pamięci podręcznej w sesji użytkownika
 if 'gs_initialized' not in st.session_state:
     load_from_google_sheets()
     st.session_state.gs_initialized = True
@@ -487,7 +481,6 @@ else:
             h_key = f"h_{m_id}"
             a_key = f"a_{m_id}"
             
-            # Zapobiegamy nadpisywaniu wprowadzanych wartości przez widgety
             if h_key not in st.session_state: st.session_state[h_key] = saved_h if has_bet else 0
             if a_key not in st.session_state: st.session_state[a_key] = saved_a if has_bet else 0
             
@@ -522,3 +515,108 @@ else:
                         st.button("💾 Zapisz", key=f"save_btn_{m_id}", type="primary", on_click=handle_save, args=(m_id, st.session_state.logged_in_user, h_key, a_key))
                     with cb2:
                         st.button("🗑️ Usuń", key=f"del_btn_{m_id}", type="secondary", on_click=handle_delete, args=(m_id, st.session_state.logged_in_user, h_key, a_key))
+
+    with tab3:
+        st.subheader("🕵️ Przegląd typów wszystkich graczy")
+        selected_match = st.selectbox("Wybierz mecz do podglądu:", [f"Mecz #{i} - {st.session_state.results[i]['home']} vs {st.session_state.results[i]['away']}" for i in range(1, 105)])
+        m_id_sel = int(selected_match.split("#")[1].split(" ")[0])
+        
+        match_info = st.session_state.results[m_id_sel]
+        is_locked_sel = (match_info['timestamp'] - now).total_seconds() <= 0
+        
+        if not is_locked_sel and st.session_state.logged_in_user != "admin":
+            st.warning("🔒 Typy innych graczy zostaną odblokowane automatycznie po rozpoczęciu tego meczu!")
+        else:
+            show_data = []
+            for p in players:
+                bet = st.session_state.bets.get(m_id_sel, {}).get(p)
+                show_data.append({
+                    "Gracz": p,
+                    "Typ": f"{bet[0]} : {bet[1]}" if bet else "Brak typu"
+                })
+            st.table(pd.DataFrame(show_data))
+
+    with tab4:
+        st.subheader("📈 Tabele Grupowe")
+        st.info("Tabele generują się automatycznie na podstawie oficjalnych wyników wprowadzonych przez administratora.")
+
+    with tab5:
+        st.subheader("🏆 Drabinka Turniejowa MŚ 2026")
+        
+        c1, c2, c3, c4, c5, c6, c7, c8, c9 = st.columns([1.2, 0.4, 1.2, 1.2, 1.6, 1.2, 1.2, 0.4, 1.2], gap="small")
+        
+        with c1:
+            st.markdown("<p style='text-align:center; font-weight:bold; color:#F97316;'>1/16 Finału (Lewa)</p>", unsafe_allow_html=True)
+            render_bracket_match_html_clean(73)
+            render_bracket_match_html_clean(74)
+            render_bracket_match_html_clean(75)
+            render_bracket_match_html_clean(76)
+            render_bracket_match_html_clean(77)
+            render_bracket_match_html_clean(78)
+            render_bracket_match_html_clean(79)
+            render_bracket_match_html_clean(80)
+            
+        with c3:
+            st.markdown("<p style='text-align:center; font-weight:bold; color:#F97316;'>1/8 Finału</p>", unsafe_allow_html=True)
+            render_bracket_match_html_clean(89, mt="35px", mb="65px")
+            render_bracket_match_html_clean(90, mt="35px", mb="65px")
+            render_bracket_match_html_clean(91, mt="35px", mb="65px")
+            render_bracket_match_html_clean(92, mt="35px")
+            
+        with c4:
+            st.markdown("<p style='text-align:center; font-weight:bold; color:#F97316;'>Ćwierćfinały</p>", unsafe_allow_html=True)
+            render_bracket_match_html_clean(97, mt="110px", mb="210px")
+            render_bracket_match_html_clean(98, mt="110px")
+            
+        with c5:
+            st.markdown("<p style='text-align:center; font-weight:bold; color:#F97316;'>Półfinały & Finał</p>", unsafe_allow_html=True)
+            render_bracket_match_html_clean(101, mt="220px")
+            
+            # Centralna karta wielkiego finału
+            m_fin = st.session_state.results.get(104)
+            status_f = m_fin.get("status")
+            sh_f, sa_f = (str(m_fin.get("score_h")), str(m_fin.get("score_a"))) if status_f in ["Zakończony", "LIVE"] and m_fin.get("score_h") is not None else ("?", "?")
+            
+            st.markdown(
+                f"<div class='center-final-card-wrapper'>"
+                f"<div class='center-final-card'>"
+                f"<div class='final-title'>🏆 WIELKI FINAŁ 🏆</div>"
+                f"<div class='final-teams'>"
+                f"<div class='final-team'>{get_cdn_flag_img_html(m_fin['home'])} <span>{m_fin['home']}</span></div>"
+                f"<div class='final-score'>{sh_f} : {sa_f}</div>"
+                f"<div class='final-team'><span>{m_fin['away']}</span> {get_cdn_flag_img_html(m_fin['away'])}</div>"
+                f"</div>"
+                f"<div class='final-venue'>📍 {m_fin['venue']}</div>"
+                f"</div></div>", 
+                unsafe_allow_html=True
+            )
+            
+            # Mecz o 3. miejsce pod spodem finału
+            st.markdown("<div style='margin-top:50px;'></div>", unsafe_allow_html=True)
+            render_bracket_match_html_clean(103, mt="40px")
+            st.markdown("<p style='text-align:center; color:#94A3B8; font-size:0.75rem; font-weight:bold;'>Mecz o 3. miejsce</p>", unsafe_allow_html=True)
+            
+            render_bracket_match_html_clean(102, mt="50px")
+            
+        with c6:
+            st.markdown("<p style='text-align:center; font-weight:bold; color:#F97316;'>Ćwierćfinały</p>", unsafe_allow_html=True)
+            render_bracket_match_html_clean(99, mt="110px", mb="210px")
+            render_bracket_match_html_clean(100, mt="110px")
+            
+        with c7:
+            st.markdown("<p style='text-align:center; font-weight:bold; color:#F97316;'>1/8 Finału</p>", unsafe_allow_html=True)
+            render_bracket_match_html_clean(93, mt="35px", mb="65px")
+            render_bracket_match_html_clean(94, mt="35px", mb="65px")
+            render_bracket_match_html_clean(95, mt="35px", mb="65px")
+            render_bracket_match_html_clean(96, mt="35px")
+            
+        with c9:
+            st.markdown("<p style='text-align:center; font-weight:bold; color:#F97316;'>1/16 Finału (Prawa)</p>", unsafe_allow_html=True)
+            render_bracket_match_html_clean(81)
+            render_bracket_match_html_clean(82)
+            render_bracket_match_html_clean(83)
+            render_bracket_match_html_clean(84)
+            render_bracket_match_html_clean(85)
+            render_bracket_match_html_clean(86)
+            render_bracket_match_html_clean(87)
+            render_bracket_match_html_clean(88)
